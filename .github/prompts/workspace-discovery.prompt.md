@@ -5,9 +5,48 @@ description: Scan and document multi-root workspace with machine-readable YAML f
 
 # Workspace Discovery & Documentation
 
+## Trigger / Kích hoạt
+
+- User says: `setup workspace`, `discover workspace`, `scan workspace`
+- First time setting up copilot-flow in a workspace
+- Adding a new root to existing workspace
+
 ## Objective
 
 Generate a **machine-optimized** `WORKSPACE_CONTEXT.md` file that AI agents can efficiently parse and reference. Output is YAML-only, no prose, no Mermaid diagrams, no markdown tables.
+
+---
+
+## Full Setup Mode (`setup workspace`)
+
+When user says `setup workspace`, run ALL setup steps in sequence:
+
+```yaml
+setup_sequence:
+  1. workspace-discovery (this prompt):
+     - Scan all roots
+     - Generate WORKSPACE_CONTEXT.md
+     
+  2. cross-root-guide:
+     - Auto-detect cross-root patterns
+     - Save to Section 9
+     
+  3. sync-instructions:
+     - Sync shared instructions
+     - Detect tech stacks
+     - Suggest missing instructions
+
+output_after_all:
+  "## ✅ Workspace Setup Complete!
+  
+  | Step | Status |
+  |------|--------|
+  | 1. Discovery | ✅ WORKSPACE_CONTEXT.md created |
+  | 2. Cross-root | ✅ Patterns saved to Section 9 |
+  | 3. Sync Instructions | ✅ Synced + tech stacks analyzed |
+  
+  Ready to start working. Say `init` to begin."
+```
 
 ---
 
@@ -297,6 +336,37 @@ Correct? Reply 'yes' or provide corrections.
 
 Create `WORKSPACE_CONTEXT.md` with YAML schema above.
 
+### Phase 8: Post-Setup Actions
+
+After generating WORKSPACE_CONTEXT.md, prompt user for next steps:
+
+```
+## ✅ Workspace Context Created!
+
+### 📋 Recommended Next Steps:
+
+1. **Configure cross-root patterns** (if multi-root):
+   Say: `cross-root`
+   → Auto-detect library/consumer, shared packages, API integrations
+   → Saves config to WORKSPACE_CONTEXT.md Section 9
+
+2. **Sync shared instructions** (recommended):
+   Say: `sync instructions`
+   → Copies coding standards from copilot-flow to all roots
+   → Auto-detects tech stacks and suggests missing instructions
+   → Creates Python, Go, Java instructions if needed
+
+3. **Start working**:
+   Say: `init` to begin a session
+
+Which step would you like to do? (1, 2, 3, or 'all')
+```
+
+If user says 'all':
+1. Run cross-root-guide.prompt.md
+2. Run sync-instructions.prompt.md
+3. Show init summary
+
 ---
 
 ## Constraints
@@ -335,3 +405,15 @@ Re-run when:
 - `copilot-instructions.md` modified
 - Quarterly review
 - Hash mismatch in staleness section
+
+---
+
+## Related Prompts
+
+| Prompt | Purpose |
+|--------|---------|
+| [cross-root-guide.prompt.md](cross-root-guide.prompt.md) | Configure cross-root relationships |
+| [sync-instructions.prompt.md](sync-instructions.prompt.md) | Sync shared instructions + detect tech stacks |
+| [init-context.prompt.md](init-context.prompt.md) | Start working session |
+
+````

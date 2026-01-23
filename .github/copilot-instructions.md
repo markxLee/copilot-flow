@@ -101,7 +101,10 @@ Copilot thinks:
 | `help` / `?` | Show quick reference card |
 | `lite: <desc>` | Start lite mode for simple tasks |
 | `rollback` | Undo implementation changes |
-| `cross-root` | Configure & save cross-root relationships |
+| `cross-root` | Auto-config & save cross-root relationships |
+| `sync instructions` | Sync shared instructions + detect tech stacks |
+| `suggest instructions` | Analyze tech stacks & suggest missing instructions |
+| `setup workspace` | Run full setup (discovery → cross-root → sync) |
 
 ---
 
@@ -276,7 +279,8 @@ affected_roots (other repos):
 | `.github/prompts/workflow-resume.prompt.md` | Resume from saved state |
 | `.github/prompts/memory-context-hygiene.prompt.md` | Reset context when confused |
 | `.github/prompts/workspace-update-root.prompt.md` | Update workspace context |
-| `.github/prompts/cross-root-guide.prompt.md` | **Configure & SAVE cross-root relationships** |
+| `.github/prompts/cross-root-guide.prompt.md` | **Auto-config & SAVE cross-root relationships** |
+| `.github/prompts/sync-instructions.prompt.md` | **Sync shared instructions to all roots** |
 | `.github/prompts/quick-ref.prompt.md` | Quick reference card / cheat sheet |
 | `.github/prompts/rollback.prompt.md` | Undo implementation changes |
 | `.github/prompts/lite-mode.prompt.md` | Streamlined workflow for simple tasks |

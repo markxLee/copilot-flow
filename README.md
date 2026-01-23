@@ -20,6 +20,7 @@ Repository này chứa hệ thống workflow hoàn chỉnh để GitHub Copilot 
 - ✅ **Iteration Support** — Handle requirement changes with versioned docs
 - ✅ **Bilingual Docs** — English & Vietnamese inline format
 - ✅ **PR Automation** — Generate PR descriptions and reviewer notifications
+- ✅ **Shared Instructions** — Sync coding standards across all roots
 
 ---
 
@@ -29,6 +30,11 @@ Repository này chứa hệ thống workflow hoàn chỉnh để GitHub Copilot 
 copilot-flow/
 ├── .github/
 │   ├── copilot-instructions.md      # Entry point (auto-read by Copilot)
+│   ├── instructions/
+│   │   └── shared/                  # Shared instructions (sync to other roots)
+│   │       ├── coding-practices.instructions.md
+│   │       ├── typescript.instructions.md
+│   │       └── testing.instructions.md
 │   └── prompts/                     # All workflow prompts
 │       ├── init-context.prompt.md
 │       ├── work-intake.prompt.md
@@ -52,7 +58,8 @@ copilot-flow/
 │       ├── memory-context-hygiene.prompt.md
 │       ├── workspace-discovery.prompt.md
 │       ├── workspace-update-root.prompt.md
-│       ├── cross-root-guide.prompt.md   # Config & save cross-root relationships
+│       ├── cross-root-guide.prompt.md   # Auto-config cross-root relationships
+│       ├── sync-instructions.prompt.md  # Sync shared instructions to all roots
 │       ├── quick-ref.prompt.md          # Quick reference / cheat sheet
 │       ├── rollback.prompt.md           # Undo implementation changes
 │       └── lite-mode.prompt.md          # Streamlined workflow for simple tasks
@@ -122,14 +129,77 @@ Copilot will:
 
 ---
 
+## � Shared Instructions / Instructions Dùng Chung
+
+Maintain consistent coding standards across all workspace roots.
+
+### Structure / Cấu trúc
+
+```
+copilot-flow/.github/instructions/shared/    # Master copies (edit here)
+├── coding-practices.instructions.md         # Error handling, code style
+├── typescript.instructions.md               # TypeScript standards
+└── testing.instructions.md                  # Test conventions
+
+<other-roots>/.github/instructions/          # Synced copies (auto-generated)
+├── coding-practices.instructions.md         # ← Synced
+├── typescript.instructions.md               # ← Synced
+└── <root-specific>.instructions.md          # ← Root-specific (not synced)
+```
+
+### Sync Instructions / Đồng bộ Instructions
+
+```bash
+# Sync shared instructions to all roots + analyze tech stacks
+sync instructions
+
+# Sync to specific root only
+sync instructions to apphub-vision
+
+# Sync except specific root
+sync instructions except reviews-assets
+
+# Sync without tech stack analysis
+sync instructions --skip-analysis
+
+# Only analyze tech stacks, don't sync
+suggest instructions
+
+# Analyze specific root
+suggest instructions for python-service
+```
+
+**Auto Tech Stack Detection**: When syncing, Copilot automatically:
+1. Detects each root's tech stack (Python, Go, Java, etc.)
+2. Compares with existing shared instructions
+3. Suggests creating missing instructions from templates
+
+### Adding New Shared Instructions / Thêm Instructions Mới
+
+1. Create file in `copilot-flow/.github/instructions/shared/`
+2. Run `sync instructions`
+3. File will be copied to all workspace roots
+
+### Root-Specific Instructions / Instructions Riêng
+
+Each root can have additional instructions that are NOT synced:
+- `apphub-vision`: prisma.instructions.md, ai-api.instructions.md
+- `reviews-assets`: storybook.instructions.md
+- `boost-pfs-backend`: api-design.instructions.md
+
+---
+
 ## 📊 Workflow Diagram / Sơ đồ Workflow
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     WORKSPACE SETUP (one-time)                      │
 ├─────────────────────────────────────────────────────────────────────┤
-│  workspace-discovery  →  WORKSPACE_CONTEXT.md  →  workspace-update  │
-│  (detect roots, relationships, impl_root)                           │
+│  Step 1: workspace-discovery  →  Creates WORKSPACE_CONTEXT.md       │
+│  Step 2: cross-root           →  Configure cross-root patterns      │
+│  Step 3: sync instructions    →  Sync standards + detect tech stack │
+│                                                                     │
+│  Quick setup: say "setup workspace" → runs all 3 steps              │
 └─────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
