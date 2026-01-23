@@ -63,7 +63,33 @@ verification:
   4. Update WORKSPACE_CONTEXT.md with answer
 ```
 
-### Step 3: Check for Existing Workflow / Kiểm tra Workflow đang có
+### Step 3: Load Cross-Root Workflows / Đọc Cấu hình Đa Root
+
+```yaml
+cross_root_detection:
+  1. Read WORKSPACE_CONTEXT.md section:
+     section: cross_root_workflows
+     
+  2. If section EXISTS:
+     - Load library_consumer patterns
+     - Load shared_packages patterns
+     - Load api_integration patterns
+     - Load multi_root_build_order
+     - Load pr_strategies
+     - Display in context summary (Step 6)
+     
+  3. If section NOT EXISTS:
+     - Skip cross-root display
+     - Suggest running `cross-root-guide` if multi-root task detected
+     
+  4. Store in session context:
+     cross_root_config:
+       patterns: <loaded patterns>
+       build_order: <loaded build order>
+       pr_strategies: <loaded strategies>
+```
+
+### Step 4: Check for Existing Workflow / Kiểm tra Workflow đang có
 
 ```yaml
 workflow_detection:
@@ -77,14 +103,14 @@ workflow_detection:
      
   3. If state file EXISTS:
      action: Load and show resume prompt
-     goto: Step 4A (Resume Mode)
+     goto: Step 5A (Resume Mode)
      
   4. If state file NOT EXISTS:
      action: Ask what user wants to do
-     goto: Step 4B (New Session Mode)
+     goto: Step 5B (New Session Mode)
 ```
 
-### Step 4A: Resume Mode / Chế độ Tiếp tục
+### Step 5A: Resume Mode / Chế độ Tiếp tục
 
 ```yaml
 resume_actions:
@@ -118,7 +144,7 @@ resume_actions:
   3. Wait for user choice
 ```
 
-### Step 4B: New Session Mode / Chế độ Phiên mới
+### Step 5B: New Session Mode / Chế độ Phiên mới
 
 ```yaml
 new_session_actions:
@@ -151,7 +177,7 @@ new_session_actions:
   2. Wait for user input
 ```
 
-### Step 5: Initialize Workflow (if requested) / Khởi tạo Workflow
+### Step 6: Initialize Workflow (if requested) / Khởi tạo Workflow
 
 ```yaml
 init_workflow:
@@ -201,7 +227,7 @@ init_workflow:
     8. If READY, proceed to Phase 0 Analysis (solution design)
 ```
 
-### Step 6: Work Description Flow / Luồng Mô tả Công việc
+### Step 7: Work Description Flow / Luồng Mô tả Công việc
 
 ```yaml
 work_flow:
@@ -264,13 +290,27 @@ After initialization, always show:
 | <root1> | <type> | <impl_root / code / ui / ...> |
 | <root2> | <type> | <role> |
 
-### Key Relationships / Quan hệ Chính
-- <root1> → <root2>: <relationship-type>
+### Cross-Root Relationships / Quan hệ Đa Root
+(If cross_root_workflows exists in WORKSPACE_CONTEXT.md)
+
+| Pattern | Source | Target | Type |
+|---------|--------|--------|------|
+| Library→Consumer | reviews-assets | apphub-vision | @apphubdev/clearer-ui |
+| Shared Packages | apphub-vision | internal | @clearer/* |
+| API Integration | boost-pfs-backend | apphub-vision | API calls |
+
+**Build Order:** reviews-assets → apphub-vision
 
 ---
 
 **Ready. What would you like to do?**
 **Sẵn sàng. Bạn muốn làm gì?**
+```
+
+If cross_root_workflows NOT configured, instead show:
+```markdown
+### Cross-Root Relationships / Quan hệ Đa Root
+⚠️ Not configured. Run `cross-root-guide` to set up cross-root patterns.
 ```
 
 ---

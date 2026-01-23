@@ -318,6 +318,92 @@ staleness:
     watch: [.github/**]
 
 # ================================================================
-# END - Total sections: 8
+# SECTION 9: CROSS-ROOT WORKFLOWS
+# ================================================================
+
+cross_root_workflows:
+  # Pattern: Library provides package, Consumer imports it
+  library_consumer:
+    - library:
+        root: reviews-assets
+        package: "@apphubdev/clearer-ui"
+        build_cmd: "cd reviews-assets && npm run build"
+        source_path: "public/documentation/ui-library/"
+      consumers:
+        - root: apphub-vision
+          apps: ["dashboard", "billing"]
+          import_pattern: "import { X } from '@apphubdev/clearer-ui'"
+      workflow:
+        1_change_library: "Edit component in reviews-assets"
+        2_build_library: "npm run build in reviews-assets"
+        3_update_consumer: "Update imports in apphub-vision if API changed"
+        4_test_integration: "pnpm dev in apphub-vision to verify"
+
+  # Pattern: Shared packages within monorepo
+  shared_packages:
+    - provider:
+        root: apphub-vision
+        packages: ["@clearer/utils", "@clearer/core", "@clearer/types"]
+      consumers:
+        - root: apphub-vision
+          apps: ["ai-api", "dashboard", "lambda"]
+      workflow:
+        1_update_package: "Edit in packages/"
+        2_build_deps: "pnpm <pkg>:build from root"
+        3_check_types: "pnpm build to verify types"
+
+  # Pattern: API provider and consumer
+  api_integration:
+    - provider:
+        root: boost-pfs-backend
+        type: "REST API"
+        services:
+          sip-v3: "${DISCOVERY_SIP_V3_BASE_URL}"      # /sip-api/*
+          admin-v2: "${DISCOVERY_ADMIN_V2_BASE_URL}"  # /bc-sf-filter-admin-v2/*
+          admin-v3: "${DISCOVERY_ADMIN_V3_BASE_URL}"  # /sip-api/admin/*
+          filter: "${DISCOVERY_FILTER_URL}"
+          widget-integration: "${DISCOVERY_WIDGET_INTEGRATION_BASE_URL}"
+        auth_method: "JWT via clearer-auth-token header"
+      consumer:
+        root: apphub-vision
+        apps: ["dashboard"]
+        config_file: "apps/dashboard/helper/boost/api/api.config.json"
+        client_file: "apps/dashboard/helper/boost/api/base-api.ts"
+      workflow:
+        1_update_api: "Modify endpoint in boost-pfs-backend (keep backward compat)"
+        2_deploy_backend: "Deploy backend first"
+        3_update_config: "Update api.config.json if new endpoint"
+        4_update_frontend: "Update API client in apphub-vision"
+        5_deploy_frontend: "Deploy frontend after backend is live"
+
+  # Build order when spanning roots
+  multi_root_build_order:
+    sequence:
+      - root: reviews-assets
+        cmd: "npm run build"
+        reason: "Library must be built first"
+      - root: apphub-vision
+        cmd: "pnpm build"
+        reason: "Consumer builds after library"
+
+  # PR strategy for cross-root changes
+  pr_strategies:
+    independent:
+      description: "Changes can be merged separately"
+      use_when: "No breaking changes, can deploy independently"
+      example: "reviews-assets PR → merge → apphub-vision PR → merge"
+
+    coordinated:
+      description: "Changes must be merged in order"
+      use_when: "Breaking changes, sync deploy required"
+      example: "PR #1 reviews-assets → merge → PR #2 apphub-vision (links to #1)"
+
+    docs_separate:
+      description: "Workflow docs in impl_root, code in other roots"
+      use_when: "Standard workflow with docs"
+      example: "PR copilot-flow (docs) + PR apphub-vision (code)"
+
+# ================================================================
+# END - Total sections: 9
 # ================================================================
 ```

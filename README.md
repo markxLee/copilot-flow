@@ -52,6 +52,7 @@ copilot-flow/
 │       ├── memory-context-hygiene.prompt.md
 │       ├── workspace-discovery.prompt.md
 │       ├── workspace-update-root.prompt.md
+│       ├── cross-root-guide.prompt.md   # Config & save cross-root relationships
 │       ├── quick-ref.prompt.md          # Quick reference / cheat sheet
 │       ├── rollback.prompt.md           # Undo implementation changes
 │       └── lite-mode.prompt.md          # Streamlined workflow for simple tasks
