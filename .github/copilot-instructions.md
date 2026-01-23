@@ -98,6 +98,9 @@ Copilot thinks:
 | `status` / `trạng thái` | Show workflow status |
 | `go` / `tiếp` | Execute next action |
 | `approved` / `duyệt` | Approve current phase |
+| `help` / `?` | Show quick reference card |
+| `lite: <desc>` | Start lite mode for simple tasks |
+| `rollback` | Undo implementation changes |
 
 ---
 
@@ -132,8 +135,14 @@ check_sequence:
 - Any request with unclear requirements
 - Work affecting multiple workspace roots
 
-**SKIP workflow for:**
+**USE lite mode for:**
 - Simple one-file edits
+- Bug fixes with clear cause
+- Small features (< 3 files)
+- Configuration changes
+- Say: `lite: <description>`
+
+**SKIP workflow for:**
 - Quick questions/explanations
 - Code review comments
 - Documentation typo fixes

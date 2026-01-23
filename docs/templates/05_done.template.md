@@ -70,9 +70,37 @@
 
 ---
 
-## 2. Pre-Merge Verification / Xác nhận Trước Merge
+## 2. Commit Message / Commit Message
 
-### 2.1 Branch Status / Trạng thái Nhánh
+### Generated / Được tạo tự động
+
+```bash
+<type>(<scope>): <short description>
+```
+
+**Example / Ví dụ:**
+```bash
+feat(analytics): add event tracking to dashboard
+fix(auth): resolve token refresh issue
+refactor(api): simplify error handling
+```
+
+### Type Reference / Tham khảo Loại
+
+| Type | Use When / Dùng khi |
+|------|---------------------|
+| `feat` | New feature / Tính năng mới |
+| `fix` | Bug fix / Sửa lỗi |
+| `refactor` | Refactoring / Tái cấu trúc |
+| `docs` | Documentation / Tài liệu |
+| `test` | Tests / Test |
+| `chore` | Maintenance / Bảo trì |
+
+---
+
+## 3. Pre-Merge Verification / Xác nhận Trước Merge
+
+### 3.1 Branch Status / Trạng thái Nhánh
 
 | Check | Status | Command / Lệnh |
 |-------|--------|----------------|
@@ -80,7 +108,7 @@
 | No merge conflicts / Không conflict | ⬜/✅ | |
 | Clean commit history / Lịch sử commit sạch | ⬜/✅ | `git log --oneline` |
 
-### 2.2 Files Changed Summary / Tóm tắt File Thay đổi
+### 3.2 Files Changed Summary / Tóm tắt File Thay đổi
 
 | Root | Files Added | Files Modified | Files Deleted |
 |------|-------------|----------------|---------------|
@@ -88,7 +116,7 @@
 | `<root2>` | `<N>` | `<M>` | `<K>` |
 | **Total** | `<X>` | `<Y>` | `<Z>` |
 
-### 2.3 Critical Files Review / Review File Quan trọng
+### 3.3 Critical Files Review / Review File Quan trọng
 
 | File | Change Type | Reviewed By | Status |
 |------|-------------|-------------|--------|
@@ -96,7 +124,7 @@
 
 ---
 
-## 3. Release Notes / Ghi chú Phát hành
+## 4. Release Notes / Ghi chú Phát hành
 
 ### Feature Summary / Tóm tắt Tính năng
 **EN:** Brief description of what this feature does and why it was built.
@@ -132,7 +160,7 @@
 
 ---
 
-## 4. Rollback Plan / Kế hoạch Rollback
+## 5. Rollback Plan / Kế hoạch Rollback
 
 ### Rollback Trigger / Điều kiện Rollback
 > Define conditions that would trigger a rollback
@@ -157,7 +185,7 @@
 
 ---
 
-## 5. Post-Merge Tasks / Việc cần làm Sau Merge
+## 6. Post-Merge Tasks / Việc cần làm Sau Merge
 
 | Task | Owner / Chịu trách nhiệm | Due / Hạn | Status |
 |------|--------------------------|-----------|--------|
@@ -169,7 +197,7 @@
 
 ---
 
-## 6. Final Approval / Phê duyệt Cuối cùng
+## 7. Final Approval / Phê duyệt Cuối cùng
 
 ### Sign-off / Ký duyệt
 
@@ -190,7 +218,7 @@
 
 ---
 
-## 7. Completion / Hoàn thành
+## 8. Completion / Hoàn thành
 
 ### Merge Details / Chi tiết Merge
 
@@ -212,7 +240,7 @@
 
 ---
 
-## 8. Retrospective Notes / Ghi chú Hồi cứu
+## 9. Retrospective Notes / Ghi chú Hồi cứu
 
 ### What Went Well / Điều làm Tốt
 - EN: ...

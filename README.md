@@ -49,8 +49,12 @@ copilot-flow/
 │       ├── pr-description.prompt.md
 │       ├── pr-notify-reviewers.prompt.md
 │       ├── workflow-resume.prompt.md
+│       ├── memory-context-hygiene.prompt.md
 │       ├── workspace-discovery.prompt.md
-│       └── workspace-update-root.prompt.md
+│       ├── workspace-update-root.prompt.md
+│       ├── quick-ref.prompt.md          # Quick reference / cheat sheet
+│       ├── rollback.prompt.md           # Undo implementation changes
+│       └── lite-mode.prompt.md          # Streamlined workflow for simple tasks
 ├── docs/
 │   ├── workflow/
 │   │   └── contract.md              # Workflow rules & contract
@@ -102,6 +106,18 @@ Copilot will:
 - Run `work-intake` to capture requirements
 - Run `work-review` to verify readiness
 - Guide you through phases 0-5
+
+### 4. Quick Fix (Lite Mode)
+
+For simple tasks that don't need full workflow:
+```
+lite: fix typo in error message
+```
+
+Copilot will:
+- Skip phases 0-2 (no analysis/spec/tasks)
+- Implement directly
+- Quick review and done
 
 ---
 
@@ -212,12 +228,14 @@ Copilot will:
 | `init` / `start` | Initialize session, load context |
 | `resume` / `tiếp tục` | Continue from saved state |
 | `status` / `trạng thái` | Show current workflow status |
+| `help` / `?` | Show quick reference card |
 
 ### Work Commands
 
 | Say | Action |
 |-----|--------|
 | `<describe work>` | Start work-intake for new work |
+| `lite: <desc>` | Start lite mode for simple tasks |
 | `update` / `change` | Handle requirement changes |
 | `approved` / `duyệt` | Approve current phase |
 
@@ -229,6 +247,14 @@ Copilot will:
 | `review` | Run review for current phase |
 | `next task` | Move to next task (Phase 3) |
 | `next batch` | Move to next test batch (Phase 4) |
+
+### Safety Commands
+
+| Say | Action |
+|-----|--------|
+| `rollback` | Undo implementation changes |
+| `reset context` | Clear confused state |
+| `abort` | Cancel current operation |
 
 ### PR Commands
 
