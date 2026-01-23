@@ -1,0 +1,263 @@
+# Workflow State File / File Trạng thái Workflow
+# This file tracks progress and enables resuming work at any point
+# File này theo dõi tiến độ và cho phép tiếp tục công việc bất cứ lúc nào
+#
+# Location: <impl-root>/docs/runs/<branch-slug>/.workflow-state.yaml
+# Updated: Automatically by Copilot after each action
+# Format: YAML (AI-optimized for fast parsing)
+
+# ============================================================
+# META - Workflow identification / Định danh workflow
+# ============================================================
+meta:
+  branch_slug: <branch-slug>           # Derived from git branch
+  impl_root: <impl-root-name>          # Where workflow docs live
+  feature_name: <feature-name>         # Human-readable name
+  created_at: <ISO-8601-timestamp>     # When workflow started
+  last_updated: <ISO-8601-timestamp>   # Last state change
+  updated_by: copilot                  # copilot | user
+
+# ============================================================
+# CURRENT STATUS - Quick resume point / Điểm tiếp tục nhanh
+# ============================================================
+status:
+  current_phase: <0-5>                 # Phase number
+  phase_name: <phase-name>             # analysis | spec | tasks | impl | tests | done
+  phase_status: <status>               # not-started | in-progress | awaiting-review | approved | blocked
+  
+  # For implementation phase - task-level tracking
+  current_task: <task-id>              # e.g., T-003 (null if not in impl phase)
+  current_root: <root-name>            # Which root being worked on
+  
+  # Quick context for immediate resume
+  last_action: <description>           # What was just completed
+  next_action: <description>           # What to do next
+  
+  # Blockers prevent progress
+  blockers:
+    - type: <question | dependency | error | approval>
+      description: <what's blocking>
+      waiting_for: <user | external | ci>
+      since: <ISO-8601-timestamp>
+
+# ============================================================
+# PHASE PROGRESS - Detailed per-phase tracking / Theo dõi từng phase
+# ============================================================
+phases:
+  phase_0_analysis:
+    status: <not-started | in-progress | awaiting-review | approved | skipped>
+    started_at: <ISO-8601-timestamp>
+    completed_at: <ISO-8601-timestamp>
+    approved_at: <ISO-8601-timestamp>
+    approved_by: <user | auto>
+    
+    artifacts:
+      - path: 00_analysis/request-analysis.md
+        status: <pending | draft | complete>
+      - path: 00_analysis/solution-design.md
+        status: <pending | draft | complete>
+      - path: 00_analysis/diagrams/flow-overview.md
+        status: <pending | draft | complete>
+    
+    decisions:
+      - id: D-001
+        decision: <what was decided>
+        rationale: <why>
+        
+    open_questions: []
+
+  phase_1_spec:
+    status: <not-started | in-progress | awaiting-review | approved | skipped>
+    started_at: <ISO-8601-timestamp>
+    completed_at: <ISO-8601-timestamp>
+    approved_at: <ISO-8601-timestamp>
+    
+    artifacts:
+      - path: 01_spec/spec.md
+        status: <pending | draft | complete>
+    
+    requirements_count:
+      functional: <N>
+      non_functional: <M>
+    
+    open_questions: []
+
+  phase_2_tasks:
+    status: <not-started | in-progress | awaiting-review | approved | skipped>
+    started_at: <ISO-8601-timestamp>
+    completed_at: <ISO-8601-timestamp>
+    approved_at: <ISO-8601-timestamp>
+    
+    artifacts:
+      - path: 02_tasks/tasks.md
+        status: <pending | draft | complete>
+    
+    tasks_summary:
+      total: <N>
+      by_root:
+        <root1>: <count>
+        <root2>: <count>
+    
+    open_questions: []
+
+  phase_3_impl:
+    status: <not-started | in-progress | awaiting-review | approved | skipped>
+    started_at: <ISO-8601-timestamp>
+    completed_at: <ISO-8601-timestamp>
+    approved_at: <ISO-8601-timestamp>
+    
+    artifacts:
+      - path: 03_impl/impl-log.md
+        status: <pending | draft | complete>
+    
+    # Detailed task tracking for resume
+    tasks:
+      - id: T-001
+        title: <task title>
+        root: <root-name>
+        status: <pending | in-progress | done | blocked | skipped>
+        started_at: <ISO-8601-timestamp>
+        completed_at: <ISO-8601-timestamp>
+        
+        # Checkpoint for mid-task resume
+        checkpoint:
+          description: <what's been done so far>
+          files_created: [<path1>, <path2>]
+          files_modified: [<path3>]
+          next_step: <what to do next in this task>
+        
+        # Dependencies
+        depends_on: [<task-id>]
+        blocks: [<task-id>]
+        
+      - id: T-002
+        title: <task title>
+        root: <root-name>
+        status: pending
+        depends_on: [T-001]
+    
+    # Cross-root sync tracking
+    sync_status:
+      - from_root: <root1>
+        to_root: <root2>
+        type: <immediate | versioned>
+        status: <pending | synced>
+        
+    open_questions: []
+
+  phase_4_tests:
+    status: <not-started | in-progress | awaiting-review | approved | skipped>
+    started_at: <ISO-8601-timestamp>
+    completed_at: <ISO-8601-timestamp>
+    approved_at: <ISO-8601-timestamp>
+    
+    artifacts:
+      - path: 04_tests/test-plan.md
+        status: <pending | draft | complete>
+      - path: 04_tests/test-log.md
+        status: <pending | draft | complete>
+    
+    test_summary:
+      total: <N>
+      passed: <X>
+      failed: <Y>
+      skipped: <Z>
+      coverage: <percent>
+    
+    # Failed tests need attention
+    failures:
+      - test_id: <TC-XXX>
+        error: <error message>
+        attempts: <N>
+        
+    open_questions: []
+
+  phase_5_done:
+    status: <not-started | in-progress | awaiting-review | approved | skipped>
+    started_at: <ISO-8601-timestamp>
+    completed_at: <ISO-8601-timestamp>
+    approved_at: <ISO-8601-timestamp>
+    
+    artifacts:
+      - path: 05_done/done-check.md
+        status: <pending | draft | complete>
+      - path: 05_done/release-notes.md
+        status: <pending | draft | complete>
+    
+    checklist:
+      docs_complete: <true | false>
+      code_reviewed: <true | false>
+      tests_pass: <true | false>
+      ready_to_merge: <true | false>
+    
+    open_questions: []
+
+# ============================================================
+# AFFECTED ROOTS - Track changes per root / Theo dõi thay đổi theo root
+# ============================================================
+affected_roots:
+  - root: <root-name>
+    path: <absolute-path>
+    branch: <branch-name>
+    
+    # Change tracking
+    files:
+      created: [<path1>, <path2>]
+      modified: [<path3>]
+      deleted: []
+    
+    # Git status
+    git:
+      has_uncommitted: <true | false>
+      commits_ahead: <N>
+      last_commit: <sha>
+      last_commit_msg: <message>
+    
+    # PR tracking
+    pr:
+      number: <N>
+      url: <url>
+      status: <draft | open | approved | merged>
+      
+  - root: <root-name-2>
+    # ... same structure
+
+# ============================================================
+# CONVERSATION CONTEXT - For AI continuity / Ngữ cảnh cho AI
+# ============================================================
+context:
+  # Key decisions made during this session
+  session_decisions:
+    - <decision 1>
+    - <decision 2>
+  
+  # Important context that shouldn't be lost
+  important_notes:
+    - <note 1>
+    - <note 2>
+  
+  # User preferences observed
+  user_preferences:
+    language: <en | vi | both>
+    detail_level: <brief | detailed>
+    auto_commit: <true | false>
+  
+  # Errors encountered and how they were resolved
+  error_log:
+    - timestamp: <ISO-8601>
+      error: <description>
+      resolution: <how it was fixed>
+
+# ============================================================
+# HISTORY - Timeline of actions / Lịch sử hành động
+# ============================================================
+history:
+  - timestamp: <ISO-8601>
+    phase: <phase-number>
+    action: <action-type>  # phase_start | task_start | task_complete | approval | error | resume
+    description: <what happened>
+    
+  - timestamp: <ISO-8601>
+    phase: 3
+    action: task_complete
+    description: "Completed T-001: Created helper utilities"
