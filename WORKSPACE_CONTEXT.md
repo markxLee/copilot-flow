@@ -91,7 +91,92 @@ relationships:
       sync: versioned
       via: "@apphubdev/clearer-ui"
       confidence: high
-      notes: "UI lib published to GitHub Packages, dashboard imports v1.2.61"
+      notes: |
+        UI lib published to GitHub Packages, dashboard imports v1.2.68
+        
+        ⚠️ CRITICAL: reviews-assets IS the UI library source for apphub-vision
+        - Source: reviews-assets/public/documentation/ui-library/src/components/production/
+        - Published as: @apphubdev/clearer-ui (npm package on GitHub Packages)
+        - In Storybook code: `import { X } from '../../components/production'`
+        - In apphub-vision apps: `import { X } from '@apphubdev/clearer-ui'`
+        - Icons: `import { Icon } from '@apphubdev/clearer-ui/icons'`
+        
+        ⚠️ IMPORTANT RULE: Apps in apphub-vision must NOT install @radix-ui/* directly!
+        All Radix UI components are wrapped and re-exported through @apphubdev/clearer-ui.
+        
+        ⚠️ MIGRATION RULE: When migrating from Storybook to apps:
+        - Import from '../../components/production' → Already in @apphubdev/clearer-ui (DO NOT recreate)
+        - Import from './*.stories' → These are page/feature-specific, MUST recreate in app
+        
+        ⚠️ CRITICAL - LAYOUT PATTERN DIFFERENCE:
+        
+        STORYBOOK (không dùng Next.js, serve nhiều app):
+        - Mỗi story tự wrap layout riêng
+        - Pattern: <AppProviders><Layout>...</Layout></AppProviders> trong mỗi story
+        
+        NEXT.JS APP (billing, dashboard - dùng App Router):
+        - Layout định nghĩa 1 LẦN trong app/layout.tsx
+        - Layout tự động áp dụng cho TẤT CẢ pages
+        - Pages KHÔNG wrap layout, chỉ render content trực tiếp
+        - Pattern: layout.tsx chứa <AppProviders><LayoutContent2ColScroll>...</>
+                   page.tsx chỉ chứa <HeaderBlock>...</HeaderBlock> và content
+        
+        SAI (đừng làm thế này trong Next.js app):
+        ```tsx
+        // ❌ page.tsx - WRONG
+        export default function Page() {
+          return (
+            <BillingLayout sidebar={...} topbar={...}>
+              <Content />
+            </BillingLayout>
+          );
+        }
+        ```
+        
+        ĐÚNG:
+        ```tsx
+        // ✅ app/layout.tsx - Layout wrapper
+        export default function RootLayout({ children }) {
+          return (
+            <AppProviders>
+              <LayoutContent2ColScroll sidebar={...} topbar={...}>
+                <LayoutContent2ColScrollMain>
+                  {children}  {/* ← Pages auto-injected here */}
+                </LayoutContent2ColScrollMain>
+              </LayoutContent2ColScroll>
+            </AppProviders>
+          );
+        }
+        
+        // ✅ app/payment-details/page.tsx - Just content
+        export default function PaymentDetailsPage() {
+          return (
+            <>  {/* No layout wrapper needed! */}
+              <HeaderBlock title="Payment details" />
+              <PaymentMethodsList />
+            </>
+          );
+        }
+        ```
+        
+        Example:
+        ```tsx
+        // In Storybook
+        import { HeaderBlock, AppProviders } from '../../components/production'; // ✅ In clearer-ui
+        import { BillingSidebar } from './BillingSidebar.stories'; // ❌ NOT in clearer-ui, recreate
+        
+        // In apphub-vision app
+        import { HeaderBlock, AppProviders } from '@apphubdev/clearer-ui'; // ✅ Use lib
+        import { BillingSidebar } from '@/components/layout/BillingSidebar'; // ✅ Recreated
+        ```
+        
+        Available exports from @apphubdev/clearer-ui include:
+        - UI Components: Button, Card, Dialog, Input, Label, Badge, Alert, etc.
+        - Layout: Sidebar, SidebarProvider, useSidebar, TopBar, Layout, LayoutContent2ColScroll, LayoutContent2ColScrollMain, etc.
+        - Typography: H1, H2, H3, LargeText, Small, etc.
+        - Feedback: Toast, Tooltip, Progress, Skeleton, etc.
+        - Forms: Checkbox, RadioGroup, Select, Switch, etc.
+        - AppProviders, HeaderBlock, etc.
 
   boost-pfs-backend:
     - to: apphub-vision
@@ -192,6 +277,13 @@ conventions:
     async: "tryCatch returns {data, error}"
     pkg_install: "pnpm install from root"
     build_order: "db:generate → utils → core → assistant → apps"
+    ui_library: |
+      ⚠️ CRITICAL: Use @apphubdev/clearer-ui for ALL UI components
+      - DO NOT install @radix-ui/* packages directly
+      - Import UI components: import { Button, Card } from '@apphubdev/clearer-ui'
+      - Import icons: import { IconName } from '@apphubdev/clearer-ui/icons'
+      - All Radix UI components are wrapped in @apphubdev/clearer-ui
+      - When migrating from Storybook: '../../components/production' → '@apphubdev/clearer-ui'
 
   reviews-assets:
     error_handling: "standard try-catch"

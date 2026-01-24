@@ -233,15 +233,42 @@ execution_context:
      - Build commands for that root
      - Package manager for that root
      
-  3. Cross-root awareness:
-     - If task depends on another root's build:
-       → Verify dependency is satisfied
-       → Or note as prerequisite
+  3. CRITICAL - Cross-root awareness:
+     BEFORE implementing any cross-root task:
      
-  4. Example task roots:
+     a. READ WORKSPACE_CONTEXT.md Section 9:
+        path: copilot-flow/WORKSPACE_CONTEXT.md
+        section: cross_root_workflows
+     
+     b. Identify pattern:
+        - library_consumer: reviews-assets → apphub-vision
+        - shared_packages: packages/* → apps/*
+        - api_integration: boost-pfs-backend → apphub-vision
+     
+     c. Follow documented workflow:
+        Example for library_consumer:
+        1_change_library: Edit component in reviews-assets
+        2_build_library: npm run build in reviews-assets
+        3_update_consumer: Update imports in apphub-vision
+        4_test_integration: pnpm dev to verify
+     
+     d. Respect build order:
+        - reviews-assets MUST build before apphub-vision
+        - packages/* MUST build before apps/*
+     
+     e. Use correct import patterns:
+        - From reviews-assets: import { X } from '@apphubdev/clearer-ui'
+        - From packages: import { X } from '@clearer/utils'
+     
+  4. If task depends on another root's build:
+     → STOP if dependency not satisfied
+     → Instruct user to build dependency first
+     → Or add prerequisite task
+     
+  5. Example task roots:
      - apphub-vision: Main app code
-     - reviews-assets: UI components
-     - boost-pfs-backend: Backend services
+     - reviews-assets: UI components (library)
+     - boost-pfs-backend: Backend services (API provider)
      - copilot-flow: Workflow docs only (no code)
 ```
 

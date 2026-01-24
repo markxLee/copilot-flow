@@ -131,21 +131,48 @@ ordering_rules:
      - Configuration setup
      - Shared utilities
      
-  2. By root dependency:
+  2. CRITICAL - Cross-root build order:
+     READ WORKSPACE_CONTEXT.md Section 9 (cross_root_workflows)
+     
+     a. Check multi_root_build_order:
+        - reviews-assets MUST build before apphub-vision
+        - packages/* MUST build before apps/*
+     
+     b. For library_consumer pattern:
+        Order: library changes → library build → consumer changes
+        Example:
+          T-001: Update Button in reviews-assets
+          T-002: Build reviews-assets (npm run build)
+          T-003: Update dashboard to use new Button
+     
+     c. For api_integration pattern:
+        Order: backend changes → backend deploy → frontend changes
+        Example:
+          T-001: Add endpoint in boost-pfs-backend
+          T-002: Deploy backend (or note as external dependency)
+          T-003: Update api.config.json in apphub-vision
+          T-004: Call new endpoint from dashboard
+     
+     d. Add explicit build/sync tasks between roots:
+        - "Build reviews-assets library"
+        - "Sync shared packages"
+        - "Verify API deployed"
+     
+  3. By root dependency:
      - If root A depends on root B, do B first
      - Follow sync_type from spec
      
-  3. Core before peripheral:
+  4. Core before peripheral:
      - Core logic first
      - UI/integration last
      
-  4. Data flow order:
+  5. Data flow order:
      - Data models
      - Business logic
      - API/Service layer
      - UI components
      
-  5. Tests last (per feature):
+  6. Tests last (per feature):
      - Unit tests after implementation
      - Integration tests after units
 ```

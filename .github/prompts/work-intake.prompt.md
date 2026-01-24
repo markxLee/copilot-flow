@@ -78,7 +78,20 @@ steps:
   5. Identify affected roots
      action: Which workspace roots will be changed?
      
-  6. Output structured Work Description
+  6. CHECK CROSS-ROOT RELATIONSHIPS (CRITICAL)
+     action: |
+       IF work involves multiple roots:
+         1. Read WORKSPACE_CONTEXT.md Section 9 (cross_root_workflows)
+         2. Identify which pattern applies (library_consumer, shared_packages, api_integration)
+         3. Note build order and dependencies
+         4. Include in Constraints section
+       
+       Example: "Migrate component from storybook to dashboard"
+         → Check library_consumer pattern
+         → Note: reviews-assets must build first
+         → Import pattern: import { X } from '@apphubdev/clearer-ui'
+     
+  7. Output structured Work Description
      format: Bilingual (EN then VI)
 ```
 

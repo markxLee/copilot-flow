@@ -160,12 +160,28 @@ research_steps:
      - Cross-root dependencies
      - External API dependencies
      
-  3. Review constraints:
+  3. CRITICAL - Check WORKSPACE_CONTEXT.md for cross-root work:
+     IF work involves multiple roots:
+       a. READ WORKSPACE_CONTEXT.md Section 9 (cross_root_workflows)
+       b. Identify which pattern applies:
+          - library_consumer: reviews-assets → apphub-vision
+          - shared_packages: packages/* → apps/*
+          - api_integration: boost-pfs-backend → apphub-vision
+       c. Document the workflow sequence from WORKSPACE_CONTEXT
+       d. Note build order dependencies
+       e. Verify import patterns
+       
+     Example triggers:
+       - "migrate from storybook" → check library_consumer
+       - "use shared package" → check shared_packages
+       - "call backend API" → check api_integration
+     
+  4. Review constraints:
      - Technical limitations
      - Performance requirements
      - Security considerations
      
-  4. Document learnings:
+  5. Document learnings:
      - What can be reused
      - What needs to be created
      - What patterns to follow

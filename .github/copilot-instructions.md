@@ -70,7 +70,66 @@ Copilot thinks:
 
 ---
 
-## 📋 Quick Reference
+## � CRITICAL: Cross-Root Awareness (ALWAYS CHECK)
+
+**Before ANY work that involves multiple roots or migration between roots:**
+
+```yaml
+MANDATORY_CHECK:
+  trigger:
+    - Work mentions "migrate", "move", "copy" between roots
+    - Work involves components from different roots
+    - Work mentions library → app integration (e.g., storybook → dashboard)
+    - Work involves API provider → consumer
+    - Any task touching files in multiple roots
+
+  action:
+    1. READ WORKSPACE_CONTEXT.md SECTION 9 (cross_root_workflows)
+    2. Identify which pattern applies:
+       - library_consumer: UI library → app
+       - shared_packages: package → multiple apps
+       - api_integration: backend → frontend
+    3. Follow the documented workflow sequence
+    4. Respect build order (multi_root_build_order)
+    5. Use correct PR strategy (pr_strategies)
+
+  example:
+    request: "Migrate Button component from storybook to dashboard"
+    
+    MUST check:
+    - reviews-assets.ui_library_path → "public/documentation/ui-library/"
+    - library_consumer.workflow → build library → update consumer
+    - multi_root_build_order → reviews-assets first, then apphub-vision
+    
+    MUST NOT:
+    - Ignore build dependencies
+    - Copy code without checking import patterns
+    - Skip library rebuild after changes
+```
+
+**Key Cross-Root Patterns in WORKSPACE_CONTEXT.md:**
+
+| Pattern | Source | Target | Key Config |
+|---------|--------|--------|------------|
+| `library_consumer` | reviews-assets | apphub-vision | @apphubdev/clearer-ui |
+| `shared_packages` | packages/* | apps/* | @clearer/* |
+| `api_integration` | boost-pfs-backend | apphub-vision | api.config.json |
+
+**Copilot MUST:**
+- ✅ Read Section 9 before cross-root work
+- ✅ Follow documented workflow steps in order
+- ✅ Check build dependencies
+- ✅ Verify import patterns match config
+
+**Copilot MUST NOT:**
+- ❌ Guess relationships between roots
+- ❌ Skip library rebuild when consumer needs it
+- ❌ Ignore documented workflow sequences
+- ❌ Mix up source/target roots
+
+---
+
+## �📋 Quick Reference
 
 ### Workflow Phases
 | Phase | Name | Gate |
