@@ -8,9 +8,29 @@ Bạn đóng vai trò **Kiến trúc sư Giải pháp và Phân tích viên Kỹ
 
 ## Trigger / Kích hoạt
 
-After `work-review` passes with READY verdict and user approves:
-- User says `approved` / `go` / `duyệt`
-- Or explicitly: `start phase 0` / `analyze`
+```yaml
+TRIGGER_RULES:
+  # CRITICAL: Must use explicit prompt reference
+  # Prevents phase skipping when context is long
+  
+  valid_triggers:
+    - "/phase-0-analysis"  # Explicit prompt call
+    - Workflow resume with current_phase: 0 in state
+    
+  pre_condition:
+    - work-review completed with READY verdict
+    - User confirmed approval
+    
+  invalid_triggers:
+    - "go"         # Too generic
+    - "approved"   # Ambiguous without context
+    - "analyze"    # May skip validation
+    
+  on_invalid_trigger:
+    action: |
+      STOP and respond:
+      "Please use: `/phase-0-analysis` to start Phase 0."
+```
 
 ---
 
@@ -538,9 +558,25 @@ None found in codebase. Will follow GA4 best practices.
 
 ---
 
-## ⏸️ Phase 0 Complete
+## ⏸️ CHECKPOINT: Phase 0 Complete
 
-**⏸️ STOP: Awaiting Approval**
+**Analysis & Design finished. Awaiting approval.**
 
-Reply `approved` to proceed to Phase 1: Specification.
+---
+
+### 📋 Next Steps (EXPLICIT PROMPTS REQUIRED)
+
+**To approve and proceed to Phase 1:**
+```
+/phase-1-spec
+```
+
+**To request changes:**
+```
+feedback: <your feedback>
+```
+Then re-run `/phase-0-analysis`
+
+⚠️ DO NOT use generic commands like `go`, `approved`, `continue`.
+⚠️ KHÔNG dùng lệnh chung như `go`, `approved`, `continue`.
 ```

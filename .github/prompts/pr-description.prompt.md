@@ -8,9 +8,22 @@ Bạn đóng vai trò **Người Viết Mô tả PR và Truyền thông Release*
 
 ## Trigger / Kích hoạt
 
-- After Phase 5 Done check passes
-- User says `pr` / `create pr` / `tạo pr`
-- Ready to submit code for review
+```yaml
+TRIGGER_RULES:
+  explicit_only: true
+  accepted_triggers:
+    - "/pr-description"          # Explicit prompt reference (REQUIRED)
+    
+  rejected_triggers:
+    - "pr", "create pr", "tạo pr"  # ⚠️ TOO VAGUE
+    - "go", "continue"            # ⚠️ DANGEROUS in long conversations
+    
+  why: |
+    PR creation is a significant action that should be explicit.
+    
+  prerequisites:
+    - Phase 5 Done check passed (/phase-5-done completed)
+```
 
 ---
 

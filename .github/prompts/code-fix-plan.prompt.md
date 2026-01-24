@@ -8,9 +8,23 @@ Bạn đóng vai trò **Kỹ sư Cấp cao và Người Lập kế hoạch Khắ
 
 ## Trigger / Kích hoạt
 
-- Code review verdict = REQUEST CHANGES
-- User says `fix plan` / `kế hoạch sửa`
-- After code-review identifies issues
+```yaml
+TRIGGER_RULES:
+  explicit_only: true
+  accepted_triggers:
+    - "/code-fix-plan T-XXX"  # Explicit prompt reference with task ID (REQUIRED)
+    
+  rejected_triggers:
+    - "fix plan", "kế hoạch sửa"        # ⚠️ TOO VAGUE
+    - "go", "continue", "approved"      # ⚠️ DANGEROUS in long conversations
+    
+  why: |
+    Explicit prompt references prevent accidental phase skipping
+    in long conversations where context may be confused.
+    
+  prerequisites:
+    - code-review verdict = REQUEST CHANGES for task T-XXX
+```
 
 ---
 
@@ -263,7 +277,25 @@ MUST:
 
 | User Response | Next Action |
 |---------------|-------------|
-| `approved` | Run: `code-fix-apply.prompt.md` |
+| `approved` | Proceed to apply fixes |
 | `adjust <finding>` | Modify fix approach, re-present plan |
 | `skip minor` | Proceed with critical + major only |
 | Questions | Clarify fix approach |
+
+---
+
+## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  after_plan_approved:
+    recommended: "/code-fix-apply T-XXX"
+    command: "Run: /code-fix-apply T-XXX"
+    
+  DO_NOT_SAY:
+    - "Reply approved to continue"
+    - "Say go to proceed"
+    
+  MUST_SAY:
+    - "Run `/code-fix-apply T-XXX` to apply the approved fixes"
+```

@@ -13,7 +13,7 @@ meta:
   schema_version: "2.0"
   roots_count: 4
   primary_root: apphub-vision
-  impl_root: copilot-flow  # Where ALL workflow docs are stored
+  impl_root: apphub-vision  # Where ALL workflow docs are stored
 
 roots:
   apphub-vision:

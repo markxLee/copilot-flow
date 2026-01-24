@@ -23,9 +23,17 @@ Hoàn tác an toàn các thay đổi code khi:
 
 ## Trigger / Kích hoạt
 
-- User says: `rollback`, `undo`, `revert`, `hoàn tác`, `quay lại`
-- User says: `that didn't work`, `start over`, `try again`
-- After failed implementation or test
+```yaml
+TRIGGER_RULES:
+  accepted_triggers:
+    - "/rollback"                # Explicit prompt reference (RECOMMENDED)
+    - "rollback", "undo", "revert", "hoàn tác", "quay lại"  # Clear intent
+    - "that didn't work", "start over", "try again"
+    
+  why: |
+    Rollback intent is usually clear from user's message.
+    The prompt will confirm scope before taking action.
+```
 
 ---
 

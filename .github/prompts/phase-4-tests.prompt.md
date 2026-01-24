@@ -8,9 +8,24 @@ Bạn đóng vai trò **Kỹ sư Test và Chuyên gia Đảm bảo Chất lượ
 
 ## Trigger / Kích hoạt
 
-- All Phase 3 tasks approved
-- User says `test` / `phase 4` / `kiểm thử`
-- Workflow resume with current_phase = 4
+```yaml
+TRIGGER_RULES:
+  explicit_only: true
+  accepted_triggers:
+    - "/phase-4-tests"      # Explicit prompt reference (REQUIRED)
+    
+  rejected_triggers:
+    - "test", "phase 4", "kiểm thử"  # ⚠️ TOO VAGUE - may skip phases
+    - "go", "continue", "approved"    # ⚠️ DANGEROUS in long conversations
+    
+  why: |
+    Explicit prompt references prevent accidental phase skipping
+    in long conversations where context may be confused.
+    
+  prerequisites:
+    - ALL Phase 3 tasks must have status "approved"
+    - code-review passed for ALL tasks
+```
 
 ---
 
@@ -358,8 +373,31 @@ DO_NOT:
 
 | User Response | Next Action |
 |---------------|-------------|
-| `pass` | Write next batch OR run: `test-verify.prompt.md` if all done |
+| `pass` | Write next batch OR proceed to test verify |
 | `fail <details>` | Failure analysis, propose fixes |
 | `next batch` | Write next test batch |
-| `verify` | Run: `test-verify.prompt.md` |
 | `coverage <X>%` | Analyze coverage, plan more tests if < 70% |
+
+---
+
+## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  after_all_batches_pass:
+    recommended: "/test-verify"    # Quality gate before Phase 5
+    command: "Run: /test-verify"
+    
+  after_test_verify_pass:
+    recommended: "/phase-5-done"
+    command: "Run: /phase-5-done"
+    
+  DO_NOT_SAY:
+    - "Reply approved to continue"
+    - "Say go to proceed"
+    - "Type continue"
+    
+  MUST_SAY:
+    - "Run `/test-verify` to verify all tests"
+    - "After test verify passes, run `/phase-5-done`"
+```

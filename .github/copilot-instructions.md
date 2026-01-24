@@ -91,21 +91,54 @@ Copilot thinks:
 | `docs/templates/workflow-state.template.yaml` | State tracking |
 | `docs/runs/<branch-slug>/` | Active workflow artifacts |
 
-### Quick Commands
+### Quick Commands — EXPLICIT PROMPT REFERENCES (Recommended)
+
+**⚠️ IMPORTANT:** Use explicit `/prompt-name` to prevent phase skipping in long conversations.
+
+| Prompt Reference | Action |
+|------------------|--------|
+| `/work-intake` | Capture work description |
+| `/work-review` | Review work readiness |
+| `/work-update` | Handle requirement changes & iterations |
+| `/phase-0-analysis` | Start Phase 0: Analysis |
+| `/phase-1-spec` | Start Phase 1: Specification |
+| `/spec-review` | Review spec quality |
+| `/phase-2-tasks` | Start Phase 2: Task Planning |
+| `/task-plan-review` | Review task plan quality |
+| `/phase-3-impl T-XXX` | Implement specific task |
+| `/phase-3-impl next` | Implement next task |
+| `/code-review T-XXX` | Review task changes |
+| `/code-fix-plan T-XXX` | Plan fixes for review issues |
+| `/code-fix-apply T-XXX` | Apply approved fixes |
+| `/phase-4-tests` | Start Phase 4: Testing |
+| `/test-verify` | Verify test coverage & quality |
+| `/phase-5-done` | Start Phase 5: Done Check |
+| `/pr-description` | Generate PR description |
+| `/pr-notify-reviewers` | Generate reviewer notification |
+| `/workflow-resume` | Resume from saved state |
+| `/rollback` | Undo implementation changes |
+| `/lite-mode` | Start lite mode for simple tasks |
+
+### Generic Commands (Use with caution)
+| Say | Action | ⚠️ Risk |
+|-----|--------|---------|
+| `resume` / `tiếp tục` | Continue from saved state | ✅ Low |
+| `status` / `trạng thái` | Show workflow status | ✅ Low |
+| `help` / `?` | Show quick reference card | ✅ Low |
+| `lite: <desc>` | Start lite mode for simple tasks | ✅ Low |
+| `rollback` | Undo implementation changes | ✅ Low |
+| ~~`go`~~ / ~~`tiếp`~~ | ~~Execute next action~~ | ❌ HIGH - May skip phases |
+| ~~`approved`~~ / ~~`duyệt`~~ | ~~Approve current phase~~ | ❌ HIGH - May skip phases |
+| ~~`continue`~~ | ~~Continue workflow~~ | ❌ HIGH - May skip phases |
+
+### Setup Commands
 | Say | Action |
 |-----|--------|
-| `resume` / `tiếp tục` | Continue from saved state |
-| `status` / `trạng thái` | Show workflow status |
-| `go` / `tiếp` | Execute next action |
-| `approved` / `duyệt` | Approve current phase |
-| `help` / `?` | Show quick reference card |
-| `lite: <desc>` | Start lite mode for simple tasks |
-| `rollback` | Undo implementation changes |
+| `setup workspace` | Run full setup (discovery → cross-root → sync → generate) |
 | `cross-root` | Auto-config & save cross-root relationships |
 | `sync instructions` | Sync shared instructions + detect tech stacks |
 | `suggest instructions` | Analyze tech stacks & suggest missing instructions |
 | `sync vscode settings` | Sync VS Code settings to all roots |
-| `setup workspace` | Run full setup (discovery → cross-root → sync → generate) |
 | `generate workspace file` | Generate .code-workspace from context |
 | `generate architecture` | Generate ARCHITECTURE.md from context |
 

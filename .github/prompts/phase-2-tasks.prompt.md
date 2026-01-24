@@ -8,9 +8,29 @@ Bạn đóng vai trò **Người Lập Kế hoạch Task Kỹ thuật**.
 
 ## Trigger / Kích hoạt
 
-After Phase 1 Specification is approved:
-- User says `approved` / `go` / `duyệt` after Phase 1 or spec-review
-- Or explicitly: `start phase 2` / `tasks` / `plan`
+```yaml
+TRIGGER_RULES:
+  # CRITICAL: Must use explicit prompt reference
+  # Prevents phase skipping when context is long
+  
+  valid_triggers:
+    - "/phase-2-tasks"  # Explicit prompt call
+    - Workflow resume with current_phase: 2 in state
+    
+  pre_condition:
+    - Phase 1 Specification approved (status: approved)
+    
+  invalid_triggers:
+    - "go"         # Too generic
+    - "approved"   # Ambiguous
+    - "tasks"      # May skip validation
+    - "plan"       # Ambiguous
+    
+  on_invalid_trigger:
+    action: |
+      STOP and respond:
+      "Please use: `/phase-2-tasks` to start Phase 2."
+```
 
 ---
 
@@ -381,25 +401,70 @@ After completing task plan:
 Please review the task plan.
 Vui lòng review kế hoạch task.
 
-Reply / Trả lời:
-- `approved` / `duyệt` → Proceed to Phase 3: Implementation
-- `review` → Run task-plan-review for detailed analysis
-- `feedback: <your feedback>` → Revise task plan
+**👉 RECOMMENDED: Run task plan review first / KHỤYẾN NGHỊ: Chạy task plan review trước**
+```
+/task-plan-review
+```
+
+**Or if you want to manually review and approve / Hoặc nếu muốn tự review và duyệt:**
+Say `approved` then run `/phase-3-impl T-001`
 ```
 
 ---
 
 ## Next Step / Bước tiếp theo
 
-After task plan is written:
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Always recommend review prompt first
+  # User can skip review by saying 'approved' explicitly
+  
+  after_task_plan_written:
+    action: |
+      Output EXACTLY at the end:
+      
+      ---
+      ## ⏸️ CHECKPOINT: Task Plan Complete
+      
+      ### 📋 Next Steps (EXPLICIT PROMPTS REQUIRED)
+      
+      **Step 1: Run task plan review (RECOMMENDED)**
+      ```
+      /task-plan-review
+      ```
+      
+      **Step 2: After review passes, start Phase 3 with first task**
+      ```
+      /phase-3-impl T-001
+      ```
+      
+      ---
+      
+      **⚠️ Skip review (manual approval):**
+      If you reviewed manually and want to proceed directly:
+      Say `approved` then run `/phase-3-impl T-001`
+      
+      ⚠️ DO NOT use generic commands like `go`, `approved` alone.
+      ⚠️ KHÔNG dùng lệnh chung như `go`, `approved` một mình.
+      ---
 ```
-→ Optional: Run task-plan-review.prompt.md for detailed review
-→ Or approve directly to continue
-```
-
-After approval:
-```
-→ Run: phase-3-impl.prompt.md
-→ Start with T-001 (first task)
-→ Update state: current_phase = 3, current_task = T-001
+      
+      ---
+      ## ⏸️ CHECKPOINT: Task Plan Complete
+      
+      ### 📋 Next Steps (EXPLICIT PROMPTS REQUIRED)
+      
+      **Option 1: Detailed review (recommended)**
+      ```
+      /task-plan-review
+      ```
+      
+      **Option 2: Approve and start Phase 3 with first task**
+      ```
+      /phase-3-impl T-001
+      ```
+      
+      ⚠️ DO NOT use generic commands like `go`, `approved`.
+      ⚠️ KHÔNG dùng lệnh chung như `go`, `approved`.
+      ---
 ```

@@ -6,12 +6,18 @@
 
 ## Trigger / Kích hoạt
 
-User says one of:
-- "resume" / "tiếp tục"
-- "continue" / "tiếp"
-- "where were we" / "đang làm gì"
-- "status" / "trạng thái"
-- "what's next" / "làm gì tiếp"
+```yaml
+TRIGGER_RULES:
+  accepted_triggers:
+    - "/workflow-resume"         # Explicit prompt reference (RECOMMENDED)
+    - "resume", "tiếp tục"       # Also accepted - clear intent
+    - "status", "trạng thái"     # Also accepted - status check
+    - "where were we", "đang làm gì"  # Also accepted
+    
+  why: |
+    Resume is safe because it loads state and suggests explicit next prompt.
+    It does NOT auto-execute next action.
+```
 
 ---
 
@@ -85,9 +91,26 @@ Output format (bilingual):
 
 ---
 
-**Ready to continue? / Sẵn sàng tiếp tục?**
-Reply `go` to proceed with: <next_action>
-Or specify what you want to do.
+## 📋 Next Action — Explicit Prompt / Hành động Tiếp — Prompt Cụ thể
+
+Based on current phase, run one of:
+
+| Current State | Recommended Prompt |
+|---------------|--------------------|
+| Phase 0 in progress | `/phase-0-analysis` |
+| Phase 0 awaiting review | Review analysis, then `/phase-1-spec` |
+| Phase 1 in progress | `/phase-1-spec` |
+| Phase 1 awaiting review | `/spec-review` then `/phase-2-tasks` |
+| Phase 2 in progress | `/phase-2-tasks` |
+| Phase 2 awaiting review | `/task-plan-review` then `/phase-3-impl T-001` |
+| Phase 3 task pending | `/phase-3-impl T-XXX` |
+| Phase 3 task needs review | `/code-review T-XXX` |
+| Phase 3 all tasks done | `/phase-4-tests` |
+| Phase 4 in progress | `/phase-4-tests` |
+| Phase 4 awaiting verify | `/test-verify` then `/phase-5-done` |
+| Phase 5 in progress | `/phase-5-done` |
+
+**⚠️ DO NOT say "Reply `go` to proceed"** - Use explicit prompt references above.
 ```
 
 ### Step 4: Handle Different States / Xử lý các trạng thái
@@ -184,15 +207,16 @@ not-started ──▶ in-progress ──▶ awaiting-review ──▶ approved �
 
 ## Quick Commands / Lệnh nhanh
 
-| Command | Action |
-|---------|--------|
-| `resume` / `tiếp tục` | Continue from last state |
-| `status` / `trạng thái` | Show current status only |
-| `go` / `tiếp` | Execute next_action |
-| `skip` / `bỏ qua` | Skip current task/blocker |
-| `back` / `quay lại` | Go to previous phase |
-| `restart` / `làm lại` | Restart current phase |
-| `abort` / `hủy` | Cancel workflow |
+| Command | Action | Risk |
+|---------|--------|------|
+| `resume` / `tiếp tục` | Continue from last state | ✅ Safe |
+| `status` / `trạng thái` | Show current status only | ✅ Safe |
+| `/phase-X-...` | Run specific phase prompt | ✅ Safe |
+| `skip` / `bỏ qua` | Skip current task/blocker | ⚠️ Caution |
+| `back` / `quay lại` | Go to previous phase | ⚠️ Caution |
+| `restart` / `làm lại` | Restart current phase | ⚠️ Caution |
+| `abort` / `hủy` | Cancel workflow | ⚠️ Caution |
+| ~~`go`~~ / ~~`tiếp`~~ | ~~Execute next_action~~ | ❌ RISKY - may skip phases |
 
 ---
 
@@ -275,11 +299,15 @@ None
 
 ---
 
-**Ready to continue? / Sẵn sàng tiếp tục?**
-Reply `go` to proceed with: Update dashboard component
-Or specify what you want to do.
+## 📋 Next Action — Explicit Prompt
 
-User: go
+Based on current state (Phase 3, Task T-004 pending):
+
+**Run:** `/phase-3-impl T-004`
+
+This will implement: Update dashboard component to integrate tracker
+
+User: /phase-3-impl T-004
 
 Copilot: Starting T-004: Integrate analytics tracker into dashboard...
 [continues implementation]

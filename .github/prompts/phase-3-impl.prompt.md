@@ -8,9 +8,32 @@ Bạn đóng vai trò **Người Thực thi Triển khai Có Kiểm soát**.
 
 ## Trigger / Kích hoạt
 
-- Phase 2 approved AND user says `go` / `implement` / `tiếp`
-- OR user says `next task` / `task tiếp theo`
-- OR workflow resume with current_phase = 3
+```yaml
+TRIGGER_RULES:
+  # CRITICAL: Each task MUST be explicitly triggered with task ID
+  # This prevents context confusion and ensures controlled execution
+  
+  valid_triggers:
+    - "/phase-3-impl T-001"  # Start specific task
+    - "/phase-3-impl next"   # Start next incomplete task
+    - "/phase-3-impl"        # Resume current task
+    
+  invalid_triggers:
+    - "go"           # Too generic, may skip steps
+    - "implement"    # Ambiguous without task ID
+    - "continue"     # May jump to wrong phase
+    - "tiếp"         # Same issue in Vietnamese
+    
+  on_invalid_trigger:
+    action: |
+      STOP and respond:
+      "Please use explicit prompt: `/phase-3-impl T-XXX` or `/phase-3-impl next`"
+```
+
+**Accepted triggers:**
+- `/phase-3-impl T-XXX` — Start/continue specific task
+- `/phase-3-impl next` — Start next incomplete task  
+- Workflow resume with `current_phase: 3` in state file
 
 ---
 
@@ -353,20 +376,50 @@ Add to `03_impl/impl-log.md`:
 
 ## ⏸️ STOP — Task Complete / DỪNG — Task Hoàn thành
 
-### Task T-XXX implemented. Awaiting review.
-### Task T-XXX đã triển khai. Đợi review.
-
-**Progress / Tiến độ:**
-| Completed | In Review | Remaining |
-|-----------|-----------|-----------|
-| <N> tasks | 1 task | <M> tasks |
-
-**Next Steps / Bước tiếp theo:**
-1. Run `review` to check this task's changes
-2. If approved, run `next task` for T-YYY
-3. Or run `status` to see full progress
-
-Reply `review` to start code review.
+```yaml
+TASK_COMPLETION_OUTPUT:
+  # CRITICAL: Always output explicit next prompt commands
+  # Never use generic commands that may cause phase skipping
+  
+  format: |
+    ---
+    ## ⏸️ CHECKPOINT: Task T-XXX Complete
+    
+    ### Task T-XXX implemented. Awaiting review.
+    ### Task T-XXX đã triển khai. Đợi review.
+    
+    **Progress / Tiến độ:**
+    | Completed | In Review | Remaining |
+    |-----------|-----------|-----------|
+    | <N> tasks | 1 task | <M> tasks |
+    
+    ---
+    
+    ### 📋 Next Steps (EXPLICIT PROMPTS REQUIRED)
+    
+    **Step 1: Review this task**
+    ```
+    /code-review T-XXX
+    ```
+    
+    **Step 2: After review approved, start next task**
+    ```
+    /phase-3-impl T-YYY
+    ```
+    OR
+    ```
+    /phase-3-impl next
+    ```
+    
+    **Step 3: When ALL tasks complete**
+    ```
+    /phase-4-tests
+    ```
+    
+    ⚠️ DO NOT use generic commands like `go`, `next`, `continue`.
+    ⚠️ KHÔNG dùng lệnh chung như `go`, `next`, `continue`.
+    ---
+```
 ```
 
 ---
@@ -459,11 +512,48 @@ if_wrong_root:
 
 ## Next Step / Bước tiếp theo
 
-After STOP:
-```
-→ Run: code-review.prompt.md
-  - If APPROVED → Run: phase-3-impl.prompt.md (next task)
-  - If REQUEST CHANGES → Run: code-fix-plan.prompt.md
-→ When all tasks complete:
-  - Run: phase-4-tests.prompt.md
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Always use explicit prompt references
+  # This prevents context confusion when conversation is long
+  
+  after_task_complete:
+    action: |
+      Output EXACTLY:
+      
+      **Next:** `/code-review T-XXX`
+      
+  after_code_review_approved:
+    if: More tasks remaining
+    action: |
+      Output EXACTLY:
+      
+      **Next:** `/phase-3-impl T-YYY` or `/phase-3-impl next`
+      
+    if: All tasks complete
+    action: |
+      Output EXACTLY:
+      
+      **Next:** `/phase-4-tests`
+      
+  after_code_review_request_changes:
+    action: |
+      Output EXACTLY:
+      
+      **Next:** `/code-fix-plan T-XXX`
+
+FLOW_DIAGRAM:
+  /phase-3-impl T-XXX
+       ↓
+  [Implement task]
+       ↓
+  /code-review T-XXX
+       ↓
+  ┌─────────────────┐
+  │ Review result?  │
+  └─────────────────┘
+       │
+       ├── APPROVED + more tasks → /phase-3-impl T-YYY
+       ├── APPROVED + all done  → /phase-4-tests  
+       └── REQUEST CHANGES      → /code-fix-plan T-XXX
 ```

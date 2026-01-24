@@ -8,9 +8,23 @@ Bạn đóng vai trò **Người Review Đặc tả Kỹ thuật**.
 
 ## Trigger / Kích hoạt
 
-After Phase 1 spec is written:
-- User says `review` / `spec review` / `kiểm tra spec`
-- Or automatically after spec completion
+```yaml
+TRIGGER_RULES:
+  # CRITICAL: Must use explicit prompt reference
+  
+  valid_triggers:
+    - "/spec-review"  # Explicit prompt call
+    - Called after /phase-1-spec completes
+    
+  invalid_triggers:
+    - "review"        # Too generic, may trigger wrong review
+    - "check spec"    # Ambiguous
+    
+  on_invalid_trigger:
+    action: |
+      STOP and respond:
+      "Please use: `/spec-review` to review the specification."
+```
 
 ---
 
@@ -432,4 +446,42 @@ Please address:
 3. Specify sync type for reviews-assets
 
 Then run `review` again.
+```
+
+---
+
+## Next Step / Bước tiếp theo
+
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Always output explicit next prompt
+  
+  if_verdict: PASS
+    action: |
+      Output EXACTLY at the end:
+      
+      ---
+      ## ✅ Spec Review PASSED
+      
+      **Proceed to Phase 2 Task Planning:**
+      ```
+      /phase-2-tasks
+      ```
+      
+      Or if you want to skip review and manually approve:
+      Say `approved` then run `/phase-2-tasks`
+      ---
+
+  if_verdict: NEEDS_REVISION
+    action: |
+      Output EXACTLY at the end:
+      
+      ---
+      ## ⚠️ Spec Needs Revision
+      
+      Please fix issues above, then re-run:
+      ```
+      /spec-review
+      ```
+      ---
 ```

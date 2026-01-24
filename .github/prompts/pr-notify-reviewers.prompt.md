@@ -8,8 +8,16 @@ Bạn đóng vai trò **Trợ lý Giao tiếp Thân thiện**.
 
 ## Trigger / Kích hoạt
 
-- After PR is created
-- User says `notify` / `ping reviewers` / `báo reviewer`
+```yaml
+TRIGGER_RULES:
+  accepted_triggers:
+    - "/pr-notify-reviewers"     # Explicit prompt reference (RECOMMENDED)
+    - "notify", "ping reviewers", "báo reviewer"  # Clear intent
+    
+  prerequisites:
+    - PR has been created
+    - /pr-description completed (optional but recommended)
+```
 
 ---
 

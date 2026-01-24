@@ -8,9 +8,24 @@ Bạn đóng vai trò **Kiểm toán Chất lượng Test và Phân tích Độ 
 
 ## Trigger / Kích hoạt
 
-- All test batches written and executed
-- User says `verify` / `test verify` / `xác nhận test`
-- Before proceeding to Phase 5
+```yaml
+TRIGGER_RULES:
+  explicit_only: true
+  accepted_triggers:
+    - "/test-verify"         # Explicit prompt reference (REQUIRED)
+    
+  rejected_triggers:
+    - "verify", "test verify", "xác nhận test"  # ⚠️ TOO VAGUE
+    - "go", "continue", "approved"              # ⚠️ DANGEROUS in long conversations
+    
+  why: |
+    Explicit prompt references prevent accidental phase skipping
+    in long conversations where context may be confused.
+    
+  prerequisites:
+    - All test batches written and executed
+    - User has run tests and reported results
+```
 
 ---
 
@@ -272,7 +287,29 @@ FAIL_criteria:
 
 **Ready for Phase 5: Done Check**
 
-Reply `approved` to proceed to final review.
+---
+
+## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  on_PASS:
+    recommended: "/phase-5-done"
+    command: "Run: /phase-5-done"
+    
+  on_FAIL:
+    if_test_bug: "Fix tests, then /test-verify again"
+    if_impl_bug: "/phase-3-impl T-XXX to fix implementation"
+    
+  DO_NOT_SAY:
+    - "Reply approved to continue"
+    - "Say go to proceed"
+    
+  MUST_SAY:
+    - "Run `/phase-5-done` to complete the workflow"
+```
+
+Run `/phase-5-done` to proceed to final review.
 
 <If FAIL>
 ❌ **Test verification failed**
@@ -286,13 +323,13 @@ Reply `approved` to proceed to final review.
 **Actions Required:**
 1. Fix failing tests (see analysis above)
 2. Add tests for coverage gaps
-3. Run `verify` again
+3. Run `/test-verify` again
 
 <If test bug>
-Reply `fix tests` to write corrected tests.
+Fix tests, then run `/test-verify` again.
 
 <If impl bug>
-Reply `impl fix` to go back to Phase 3 for implementation fix.
+Run `/phase-3-impl T-XXX` to fix implementation issue.
 ```
 
 ---

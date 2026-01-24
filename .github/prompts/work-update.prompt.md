@@ -8,10 +8,26 @@ Bạn đóng vai trò **Điều phối viên Quản lý Thay đổi**.
 
 ## Trigger / Kích hoạt
 
-- User says `update` / `change` / `cập nhật` / `thay đổi`
-- PR review requests changes
-- Requirement changes mid-workflow
-- Stakeholder feedback requires rework
+```yaml
+TRIGGER_RULES:
+  explicit_only: true
+  accepted_triggers:
+    - "/work-update"         # Explicit prompt reference (REQUIRED)
+    
+  rejected_triggers:
+    - "update", "change", "cập nhật"  # ⚠️ TOO VAGUE - could mean many things
+    - "go", "continue", "approved"    # ⚠️ DANGEROUS in long conversations
+    
+  why: |
+    Explicit prompt references prevent accidental phase skipping
+    and ensure user intentionally wants to register a work update.
+    
+  use_cases:
+    - PR review requests changes
+    - Requirement changes mid-workflow
+    - Stakeholder feedback requires rework
+    - Bug found during testing
+```
 
 ---
 
@@ -354,7 +370,30 @@ MUST:
 
 | User Response | Next Action |
 |---------------|-------------|
-| `approved` | Run restart phase prompt (e.g., `phase-0-analysis.prompt.md`) |
+| `approved` | Run restart phase prompt |
 | `adjust phase <X>` | Change restart phase |
 | `cancel` | Cancel update, keep current state |
 | `show history` | Display all updates history |
+
+---
+
+## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  after_update_approved:
+    restart_from_phase_0: "/phase-0-analysis"
+    restart_from_phase_1: "/phase-1-spec"
+    restart_from_phase_2: "/phase-2-tasks"
+    restart_from_phase_3: "/phase-3-impl T-XXX"
+    restart_from_phase_4: "/phase-4-tests"
+    
+  command_pattern: "Run: /phase-X-... (based on restart phase)"
+  
+  DO_NOT_SAY:
+    - "Reply approved to continue"
+    - "Say go to proceed"
+    
+  MUST_SAY:
+    - "Run `/phase-X-...` to restart from Phase X"
+```

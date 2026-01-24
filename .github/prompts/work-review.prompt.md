@@ -249,18 +249,45 @@ status:
 
 ## Next Step / Bước tiếp theo
 
-**If READY:**
-```
-→ STOP and wait for user approval
-→ User says "approved" / "go" / "duyệt"
-→ Run: phase-0-analysis.prompt.md
-```
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Do NOT use generic commands like 'go', 'approved', 'continue'
+  # ALWAYS suggest explicit prompt reference to prevent phase skipping
+  
+  if: Verdict is READY
+  action: |
+    Output EXACTLY at the end:
+    
+    ---
+    ## ⏸️ CHECKPOINT: Work Review Complete — READY
+    
+    ✅ **Work description approved.** To start Phase 0 Analysis, run:
+    
+    ```
+    /phase-0-analysis
+    ```
+    
+    DO NOT proceed without explicit user confirmation.
+    KHÔNG tiến hành khi chưa có xác nhận từ user.
+    
+    Say `approved` to confirm, then run `/phase-0-analysis`.
+    ---
 
-**If NOT READY:**
-```
-→ STOP and show blockers
-→ User provides missing info
-→ Re-run work-review.prompt.md
+  if: Verdict is NOT READY
+  action: |
+    Output EXACTLY at the end:
+    
+    ---
+    ## ⏸️ BLOCKED: Not Ready for Analysis
+    
+    ❌ Please address the blockers above, then re-run:
+    
+    ```
+    /work-review
+    ```
+    
+    DO NOT proceed to Phase 0 until review passes.
+    ---
 ```
 
 ---

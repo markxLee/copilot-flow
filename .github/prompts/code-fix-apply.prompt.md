@@ -8,9 +8,24 @@ Bạn đóng vai trò **Người Thực thi Sửa Code Có Kiểm soát**.
 
 ## Trigger / Kích hoạt
 
-- Fix plan approved by user
-- User says `approved` / `apply fixes` / `áp dụng`
-- After code-fix-plan reviewed
+```yaml
+TRIGGER_RULES:
+  explicit_only: true
+  accepted_triggers:
+    - "/code-fix-apply T-XXX"  # Explicit prompt reference with task ID (REQUIRED)
+    
+  rejected_triggers:
+    - "apply fixes", "áp dụng"         # ⚠️ TOO VAGUE
+    - "go", "continue", "approved"    # ⚠️ DANGEROUS in long conversations
+    
+  why: |
+    Explicit prompt references prevent accidental phase skipping
+    in long conversations where context may be confused.
+    
+  prerequisites:
+    - Fix plan created and approved for task T-XXX
+    - User explicitly approved the fix plan
+```
 
 ---
 
@@ -327,8 +342,30 @@ if_user_rejects_fix:
 
 | User Response | Next Action |
 |---------------|-------------|
-| `verified` / `review` | Run: `code-review.prompt.md` (re-review) |
-| `next batch` | Re-run: `code-fix-apply.prompt.md` (loop) |
+| `verified` | Proceed to re-review |
+| `next batch` | Apply next batch of fixes |
 | `failed` + details | Analyze failure, propose correction |
 | `skip <finding>` | Skip that fix, continue |
-| `abort` | Revert changes, re-run: `code-fix-plan.prompt.md` |
+| `abort` | Revert changes, re-plan fixes |
+
+---
+
+## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  after_fixes_verified:
+    recommended: "/code-review T-XXX"
+    command: "Run: /code-review T-XXX to re-review after fixes"
+    
+  if_more_batches:
+    recommended: "/code-fix-apply T-XXX"
+    command: "Run: /code-fix-apply T-XXX to apply next batch"
+    
+  DO_NOT_SAY:
+    - "Reply verified to continue"
+    - "Say review to proceed"
+    
+  MUST_SAY:
+    - "Run `/code-review T-XXX` to re-review after fixes"
+```

@@ -8,9 +8,23 @@ Bạn đóng vai trò **Người Review Kế hoạch Task và Kiểm toán Deliv
 
 ## Trigger / Kích hoạt
 
-After Phase 2 task plan is written:
-- User says `review` / `task review` / `kiểm tra tasks`
-- Or automatically after task plan completion
+```yaml
+TRIGGER_RULES:
+  # CRITICAL: Must use explicit prompt reference
+  
+  valid_triggers:
+    - "/task-plan-review"  # Explicit prompt call
+    - Called after /phase-2-tasks completes
+    
+  invalid_triggers:
+    - "review"        # Too generic, may trigger wrong review
+    - "check tasks"   # Ambiguous
+    
+  on_invalid_trigger:
+    action: |
+      STOP and respond:
+      "Please use: `/task-plan-review` to review the task plan."
+```
 
 ---
 
@@ -373,17 +387,36 @@ Please fix the issues above, then run `review` again.
 
 ## Next Step / Bước tiếp theo
 
-**If PASS + User approves:**
-```
-→ Run: phase-3-impl.prompt.md
-→ Load tasks into state for tracking
-→ Start with first task (T-001)
-→ Update state: current_phase = 3, current_task = T-001
-```
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Always output explicit next prompt
+  
+  if_verdict: PASS
+    action: |
+      Output EXACTLY at the end:
+      
+      ---
+      ## ✅ Task Plan Review PASSED
+      
+      **Start Phase 3 Implementation with first task:**
+      ```
+      /phase-3-impl T-001
+      ```
+      
+      Or if you want to skip review and manually approve:
+      Say `approved` then run `/phase-3-impl T-001`
+      ---
 
-**If NEEDS REVISION:**
-```
-→ User fixes tasks.md
-→ Re-run: task-plan-review.prompt.md
-→ Repeat until PASS
+  if_verdict: NEEDS_REVISION
+    action: |
+      Output EXACTLY at the end:
+      
+      ---
+      ## ⚠️ Task Plan Needs Revision
+      
+      Please fix issues above, then re-run:
+      ```
+      /task-plan-review
+      ```
+      ---
 ```

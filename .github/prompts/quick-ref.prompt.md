@@ -254,7 +254,45 @@ Or run all at once: `setup workspace`
 
 ---
 
-### 🚀 Session Commands / Lệnh Phiên
+### ⚠️ CRITICAL: Use Explicit Prompt References / Dùng Prompt Reference Tường minh
+
+**Problem / Vấn đề:** Generic commands like `go`, `approved` can cause phase skipping in long conversations.
+Các lệnh chung như `go`, `approved` có thể gây nhảy phase khi conversation dài.
+
+**Solution / Giải pháp:** Always use explicit `/prompt-name` to ensure correct flow.
+Luôn dùng `/prompt-name` tường minh để đảm bảo đúng flow.
+
+---
+
+### 🎯 Explicit Prompt References (RECOMMENDED) / Prompt Reference Tường minh (KHUYẾN NGHỊ)
+
+| Prompt | When to Use | Khi nào Dùng |
+|--------|-------------|--------------|
+| `/work-intake` | Capture work description | Thu thập mô tả công việc |
+| `/work-review` | After work-intake, check readiness | Sau work-intake, kiểm tra sẵn sàng |
+| `/work-update` | Handle requirement changes | Xử lý thay đổi yêu cầu |
+| `/phase-0-analysis` | Start Phase 0 Analysis | Bắt đầu Phase 0 Phân tích |
+| `/phase-1-spec` | Start Phase 1 Specification | Bắt đầu Phase 1 Đặc tả |
+| `/spec-review` | Review spec (before Phase 2) | Review spec (trước Phase 2) |
+| `/phase-2-tasks` | Start Phase 2 Task Planning | Bắt đầu Phase 2 Lập kế hoạch |
+| `/task-plan-review` | Review task plan (before Phase 3) | Review task plan (trước Phase 3) |
+| `/phase-3-impl T-XXX` | Implement specific task | Triển khai task cụ thể |
+| `/phase-3-impl next` | Implement next incomplete task | Triển khai task tiếp theo |
+| `/code-review T-XXX` | Review task changes | Review thay đổi của task |
+| `/code-fix-plan T-XXX` | Plan fixes for review issues | Lập kế hoạch sửa lỗi |
+| `/code-fix-apply T-XXX` | Apply approved fixes | Áp dụng fixes đã duyệt |
+| `/phase-4-tests` | Start Phase 4 Testing | Bắt đầu Phase 4 Testing |
+| `/test-verify` | Verify test coverage & quality | Xác nhận độ phủ & chất lượng test |
+| `/phase-5-done` | Start Phase 5 Done Check | Bắt đầu Phase 5 Kiểm tra xong |
+| `/pr-description` | Generate PR description | Tạo mô tả PR |
+| `/pr-notify-reviewers` | Generate reviewer notification | Tạo tin nhắn thông báo reviewer |
+| `/workflow-resume` | Resume from saved state | Tiếp tục từ trạng thái đã lưu |
+| `/rollback` | Undo implementation changes | Hoàn tác thay đổi |
+| `/lite-mode` | Start lite mode for simple tasks | Chế độ nhanh cho task đơn giản |
+
+---
+
+### 🚀 Session Commands / Lệnh Phiên (Safe to use)
 | Command | Action | Lệnh VN |
 |---------|--------|---------|
 | `init` | Start/refresh session | `bắt đầu` |
@@ -262,27 +300,27 @@ Or run all at once: `setup workspace`
 | `status` | Show current progress | `trạng thái` |
 | `help` / `?` | Show this reference | `trợ giúp` |
 
-### 📝 Work Commands / Lệnh Công việc
-| Command | Action | Lệnh VN |
-|---------|--------|---------|
-| `<describe work>` | Start new work | `<mô tả công việc>` |
-| `update` | Handle requirement changes | `cập nhật` |
-| `lite: <desc>` | Start lite mode (skip phases) | `nhanh: <mô tả>` |
+### ⚠️ Risky Commands (Avoid in long conversations) / Lệnh Rủi ro
+| Command | Risk | Alternative |
+|---------|------|-------------|
+| ~~`approved`~~ | ❌ May skip phases | Use explicit `/phase-X-xxx` |
+| ~~`go`~~ | ❌ May skip phases | Use explicit `/phase-X-xxx` |
+| ~~`continue`~~ | ❌ May skip phases | Use explicit `/phase-X-xxx` |
+| ~~`next task`~~ | ❌ May skip review | Use `/phase-3-impl T-XXX` |
+| ~~`review`~~ | ❌ Ambiguous scope | Use `/code-review T-XXX` |
 
-### ✅ Approval Commands / Lệnh Duyệt
-| Command | Action | Lệnh VN |
-|---------|--------|---------|
-| `approved` | Approve current phase | `duyệt` |
-| `go` | Proceed to next action | `tiếp` |
-| `skip` | Skip optional step | `bỏ qua` |
-| `feedback: <text>` | Provide feedback | `góp ý: <text>` |
+### ✅ Safe Approval Pattern / Mẫu Duyệt An toàn
+```
+# Instead of:
+approved
 
-### 🔍 Review Commands / Lệnh Review
-| Command | Action | Lệnh VN |
-|---------|--------|---------|
-| `review` | Run review for current phase | `review` |
-| `next task` | Move to next task (Phase 3) | `task tiếp` |
-| `next batch` | Next test batch (Phase 4) | `batch tiếp` |
+# Use:
+/spec-review     # After Phase 1, review spec first
+/phase-2-tasks   # After spec review passes
+/task-plan-review # After Phase 2, review task plan first
+/phase-3-impl T-001  # After task plan review passes
+/code-review T-001   # After task implementation
+```
 
 ### 📤 PR Commands / Lệnh PR
 | Command | Action | Lệnh VN |
@@ -314,11 +352,32 @@ Or run all at once: `setup workspace`
 
 ---
 
-### 🔄 Common Flows / Các Luồng Phổ biến
+### 🔄 Common Flows with Explicit Prompts / Các Luồng với Prompt Tường minh
 
-**New Feature:**
+**New Feature (Full Workflow):**
 ```
-init → <describe> → approved → phase-0 → ... → phase-5 → pr
+init 
+  → <describe work> 
+  → /work-review 
+  → /phase-0-analysis 
+  → /phase-1-spec 
+  → /phase-2-tasks 
+  → /phase-3-impl T-001 
+  → /code-review T-001
+  → /phase-3-impl T-002
+  → ... (repeat for all tasks)
+  → /phase-4-tests
+  → /phase-5-done
+  → pr
+```
+
+**Phase 3 Task Loop:**
+```
+/phase-3-impl T-001
+  → (implement)
+  → /code-review T-001
+  → (if approved) → /phase-3-impl T-002
+  → (if changes requested) → /code-fix-plan T-001
 ```
 
 **Quick Fix (Lite Mode):**
@@ -328,12 +387,12 @@ lite: <describe> → implement → review → done
 
 **Resume Work:**
 ```
-resume → go → (continue where left off)
+resume → status → (use explicit prompt for current phase)
 ```
 
 **Requirement Change:**
 ```
-update → <describe change> → approved → (restart from affected phase)
+update → <describe change> → (restart from affected phase with explicit prompt)
 ```
 
 **Undo Mistake:**
@@ -345,11 +404,13 @@ rollback → (choose what to undo) → continue
 
 ### 💡 Tips / Mẹo
 
-1. **Always on feature branch** — Not main/master
-2. **State auto-saves** — Resume anytime with `resume`
-3. **Bilingual OK** — Commands work in EN or VI
-4. **Say `status` anytime** — See where you are
-5. **Approval required** — Copilot STOPs at each phase gate
+1. **Always use explicit prompts** — `/phase-X-xxx` instead of `go`/`approved`
+2. **Always on feature branch** — Not main/master
+3. **State auto-saves** — Resume anytime with `resume`
+4. **Bilingual OK** — Commands work in EN or VI
+5. **Say `status` anytime** — See where you are
+6. **Each phase needs explicit trigger** — Copilot STOPs and waits for `/prompt-name`
+7. **Task ID required for Phase 3** — Use `/phase-3-impl T-XXX`
 
 ---
 

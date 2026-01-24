@@ -25,9 +25,19 @@ Bỏ qua các phase không cần thiết cho task nhỏ, rõ ràng:
 
 ## Trigger / Kích hoạt
 
-- User says: `lite: <description>`, `quick: <description>`, `nhanh: <description>`
-- User says: `simple fix`, `small change`, `quick task`
-- User explicitly requests to skip phases
+```yaml
+TRIGGER_RULES:
+  accepted_triggers:
+    - "/lite-mode"               # Explicit prompt reference (RECOMMENDED)
+    - "lite: <description>"      # Prefix syntax
+    - "quick: <description>"     # Prefix syntax
+    - "nhanh: <description>"     # Vietnamese prefix
+    - "simple fix", "small change", "quick task"
+    
+  why: |
+    Lite mode intent is clear from prefix or explicit request.
+    The prompt validates appropriateness before proceeding.
+```
 
 ---
 

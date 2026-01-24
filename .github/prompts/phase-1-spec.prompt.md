@@ -8,9 +8,28 @@ Bạn đóng vai trò **Người viết Đặc tả Kỹ thuật**.
 
 ## Trigger / Kích hoạt
 
-After Phase 0 Analysis is approved:
-- User says `approved` / `go` / `duyệt` after Phase 0
-- Or explicitly: `start phase 1` / `spec`
+```yaml
+TRIGGER_RULES:
+  # CRITICAL: Must use explicit prompt reference
+  # Prevents phase skipping when context is long
+  
+  valid_triggers:
+    - "/phase-1-spec"  # Explicit prompt call
+    - Workflow resume with current_phase: 1 in state
+    
+  pre_condition:
+    - Phase 0 Analysis approved (status: approved)
+    
+  invalid_triggers:
+    - "go"         # Too generic
+    - "approved"   # Ambiguous without context  
+    - "spec"       # May skip validation
+    
+  on_invalid_trigger:
+    action: |
+      STOP and respond:
+      "Please use: `/phase-1-spec` to start Phase 1."
+```
 
 ---
 
@@ -350,24 +369,55 @@ After completing spec:
 Please review the specification.
 Vui lòng review đặc tả.
 
-Reply / Trả lời:
-- `approved` / `duyệt` → Proceed to Phase 2: Task Planning
-- `review` → Run spec-review for detailed analysis
-- `feedback: <your feedback>` → Revise specification
+**👉 RECOMMENDED: Run spec review first / KHỤYẾN NGHỊ: Chạy spec review trước**
+```
+/spec-review
+```
+
+**Or if you want to manually review and approve / Hoặc nếu muốn tự review và duyệt:**
+Say `approved` then run `/phase-2-tasks`
 ```
 
 ---
 
 ## Next Step / Bước tiếp theo
 
-After spec is written:
-```
-→ Optional: Run spec-review.prompt.md for detailed review
-→ Or approve directly to continue
-```
-
-After approval:
-```
-→ Run: phase-2-tasks.prompt.md
-→ Update state: current_phase = 2
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Always recommend review prompt first
+  # User can skip review by saying 'approved' explicitly
+  
+  after_spec_written:
+    action: |
+      Output EXACTLY at the end:
+      
+      ---
+      ## ⏸️ CHECKPOINT: Spec Complete
+      
+      ### 📋 Next Steps (EXPLICIT PROMPTS REQUIRED)
+      
+      **Step 1: Run spec review (RECOMMENDED)**
+      ```
+      /spec-review
+      ```
+      
+      **Step 2: After review passes, proceed to Phase 2**
+      ```
+      /phase-2-tasks
+      ```
+      
+      ---
+      
+      **⚠️ Skip review (manual approval):**
+      If you reviewed manually and want to proceed directly:
+      Say `approved` then run `/phase-2-tasks`
+      
+      ⚠️ DO NOT use generic commands like `go`, `approved` alone.
+      ---
+      ```
+      /phase-2-tasks
+      ```
+      
+      ⚠️ DO NOT use generic commands like `go`, `approved`.
+      ---
 ```

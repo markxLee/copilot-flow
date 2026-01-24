@@ -8,9 +8,23 @@ Bạn đóng vai trò **Kỹ sư Cấp cao và Người Gác cổng Code Review*
 
 ## Trigger / Kích hoạt
 
-- User says `review` / `code review` / `kiểm tra code`
-- After task implementation in Phase 3
-- When reviewing changes before commit
+```yaml
+TRIGGER_RULES:
+  # CRITICAL: Must include task ID for precise review scope
+  
+  valid_triggers:
+    - "/code-review T-XXX"  # Review specific task
+    - "/code-review"        # Review current task from state
+    
+  invalid_triggers:
+    - "review"        # Too generic
+    - "check code"    # Ambiguous
+    
+  on_invalid_trigger:
+    action: |
+      STOP and respond:
+      "Please use: `/code-review T-XXX` to review specific task."
+```
 
 ---
 
@@ -341,8 +355,51 @@ MUST:
 
 ## Next Step / Bước tiếp theo
 
-| Verdict | Next Action |
-|---------|-------------|
-| APPROVE | Run: `phase-3-impl.prompt.md` (next task) |
-| APPROVE (all tasks done) | Run: `phase-4-tests.prompt.md` |
-| REQUEST CHANGES | Run: `code-fix-plan.prompt.md` |
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Always output explicit next prompt
+  
+  if_verdict: APPROVE
+    if: more_tasks_remaining
+    action: |
+      Output EXACTLY:
+      
+      ---
+      ## ✅ Review Approved for T-XXX
+      
+      **Next task:**
+      ```
+      /phase-3-impl T-YYY
+      ```
+      OR
+      ```
+      /phase-3-impl next
+      ```
+      ---
+    
+    if: all_tasks_complete
+    action: |
+      Output EXACTLY:
+      
+      ---
+      ## ✅ All Tasks Complete
+      
+      **Proceed to testing:**
+      ```
+      /phase-4-tests
+      ```
+      ---
+
+  if_verdict: REQUEST_CHANGES
+    action: |
+      Output EXACTLY:
+      
+      ---
+      ## ⚠️ Changes Requested for T-XXX
+      
+      **Create fix plan:**
+      ```
+      /code-fix-plan T-XXX
+      ```
+      ---
+```

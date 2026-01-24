@@ -8,9 +8,24 @@ Bạn đóng vai trò **Người Gác cổng Release và Kiểm toán Định ng
 
 ## Trigger / Kích hoạt
 
-- Phase 4 tests verified and approved
-- User says `done` / `phase 5` / `hoàn thành`
-- Workflow resume with current_phase = 5
+```yaml
+TRIGGER_RULES:
+  explicit_only: true
+  accepted_triggers:
+    - "/phase-5-done"        # Explicit prompt reference (REQUIRED)
+    
+  rejected_triggers:
+    - "done", "phase 5", "hoàn thành"  # ⚠️ TOO VAGUE - may skip phases
+    - "go", "continue", "approved"      # ⚠️ DANGEROUS in long conversations
+    
+  why: |
+    Explicit prompt references prevent accidental phase skipping
+    in long conversations where context may be confused.
+    
+  prerequisites:
+    - Phase 4 tests verified (/test-verify passed)
+    - ALL phases 0-4 must be approved
+```
 
 ---
 
@@ -372,11 +387,39 @@ git push origin <branch-name>
 All Definition of Done criteria met!
 Tất cả tiêu chí Định nghĩa Hoàn thành đã đạt!
 
+---
+
+## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  on_DONE:
+    step_1: "User commits and pushes changes manually"
+    step_2_recommended: "/pr-description"
+    step_2_command: "Run: /pr-description to generate PR content"
+    
+    step_3_optional: "/pr-notify-reviewers"
+    step_3_command: "Run: /pr-notify-reviewers for friendly message"
+    
+  on_NOT_DONE:
+    action: "Fix blockers first"
+    then: "/phase-5-done again"
+    
+  DO_NOT_SAY:
+    - "Reply approved to continue"
+    - "Say go to proceed"
+    
+  MUST_SAY:
+    - "Run `/pr-description` to generate PR description"
+    - "After PR created, optionally run `/pr-notify-reviewers`"
+```
+
 **Next Steps:**
 1. Review the suggested commit messages
 2. Commit and push changes (user performs manually)
-3. Create PR using the template above
-4. Request code review from team
+3. Run `/pr-description` to generate PR content
+4. Create PR and request code review
+5. Optionally run `/pr-notify-reviewers` for friendly message
 
 🎉 Congratulations! Feature `<title>` is ready for merge.
 
@@ -389,7 +432,7 @@ Tất cả tiêu chí Định nghĩa Hoàn thành đã đạt!
 1. <Action for blocker 1>
 2. <Action for blocker 2>
 
-After fixing, run `done` again to re-verify.
+After fixing, run `/phase-5-done` again to re-verify.
 ```
 
 ---

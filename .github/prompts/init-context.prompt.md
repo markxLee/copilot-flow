@@ -210,21 +210,25 @@ init_workflow:
        path: <impl_root>/docs/runs/<branch-slug>/README.md
        
     5. Announce:
-       "## ✅ Workflow Initialized / Workflow đã khởi tạo
+       "
+       ## ✅ Workflow Initialized / Workflow đã khởi tạo
        
        | Aspect | Value |
-       |--------|-------|
+       |--------|----- -|
        | Feature | <feature-name> |
        | Branch | `<branch-slug>` |
        | Docs Location | `<impl_root>/docs/runs/<branch-slug>/` |
        
-       ---"
+       ---
        
-    6. Run work-intake.prompt.md to capture work description
-    
-    7. After work description captured, run work-review.prompt.md
-    
-    8. If READY, proceed to Phase 0 Analysis (solution design)
+       **Next step: Run work intake / Bước tiếp theo: Chạy work intake**
+       ```
+       /work-intake
+       ```
+       "
+       
+    6. STOP and wait for user to run /work-intake
+       # DO NOT auto-run work-intake, let user trigger explicitly
 ```
 
 ### Step 7: Work Description Flow / Luồng Mô tả Công việc
@@ -329,10 +333,28 @@ Show when user says "help" / Hiển thị khi user nói "help":
 | `start: <desc>` | Start new workflow |
 | `resume` / `tiếp tục` | Continue existing workflow |
 | `status` / `trạng thái` | Show current status |
-| `go` / `tiếp` | Execute next action |
-| `approved` / `duyệt` | Approve current phase |
-| `skip` / `bỏ qua` | Skip current item |
 | `help` | Show this reference |
+
+### ⚠️ Explicit Prompt References (RECOMMENDED)
+| Prompt | When to Use |
+|--------|-------------|
+| `/work-intake` | Capture work description |
+| `/work-review` | Review work readiness |
+| `/phase-0-analysis` | Start Phase 0 |
+| `/phase-1-spec` | Start Phase 1 |
+| `/spec-review` | Review spec |
+| `/phase-2-tasks` | Start Phase 2 |
+| `/task-plan-review` | Review task plan |
+| `/phase-3-impl T-XXX` | Implement task |
+| `/code-review T-XXX` | Review task code |
+| `/phase-4-tests` | Start Phase 4 |
+| `/phase-5-done` | Start Phase 5 |
+
+### ⚠️ Risky Commands (Avoid)
+| Command | Risk |
+|---------|------|
+| ~~`go`~~ / ~~`tiếp`~~ | May skip phases |
+| ~~`approved`~~ / ~~`duyệt`~~ | May skip phases |
 
 ### Workflow Phases / Các Phase
 | # | Phase | Gate |

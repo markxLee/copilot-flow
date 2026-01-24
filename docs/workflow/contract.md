@@ -25,7 +25,13 @@ Before any work, Copilot MUST reference `WORKSPACE_CONTEXT.md` to understand:
 - Cross-root dependencies
 
 If `WORKSPACE_CONTEXT.md` does not exist or is stale:
-→ STOP and run `workspace-discovery.prompt.md` first
+→ STOP and run `setup workspace` (or `workspace-discovery.prompt.md`)
+
+**Setup Workspace** runs 4 steps:
+1. Discovery → WORKSPACE_CONTEXT.md
+2. Cross-root → Configure patterns
+3. Sync instructions → Copy coding standards
+4. Generate files → .code-workspace + ARCHITECTURE.md
 
 ### Branch Slug (MANDATORY)
 All artifacts MUST be stored under a directory derived from the **current git branch name**.

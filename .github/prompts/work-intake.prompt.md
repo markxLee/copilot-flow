@@ -270,15 +270,41 @@ action:
 
 ## Next Step / Bước tiếp theo
 
-If Work Description is complete (no missing info):
-```
-→ Run work-review.prompt.md
-```
+```yaml
+NEXT_PROMPT_ENFORCEMENT:
+  # CRITICAL: Do NOT use generic commands like 'go', 'approved', 'continue'
+  # ALWAYS suggest explicit prompt reference to prevent phase skipping
+  
+  if: Work Description complete (no missing info)
+  action: |
+    Output EXACTLY:
+    
+    ---
+    ## ⏸️ CHECKPOINT: Work Intake Complete
+    
+    **Ready for review.** Run the following prompt:
+    
+    ```
+    /work-review
+    ```
+    
+    DO NOT proceed without running `/work-review` first.
+    KHÔNG tiến hành khi chưa chạy `/work-review`.
+    ---
 
-If information is missing:
-```
-→ STOP and ask user to provide answers
-→ Re-run work-intake after answers received
+  if: Information missing
+  action: |
+    Output EXACTLY:
+    
+    ---
+    ## ⏸️ BLOCKED: Missing Information
+    
+    Please answer the questions above, then re-run:
+    
+    ```
+    /work-intake
+    ```
+    ---
 ```
 
 ---
