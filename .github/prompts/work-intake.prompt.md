@@ -192,6 +192,82 @@ status:
 
 ---
 
+## ⚠️ Edge Cases & Error Handling / Xử lý Biên & Lỗi
+
+### Case 1: User gives vague description / Mô tả mơ hồ
+```yaml
+trigger: "Fix the bug" / "Make it better" / "Update the thing"
+action:
+  1. Do NOT guess what user means
+  2. Ask clarifying questions:
+     - "Which bug are you referring to? Do you have an error message?"
+     - "What specifically should be improved? Performance, UI, functionality?"
+     - "Which 'thing' needs updating? Please provide file/component name."
+  3. Wait for answers before proceeding
+```
+
+### Case 2: User describes solution not problem / Mô tả giải pháp không phải vấn đề
+```yaml
+trigger: "Add a Redis cache" / "Use PostgreSQL instead"
+action:
+  1. Acknowledge the suggested solution
+  2. Ask for the underlying problem:
+     - "What problem are you trying to solve with Redis cache?"
+     - "What issue with the current database led to this decision?"
+  3. Document both problem and proposed solution
+  4. Note that design decisions will be evaluated in Phase 0
+```
+
+### Case 3: Scope too large / Phạm vi quá lớn
+```yaml
+trigger: "Rewrite the entire app" / "Add all missing features"
+action:
+  1. Acknowledge the request
+  2. Warn about scope:
+     - "This is a large scope. Let's break it down."
+  3. Ask for priority:
+     - "Which part is most urgent?"
+     - "Can we start with a specific module?"
+  4. Suggest splitting into multiple work items
+```
+
+### Case 4: Work already exists / Công việc đã tồn tại
+```yaml
+trigger: Check .workflow-state.yaml shows active work
+action:
+  1. Warn user:
+     - "There's already active work: <feature-name>"
+     - "Phase: <current-phase>, Status: <status>"
+  2. Offer options:
+     - "Say `resume` to continue existing work"
+     - "Say `abort` then describe new work to start fresh"
+  3. Do NOT overwrite without confirmation
+```
+
+### Case 5: Multiple roots affected / Nhiều root bị ảnh hưởng
+```yaml
+trigger: Work spans multiple repositories
+action:
+  1. Identify all affected roots
+  2. Check WORKSPACE_CONTEXT.md for relationships
+  3. Warn if cross-root dependencies exist:
+     - "This work affects: apphub-vision, reviews-assets"
+     - "Note: reviews-assets depends on apphub-vision's build"
+  4. Document build order in constraints
+```
+
+### Case 6: Missing context / Thiếu ngữ cảnh
+```yaml
+trigger: WORKSPACE_CONTEXT.md not found or impl_root not set
+action:
+  1. STOP immediately
+  2. Inform user:
+     - "Workspace not configured. Run `setup workspace` first."
+  3. Do NOT proceed with work intake
+```
+
+---
+
 ## Next Step / Bước tiếp theo
 
 If Work Description is complete (no missing info):

@@ -104,7 +104,10 @@ Copilot thinks:
 | `cross-root` | Auto-config & save cross-root relationships |
 | `sync instructions` | Sync shared instructions + detect tech stacks |
 | `suggest instructions` | Analyze tech stacks & suggest missing instructions |
-| `setup workspace` | Run full setup (discovery → cross-root → sync) |
+| `sync vscode settings` | Sync VS Code settings to all roots |
+| `setup workspace` | Run full setup (discovery → cross-root → sync → generate) |
+| `generate workspace file` | Generate .code-workspace from context |
+| `generate architecture` | Generate ARCHITECTURE.md from context |
 
 ---
 

@@ -35,6 +35,10 @@ setup_sequence:
      - Sync shared instructions
      - Detect tech stacks
      - Suggest missing instructions
+     
+  4. generate-workspace-files:
+     - Generate .code-workspace file
+     - Generate ARCHITECTURE.md
 
 output_after_all:
   "## ✅ Workspace Setup Complete!
@@ -44,8 +48,14 @@ output_after_all:
   | 1. Discovery | ✅ WORKSPACE_CONTEXT.md created |
   | 2. Cross-root | ✅ Patterns saved to Section 9 |
   | 3. Sync Instructions | ✅ Synced + tech stacks analyzed |
+  | 4. Workspace Files | ✅ .code-workspace + ARCHITECTURE.md |
   
-  Ready to start working. Say `init` to begin."
+  To open workspace:
+  \`\`\`bash
+  code <workspace_name>.code-workspace
+  \`\`\`
+  
+  Ready to start working. Say \`init\` to begin."
 ```
 
 ---

@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../apphub-vision"
+		},
+		{
+			"path": "../boost-pfs-backend"
+		},
+		{
+			"path": "../reviews-assets"
+		}
+	],
+	"settings": {}
+}

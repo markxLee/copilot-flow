@@ -1,0 +1,71 @@
+{
+  // ================================================================
+  // VSCODE SETTINGS TEMPLATE
+  // ================================================================
+  // Copy this to <root>/.vscode/settings.json
+  // Customize per-root as needed
+  // ================================================================
+
+  // COPILOT - Code Generation
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": ".github/copilot-instructions.md"
+    }
+  ],
+
+  // COPILOT - Test Generation
+  "github.copilot.chat.testGeneration.instructions": [
+    {
+      "file": ".github/instructions/testing.instructions.md"
+    }
+  ],
+
+  // COPILOT - Code Review
+  "github.copilot.chat.reviewSelection.instructions": [
+    {
+      "file": ".github/instructions/code-review.instructions.md"
+    }
+  ],
+
+  // COPILOT - Commit Messages
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Use conventional commits: type(scope): description. Types: feat, fix, docs, refactor, test, chore."
+    }
+  ],
+
+  // COPILOT - Enable/Disable per language
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true,
+    "yaml": true
+  },
+
+  // EDITOR
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  // TYPESCRIPT
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // FILES
+  "files.associations": {
+    "*.instructions.md": "markdown",
+    "*.prompt.md": "markdown"
+  },
+
+  // SEARCH
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.next": true,
+    "**/coverage": true
+  }
+}

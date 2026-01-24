@@ -91,6 +91,113 @@ RULE: If git write operation needed → STOP → Instruct user to do manually
 
 ---
 
+## ⚠️ Edge Cases & Error Handling / Xử lý Biên & Lỗi
+
+### Case 1: Task depends on incomplete task / Task phụ thuộc task chưa xong
+```yaml
+trigger: Current task has dependency on task not yet complete
+action:
+  1. STOP implementation
+  2. Inform user:
+     - "Task T-003 depends on T-002 which is not complete."
+     - "T-002 status: <status>"
+  3. Offer options:
+     - "Complete T-002 first (recommended)"
+     - "Skip T-003 and do T-004 instead (if independent)"
+     - "Override dependency check (risky)"
+  4. Wait for user decision
+```
+
+### Case 2: File already modified externally / File đã bị sửa bên ngoài
+```yaml
+trigger: git status shows uncommitted changes in target file
+action:
+  1. Warn user:
+     - "File <path> has uncommitted changes not from this workflow."
+  2. Show diff summary
+  3. Offer options:
+     - "Stash changes and proceed"
+     - "Merge my changes with existing"
+     - "Skip this file (manual merge later)"
+  4. Document decision in impl-log.md
+```
+
+### Case 3: Task scope unclear / Phạm vi task không rõ
+```yaml
+trigger: Task description is ambiguous
+action:
+  1. STOP before implementing
+  2. Show task details from tasks.md
+  3. Ask for clarification:
+     - "Task says 'update component' but doesn't specify which props."
+     - "Should I: (a) update all props, (b) only required props, (c) specific list?"
+  4. Update tasks.md with clarified scope
+  5. Then proceed with implementation
+```
+
+### Case 4: Implementation conflicts with spec / Triển khai mâu thuẫn với spec
+```yaml
+trigger: During implementation, discover spec is not feasible
+action:
+  1. STOP implementation
+  2. Document the conflict:
+     - "Spec says use localStorage but this component is server-rendered."
+  3. Do NOT implement workaround silently
+  4. Offer options:
+     - "Update spec (requires re-approval)"
+     - "Use alternative approach: <suggestion>"
+  5. Wait for user decision before continuing
+```
+
+### Case 5: Cross-root dependency failed / Phụ thuộc đa root thất bại
+```yaml
+trigger: Task in root A needs package from root B that won't build
+action:
+  1. STOP task
+  2. Inform user:
+     - "Task T-003 in apphub-vision needs @clearer/ui from reviews-assets"
+     - "But reviews-assets build failed: <error>"
+  3. Mark task as blocked:
+     status: blocked
+     blocker: "reviews-assets build failure"
+  4. Offer options:
+     - "Fix reviews-assets first"
+     - "Skip to independent task"
+     - "Mock the dependency temporarily"
+```
+
+### Case 6: Test failure during implementation / Test thất bại khi triển khai
+```yaml
+trigger: User reports test failure after task implementation
+action:
+  1. Do NOT auto-fix without understanding
+  2. Categorize the failure:
+     - "Is this a regression (existing test broke)?"
+     - "Or expected change (test needs update)?"
+  3. If regression:
+     - Review the change that caused it
+     - Offer rollback or fix
+  4. If expected:
+     - Update test to match new behavior
+     - Document why test changed
+```
+
+### Case 7: Implementation too large / Triển khai quá lớn
+```yaml
+trigger: Single task requires >10 files or >500 lines changed
+action:
+  1. STOP before completing
+  2. Warn user:
+     - "This task is larger than expected (15 files, ~800 lines)."
+     - "Original estimate: 30 minutes"
+  3. Offer options:
+     - "Continue (but note this for future planning)"
+     - "Split into sub-tasks for easier review"
+     - "Pause and review what's done so far"
+```
+
+---
+
 ## Multi-Root Task Execution / Thực thi Task Đa Root
 
 ```yaml

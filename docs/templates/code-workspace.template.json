@@ -1,0 +1,99 @@
+{
+  "folders": [
+    // GENERATED DYNAMICALLY - DO NOT EDIT MANUALLY
+    // Run `generate workspace file` to regenerate
+    // 
+    // Format:
+    // { "name": "<root-name>", "path": "<relative-path>" }
+  ],
+  "settings": {
+    // ================================================================
+    // COPILOT CONFIGURATION (Workspace-Wide)
+    // ================================================================
+    
+    // Chat instructions - applies to all roots
+    "github.copilot.chat.codeGeneration.instructions": [
+      {
+        "text": "Follow the coding standards defined in each root's .github/copilot-instructions.md file. Use tryCatch for async error handling. Prefer TypeScript strict mode."
+      }
+    ],
+    
+    // Test generation instructions
+    "github.copilot.chat.testGeneration.instructions": [
+      {
+        "text": "Use Jest with ts-jest. Follow AAA pattern (Arrange-Act-Assert). Mock external dependencies. Use descriptive test names."
+      }
+    ],
+    
+    // Code review instructions
+    "github.copilot.chat.reviewSelection.instructions": [
+      {
+        "text": "Check for: 1) Proper error handling with tryCatch, 2) Type safety (no any), 3) Import organization, 4) Missing edge cases, 5) Security issues"
+      }
+    ],
+    
+    // Commit message generation
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+      {
+        "text": "Use conventional commits format: type(scope): description. Types: feat, fix, docs, refactor, test, chore. Keep subject under 72 chars."
+      }
+    ],
+
+    // ================================================================
+    // COPILOT FEATURES
+    // ================================================================
+    "github.copilot.enable": {
+      "*": true,
+      "plaintext": false,
+      "markdown": true,
+      "yaml": true,
+      "json": true
+    },
+    
+    // Chat settings
+    "chat.commandCenter.enabled": true,
+    "chat.editor.wordWrap": "on",
+
+    // ================================================================
+    // EDITOR SETTINGS (Shared)
+    // ================================================================
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    
+    // TypeScript
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "typescript.suggest.autoImports": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    
+    // File associations
+    "files.associations": {
+      "*.instructions.md": "markdown",
+      "*.prompt.md": "markdown",
+      ".env*": "dotenv"
+    },
+    
+    // Search exclusions
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.next": true,
+      "**/coverage": true,
+      "**/.turbo": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "github.copilot",
+      "github.copilot-chat",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "prisma.prisma",
+      "bradlc.vscode-tailwindcss",
+      "ms-azuretools.vscode-docker"
+    ]
+  }
+}

@@ -27,8 +27,8 @@ actions:
        - Search all workspace roots
      
   2. If not found:
-     - Run workspace-discovery.prompt.md first
-     - Or ask user to provide context
+     - Suggest: "Run `setup workspace` to initialize"
+     - This runs: discovery → cross-root → sync → generate files
      
   3. Extract key info:
      - meta.impl_root → Where workflow docs go
