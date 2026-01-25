@@ -1,29 +1,30 @@
-# Implementation Log
-# Template v3.0 - Hybrid Bilingual Format (Shared Data + Language Zones)
+# Implementation Log — `<Feature Name>`
+<!-- Template v4.0 | Inline Bilingual Format with Visual Flags -->
+<!-- 🇻🇳 Vietnamese first, 🇬🇧 English follows — for easy scanning -->
+
+**Branch:** `<branch-slug>`  
+**Started:** YYYY-MM-DD
 
 ---
 
-## 📊 SHARED DATA
-<!-- Technical data - no translation needed / Dữ liệu kỹ thuật - không cần dịch -->
-
-### TL;DR
+## TL;DR
 
 | Aspect | Value |
 |--------|-------|
 | Feature | `<name>` |
-| Current Task | T`<N>` - `<title>` |
 | Progress | `<X>`/`<Total>` tasks completed |
 | Status | 🟢 On Track / 🟡 At Risk / 🔴 Blocked |
 | Last Updated | YYYY-MM-DD HH:mm |
 
-### Progress Overview
+---
+
+## 1. Progress Overview
 
 | Task | Title | Root | Status | Completed |
 |------|-------|------|--------|-----------|
-| T1 | `<title>` | `<root>` | ✅ Done | YYYY-MM-DD |
-| T2 | `<title>` | `<root>` | 🔄 In Progress | - |
-| T3 | `<title>` | `<root>` | ⏳ Pending | - |
-| T4 | `<title>` | `<root>` | ⏳ Pending | - |
+| T-001 | `<title>` | `<root>` | ✅ Done | YYYY-MM-DD |
+| T-002 | `<title>` | `<root>` | 🔄 In Progress | - |
+| T-003 | `<title>` | `<root>` | ⏳ Pending | - |
 
 **Legend:**
 - ✅ Done
@@ -34,9 +35,9 @@
 
 ---
 
-### Task Implementation Details
+## 2. Task Implementation Details
 
-#### Task T1 — `<Title>`
+### T-001 — `<Title>`
 
 | Aspect | Value |
 |--------|-------|
@@ -45,14 +46,20 @@
 | Completed | YYYY-MM-DD HH:mm |
 | Status | ✅ Done |
 
-**Files Changed:**
+#### Summary
+
+🇻🇳 Tóm tắt những gì đã làm, quyết định quan trọng, và kết quả đạt được.
+
+🇬🇧 Summary of what was done, key decisions made, and results achieved.
+
+#### Files Changed
 
 | Action | Path | Lines |
 |--------|------|-------|
 | Created | `<file-path>` | +`<N>` |
 | Modified | `<file-path>` | +`<N>`, -`<M>` |
 
-**Key Code:**
+#### Key Code
 
 ```typescript
 // Brief code snippet showing the key implementation
@@ -61,15 +68,19 @@ export const handler = async (input: Input): Promise<Output> => {
 };
 ```
 
-**Commands Run:**
+#### Implementation Notes
 
-```bash
-# Commands executed
-pnpm lint --fix
-pnpm test
-```
+🇻🇳 Ghi chú chi tiết về cách triển khai, lý do chọn approach này, lessons learned.
 
-**Verification:**
+🇬🇧 Detailed notes on implementation approach, why this was chosen, lessons learned.
+
+#### Deviations from Plan
+
+| Aspect | Planned | Actual | Reason |
+|--------|---------|--------|--------|
+| `<aspect>` | `<planned>` | `<actual>` | `<reason>` |
+
+#### Verification
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -78,15 +89,9 @@ pnpm test
 | Tests pass | ✅ Pass | |
 | Manual test | ✅ Pass | |
 
-**Deviations from Plan:**
-
-| Aspect | Planned | Actual | Reason |
-|--------|---------|--------|--------|
-| `<aspect>` | `<planned>` | `<actual>` | `<reason>` |
-
 ---
 
-#### Task T2 — `<Title>`
+### T-002 — `<Title>`
 
 | Aspect | Value |
 |--------|-------|
@@ -95,19 +100,25 @@ pnpm test
 | Completed | - |
 | Status | 🔄 In Progress |
 
-**Files Changed:**
+#### Summary
+
+🇻🇳 Tóm tắt progress hiện tại và những gì còn lại.
+
+🇬🇧 Summary of current progress and what remains.
+
+#### Files Changed
 
 | Action | Path | Lines |
 |--------|------|-------|
 | Created | `<file-path>` | +`<N>` |
 
-**Key Code:**
+#### Implementation Notes
 
-```typescript
-// Work in progress
-```
+🇻🇳 Ghi chú về progress hiện tại.
 
-**Verification:**
+🇬🇧 Notes on current progress.
+
+#### Verification
 
 | Check | Status | Notes |
 |-------|--------|-------|
@@ -116,22 +127,9 @@ pnpm test
 
 ---
 
-### Changes by Root
+## 3. Changes by Root
 
-#### Root: `<root-name>`
-
-| Metric | Value |
-|--------|-------|
-| Files created | `<N>` |
-| Files modified | `<M>` |
-| Files deleted | `<X>` |
-
-| File | Task | Change Type |
-|------|------|-------------|
-| `<path>` | T1 | Created |
-| `<path>` | T2 | Modified |
-
-#### Root: `<root-name-2>`
+### Root: `<root-name>`
 
 | Metric | Value |
 |--------|-------|
@@ -141,45 +139,66 @@ pnpm test
 
 | File | Task | Change Type |
 |------|------|-------------|
-| `<path>` | T3 | Created |
+| `<path>` | T-001 | Created |
+| `<path>` | T-002 | Modified |
 
 ---
 
-### Issues Encountered
+## 4. Issues Encountered
 
-#### Issue 1: `<Title>`
+### Issue 1: `<Title>`
 
 | Aspect | Value |
 |--------|-------|
-| Task | T`<N>` |
+| Task | T-00X |
 | Severity | Low / Medium / High / Critical |
 | Status | 🔴 Open / ✅ Resolved |
 
-**Error:**
+#### Description
+
+🇻🇳 Mô tả issue gặp phải.
+
+🇬🇧 Describe the issue encountered.
+
+#### Error
+
 ```
 <error message or stack trace>
 ```
 
-**Resolution:**
+#### Resolution
+
+🇻🇳 Cách đã giải quyết issue này.
+
+🇬🇧 How this issue was resolved.
+
 ```
 <fix applied>
 ```
 
 ---
 
-### Scope Changes
+## 5. Scope Changes
 
 | Change | Type | Approved By | Date |
 |--------|------|-------------|------|
 | `<description>` | Added / Removed / Modified | `<name>` | YYYY-MM-DD |
 
-### Current Blockers
+🇻🇳 Giải thích tại sao có thay đổi scope.
+
+🇬🇧 Explain why scope was changed.
+
+---
+
+## 6. Current Blockers
 
 | Blocker | Affects Task | Action Required |
 |---------|--------------|-----------------|
-| `<blocker>` | T`<N>` | `<action>` |
+| `<blocker>` | T-00X | `<action>` |
 
-### Quality Checkpoints
+---
+
+## 7. Quality Checkpoints
 
 | Check | Status |
 |-------|--------|
@@ -190,121 +209,16 @@ pnpm test
 
 ---
 
-## 🇬🇧 ENGLISH
+## 8. Next Steps
 
-### 1. Implementation Summary
+🇻🇳 Liệt kê các tasks tiếp theo cần làm và thứ tự ưu tiên.
 
-> High-level summary of what has been implemented so far.
-
-### 2. Task Notes
-
-#### T1 — `<Title>`
-
-**What Was Implemented:**
-> Description of what was actually built
-
-**Challenges Faced:**
-- Challenge 1: ...
-- Challenge 2: ...
-
-**Learnings:**
-- Learning 1: ...
+🇬🇧 List next tasks to do and priority order.
 
 ---
 
-#### T2 — `<Title>`
+## Notes
 
-**What Was Implemented:**
-> ...
+🇻🇳 Ghi chú bổ sung, lessons learned, hoặc điều cần nhớ cho các tasks tiếp theo.
 
-**Challenges Faced:**
-- ...
-
----
-
-### 3. Deviations Explanation
-
-Explain any significant deviations from the original task plan and why they were necessary.
-
-### 4. Issue Details
-
-#### Issue 1: `<Title>`
-
-**Description:** What went wrong and why.
-
-**Root Cause:** The underlying reason for the issue.
-
-**Resolution:** How it was fixed.
-
-**Prevention:** How to prevent this in the future.
-
-### 5. Notes for Next Session
-
-- Note 1: ...
-- Note 2: ...
-
----
-
-## 🇻🇳 TIẾNG VIỆT
-
-### 1. Tóm tắt Triển khai
-
-> Tóm tắt cấp cao về những gì đã được triển khai đến nay.
-
-### 2. Ghi chú Task
-
-#### T1 — `<Tiêu đề>`
-
-**Đã Triển khai:**
-> Mô tả những gì thực sự đã xây dựng
-
-**Thách thức Gặp phải:**
-- Thách thức 1: ...
-- Thách thức 2: ...
-
-**Bài học:**
-- Bài học 1: ...
-
----
-
-#### T2 — `<Tiêu đề>`
-
-**Đã Triển khai:**
-> ...
-
-**Thách thức Gặp phải:**
-- ...
-
----
-
-### 3. Giải thích Sai lệch
-
-Giải thích các sai lệch đáng kể so với kế hoạch task ban đầu và tại sao chúng cần thiết.
-
-### 4. Chi tiết Vấn đề
-
-#### Vấn đề 1: `<Tiêu đề>`
-
-**Mô tả:** Điều gì đã xảy ra và tại sao.
-
-**Nguyên nhân Gốc:** Lý do cơ bản gây ra vấn đề.
-
-**Giải pháp:** Cách đã sửa.
-
-**Phòng ngừa:** Cách ngăn chặn điều này trong tương lai.
-
-### 5. Ghi chú cho Phiên tiếp theo
-
-- Ghi chú 1: ...
-- Ghi chú 2: ...
-
----
-
-## ⏭️ Next Action
-
-| Action | Command |
-|--------|---------|
-| ▶️ Continue to next task | Reply `next` |
-| ⏸️ Pause implementation | Reply `pause` |
-| 🔄 Fix issue | Reply `fix: <issue>` |
-| ✅ All tasks done → Phase 4 | Reply `phase-4` |
+🇬🇧 Additional notes, lessons learned, or things to remember for next tasks.

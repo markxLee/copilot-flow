@@ -18,9 +18,125 @@ Repository này chứa hệ thống workflow hoàn chỉnh để GitHub Copilot 
 - ✅ **State Management** — Resume work after session breaks
 - ✅ **Review Gates** — Approval required at each phase
 - ✅ **Iteration Support** — Handle requirement changes with versioned docs
-- ✅ **Bilingual Docs** — English & Vietnamese inline format
+- ✅ **Multilingual Docs** — Flag-based inline format for fast scanning
 - ✅ **PR Automation** — Generate PR descriptions and reviewer notifications
 - ✅ **Shared Instructions** — Sync coding standards across all roots
+
+---
+
+## 🌍 Multilingual Phase Documentation
+
+### Philosophy / Triết lý
+
+🇻🇳 Mỗi developer nên đọc docs bằng ngôn ngữ chính của họ để hiểu nhanh nhất và đưa ra quyết định nhanh nhất. Format song ngữ với flags giúp mỗi người dễ dàng scan và đọc phần họ cần.
+
+🇬🇧 Every developer should read docs in their primary language for fastest comprehension and quickest decision-making. The bilingual format with flags makes it easy for everyone to scan and read their relevant sections.
+
+### Format v4.0: Inline Bilingual with Visual Flags
+
+**Narrative content** uses adjacent paragraphs with country flags:
+
+```markdown
+#### Description
+
+🇻🇳 Tạo BillingLayout wrapper component với sidebar và topbar để bọc 
+tất cả các trang trong billing app.
+
+🇬🇧 Create BillingLayout wrapper component with sidebar and topbar to 
+wrap all pages in the billing app.
+```
+
+**Universal content** (no translation needed):
+- Tables with data/code
+- Code blocks
+- Mermaid diagrams
+- File paths
+- Technical identifiers
+
+### How to Read / Cách Đọc
+
+| Your Role | What to Read |
+|-----------|--------------|
+| Vietnamese developer | Scan for 🇻🇳, read those paragraphs |
+| English reviewer | Scan for 🇬🇧, read those paragraphs |
+| Other languages | Use 🇬🇧 as base, or add new language |
+
+### Adding a New Language / Thêm Ngôn ngữ Mới
+
+To add support for a new language (e.g., Japanese 🇯🇵):
+
+**Step 1:** Update templates in `docs/templates/`
+
+```markdown
+#### Description
+
+🇻🇳 [Vietnamese text]
+
+🇬🇧 [English text]
+
+🇯🇵 [Japanese text]
+```
+
+**Step 2:** Update `user_preferences` in `.workflow-state.yaml`:
+
+```yaml
+user_preferences:
+  language: ja          # Primary language for this user
+  languages_in_docs:    # Languages to include in generated docs
+    - vi
+    - en
+    - ja
+```
+
+**Step 3:** Copilot will generate docs with all specified languages.
+
+### Best Practices / Thực hành Tốt
+
+| Do ✅ | Don't ❌ |
+|-------|---------|
+| Flag before each paragraph | Mix languages in same paragraph |
+| Keep paragraphs short (~2-4 sentences) | Write long paragraphs |
+| Translate meaning, not word-by-word | Use Google Translate directly |
+| Leave technical terms in English | Translate code/identifiers |
+| Put universal content (tables, code) once | Duplicate tables for each language |
+
+### Example: Task Description
+
+```markdown
+### T-005: Create PaymentDetailsPage Route
+
+| Aspect | Detail |
+|--------|--------|
+| Status | ⏸️ Pending |
+| Phase | B - UI Components |
+
+#### Description
+
+🇻🇳 Tạo route `/payment-details` với page component. 
+Page dùng BillingLayout, có HeaderBlock với title.
+
+🇬🇧 Create route `/payment-details` with page component. 
+Page uses BillingLayout, has HeaderBlock with title.
+
+#### Files To Create
+
+| File | Purpose |
+|------|---------|
+| `app/payment-details/page.tsx` | Server component |
+| `payment-details.tsx` | Client component |
+```
+
+### Supported Languages / Ngôn ngữ Hỗ trợ
+
+| Flag | Language | Status |
+|------|----------|--------|
+| 🇻🇳 | Vietnamese | ✅ Built-in |
+| 🇬🇧 | English | ✅ Built-in |
+| 🇯🇵 | Japanese | 📝 Add to templates |
+| 🇰🇷 | Korean | 📝 Add to templates |
+| 🇨🇳 | Chinese | 📝 Add to templates |
+| 🇫🇷 | French | 📝 Add to templates |
+| 🇩🇪 | German | 📝 Add to templates |
 
 ---
 
@@ -768,8 +884,9 @@ Copilot will load state from .workflow-state.yaml
 ## 🏷️ Version / Phiên bản
 
 - **Workflow Version:** 2.0
-- **Last Updated:** 2026-01-23
-- **Features:** Multi-root, State Management, Bilingual, Iterations
+- **Template Version:** 4.0 (Inline Bilingual with Visual Flags)
+- **Last Updated:** 2026-01-25
+- **Features:** Multi-root, State Management, Multilingual Docs, Iterations
 
 ---
 

@@ -1,26 +1,23 @@
-# Done Check
-# Template v3.0 - Hybrid Bilingual Format (Shared Data + Language Zones)
+# Done Check — `<Feature Name>`
+<!-- Template v4.0 | Inline Bilingual Format with Visual Flags -->
+<!-- 🇻🇳 Vietnamese first, 🇬🇧 English follows — for easy scanning -->
 
 ---
 
-## 📊 SHARED DATA
-<!-- Technical data - no translation needed / Dữ liệu kỹ thuật - không cần dịch -->
-
-### TL;DR
+## TL;DR
 
 | Aspect | Value |
 |--------|-------|
 | Feature | `<name>` |
 | Branch | `<branch-slug>` |
-| Docs Root | `<docs_root>` |
 | All Checks Pass | ✅ Yes / ❌ No |
 | Ready for Merge | ✅ Yes / ❌ No |
 
 ---
 
-### Definition of Done Checklist
+## 1. Definition of Done Checklist
 
-#### Documentation
+### Documentation
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -32,7 +29,7 @@
 | README updated | ⬜/✅ | |
 | API docs updated | ⬜/✅ | N/A if no API change |
 
-#### Code Quality
+### Code Quality
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -43,7 +40,7 @@
 | No console.log | ⬜/✅ | |
 | Error handling with tryCatch | ⬜/✅ | |
 
-#### Testing
+### Testing
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -53,16 +50,15 @@
 | Manual testing done | ⬜/✅ | |
 | Edge cases tested | ⬜/✅ | |
 
-#### Cross-Root Sync
+### Cross-Root Sync
 
 | Item | Status | Notes |
 |------|--------|-------|
 | All affected roots updated | ⬜/✅ | |
 | Package versions synced | ⬜/✅ | |
 | Breaking changes documented | ⬜/✅ | |
-| Dependent services notified | ⬜/✅ | |
 
-#### Build & Deploy
+### Build & Deploy
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -73,111 +69,126 @@
 
 ---
 
-### Commit Message
+## 2. Summary of Changes
 
-```bash
-<type>(<scope>): <short description>
-```
+🇻🇳 Tóm tắt những gì đã thay đổi trong feature này, bao gồm các quyết định quan trọng và impact.
 
-**Type Reference:**
-| Type | Use When |
-|------|----------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `refactor` | Refactoring |
-| `docs` | Documentation |
-| `test` | Tests |
-| `chore` | Maintenance |
+🇬🇧 Summary of what changed in this feature, including key decisions and impact.
 
----
-
-### Pre-Merge Verification
-
-#### Branch Status
-
-| Check | Status | Command |
-|-------|--------|---------|
-| Up-to-date with base | ⬜/✅ | `git fetch && git rebase origin/main` |
-| No merge conflicts | ⬜/✅ | |
-| Clean commit history | ⬜/✅ | `git log --oneline` |
-
-#### Files Changed Summary
+### Files Changed
 
 | Root | Files Added | Files Modified | Files Deleted |
 |------|-------------|----------------|---------------|
 | `<root1>` | `<N>` | `<M>` | `<K>` |
-| `<root2>` | `<N>` | `<M>` | `<K>` |
 | **Total** | `<X>` | `<Y>` | `<Z>` |
 
-#### Critical Files Review
+### Key Changes
 
-| File | Change Type | Reviewed By | Status |
-|------|-------------|-------------|--------|
-| `<critical-file-path>` | Modified | `<reviewer>` | ⬜/✅ |
+🇻🇳
+1. Thay đổi chính 1: ...
+2. Thay đổi chính 2: ...
+
+🇬🇧
+1. Key change 1: ...
+2. Key change 2: ...
 
 ---
 
-### Breaking Changes
+## 3. Breaking Changes
 
 | Change | Migration Required |
 |--------|-------------------|
 | `<change>` | `<migration-steps>` |
 
-### Deprecations
+🇻🇳 Giải thích breaking changes và cách migrate.
 
-| Deprecated | Replacement | Removal Version |
-|------------|-------------|-----------------|
-| `<old-api>` | `<new-api>` | `<version>` |
+🇬🇧 Explain breaking changes and migration steps.
 
-### Known Issues
+---
+
+## 4. Known Issues
 
 | Issue | Workaround | Planned Fix |
 |-------|------------|-------------|
 | `<issue>` | `<workaround>` | `<version>` |
 
+🇻🇳 Mô tả các issues đã biết và workarounds.
+
+🇬🇧 Describe known issues and workarounds.
+
 ---
 
-### Rollback Plan
+## 5. Rollback Plan
 
-**Trigger Conditions:**
+### Trigger Conditions
+
+🇻🇳 Khi nào cần rollback.
+
+🇬🇧 When to trigger rollback.
+
 - Condition 1: ...
 - Condition 2: ...
 
-**Steps:**
+### Steps
+
 ```bash
 # Rollback commands
 git revert <commit-sha>
-# or
-git reset --hard <previous-sha>
 ```
 
-**Verification:**
-- [ ] Verify rollback worked
+### Verification
+
+🇻🇳 Cách verify rollback thành công.
+
+🇬🇧 How to verify rollback succeeded.
 
 ---
 
-### Post-Merge Tasks
+## 6. Pre-Merge Verification
+
+### Branch Status
+
+| Check | Status | Command |
+|-------|--------|---------|
+| Up-to-date with base | ⬜/✅ | `git fetch && git rebase origin/main` |
+| No merge conflicts | ⬜/✅ | |
+| Clean commit history | ⬜/✅ | |
+
+### Critical Files Review
+
+| File | Change Type | Reviewed By | Status |
+|------|-------------|-------------|--------|
+| `<critical-file>` | Modified | `<reviewer>` | ⬜/✅ |
+
+---
+
+## 7. Post-Merge Tasks
 
 | Task | Owner | Due | Status |
 |------|-------|-----|--------|
 | Monitor logs for errors | `<owner>` | +1 day | ⬜ |
 | Update CHANGELOG | `<owner>` | Immediate | ⬜ |
 | Notify stakeholders | `<owner>` | Immediate | ⬜ |
-| Update Jira ticket | `<owner>` | Immediate | ⬜ |
 | Clean up feature branch | `<owner>` | +1 week | ⬜ |
 
 ---
 
-### Final Approval
+## 8. Final Approval
 
 | Role | Name | Approval | Date |
 |------|------|----------|------|
 | Developer | ... | ⬜/✅ | ... |
 | Tech Lead | ... | ⬜/✅ | ... |
 | QA (if required) | ... | ⬜/✅ | ... |
-| Product Owner (if required) | ... | ⬜/✅ | ... |
 
-**Merge Decision:**
+---
+
+## 9. Merge Decision
+
+🇻🇳 Quyết định cuối cùng về việc merge.
+
+🇬🇧 Final decision on merging.
+
 > ⬜ **APPROVED FOR MERGE**
 > 
 > OR
@@ -186,9 +197,9 @@ git reset --hard <previous-sha>
 
 ---
 
-### Completion
+## 10. Completion
 
-#### Merge Details
+### Merge Details
 
 | Aspect | Value |
 |--------|-------|
@@ -197,142 +208,8 @@ git reset --hard <previous-sha>
 | Merge Commit | `<sha>` |
 | Target Branch | `main` / `develop` |
 
-#### Post-Merge Verification
+### Post-Merge Notes
 
-| Check | Status | Verified By |
-|-------|--------|-------------|
-| CI/CD passed on main | ⬜/✅ | |
-| Deployment successful | ⬜/✅ | |
-| Feature working in staging | ⬜/✅ | |
-| No regression detected | ⬜/✅ | |
+🇻🇳 Ghi chú sau khi merge: lessons learned, điều cần theo dõi.
 
----
-
-### Time Tracking
-
-| Phase | Estimated | Actual | Variance |
-|-------|-----------|--------|----------|
-| Phase 0: Analysis | `<X>`h | `<Y>`h | `<Z>`h |
-| Phase 1: Spec | `<X>`h | `<Y>`h | `<Z>`h |
-| Phase 2: Tasks | `<X>`h | `<Y>`h | `<Z>`h |
-| Phase 3: Impl | `<X>`h | `<Y>`h | `<Z>`h |
-| Phase 4: Tests | `<X>`h | `<Y>`h | `<Z>`h |
-| Phase 5: Done | `<X>`h | `<Y>`h | `<Z>`h |
-| **Total** | `<X>`h | `<Y>`h | `<Z>`h |
-
----
-
-## 🇬🇧 ENGLISH
-
-### 1. Release Notes
-
-#### Feature Summary
-> Brief description of what this feature does and why it was built.
-
-#### What's New
-- Feature point 1
-- Feature point 2
-
-#### Bug Fixes
-- Bug fix 1
-
-### 2. Breaking Changes Details
-
-#### Change 1: `<Title>`
-
-**What Changed:** Description of the breaking change.
-
-**Why:** Reason for the change.
-
-**Migration Guide:**
-1. Step 1
-2. Step 2
-
-### 3. Rollback Details
-
-**When to Rollback:** Conditions that would trigger a rollback.
-
-**How to Verify Rollback:** Steps to confirm rollback was successful.
-
-### 4. Retrospective
-
-#### What Went Well
-- Point 1
-- Point 2
-
-#### What Could Improve
-- Point 1
-- Point 2
-
-#### Lessons Learned
-- Lesson 1
-- Lesson 2
-
-### 5. Notes
-
-- Additional context or information
-
----
-
-## 🇻🇳 TIẾNG VIỆT
-
-### 1. Ghi chú Phát hành
-
-#### Tóm tắt Tính năng
-> Mô tả ngắn gọn tính năng này làm gì và tại sao được xây dựng.
-
-#### Có gì Mới
-- Điểm tính năng 1
-- Điểm tính năng 2
-
-#### Sửa lỗi
-- Sửa lỗi 1
-
-### 2. Chi tiết Thay đổi Breaking
-
-#### Thay đổi 1: `<Tiêu đề>`
-
-**Thay đổi gì:** Mô tả thay đổi breaking.
-
-**Tại sao:** Lý do cho thay đổi.
-
-**Hướng dẫn Migration:**
-1. Bước 1
-2. Bước 2
-
-### 3. Chi tiết Rollback
-
-**Khi nào Rollback:** Điều kiện kích hoạt rollback.
-
-**Cách Xác nhận Rollback:** Các bước xác nhận rollback thành công.
-
-### 4. Hồi cứu
-
-#### Điều làm Tốt
-- Điểm 1
-- Điểm 2
-
-#### Điều có thể Cải thiện
-- Điểm 1
-- Điểm 2
-
-#### Bài học Rút ra
-- Bài học 1
-- Bài học 2
-
-### 5. Ghi chú
-
-- Ngữ cảnh hoặc thông tin bổ sung
-
----
-
-## ✅ Workflow Complete
-
-> ✅ This feature has been completed according to the workflow contract.
-> ✅ Tính năng này đã hoàn tất theo workflow contract.
-
-**Final Status:**
-- [ ] All phases complete
-- [ ] All docs in `docs/runs/<branch-slug>/`
-- [ ] Branch merged and cleaned
-- [ ] Stakeholders notified
+🇬🇧 Post-merge notes: lessons learned, things to monitor.

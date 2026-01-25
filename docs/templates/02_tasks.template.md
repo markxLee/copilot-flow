@@ -1,12 +1,10 @@
-# Task Plan
-# Template v3.0 - Hybrid Bilingual Format (Shared Data + Language Zones)
+# Task Plan — `<Feature Name>`
+<!-- Template v4.0 | Inline Bilingual Format with Visual Flags -->
+<!-- 🇻🇳 Vietnamese first, 🇬🇧 English follows — for easy scanning -->
 
 ---
 
-## 📊 SHARED DATA
-<!-- Technical data - no translation needed / Dữ liệu kỹ thuật - không cần dịch -->
-
-### TL;DR
+## TL;DR
 
 | Aspect | Value |
 |--------|-------|
@@ -14,179 +12,256 @@
 | Total Tasks | `<N>` |
 | Estimated Effort | `<time>` |
 | Affected Roots | `<root1>`, `<root2>` |
-| Execution Order | T1 → T2 → T3 → ... |
 
-### Task Overview
+---
+
+## 1. Goal
+
+🇻🇳 Mô tả ngắn gọn những gì sẽ đạt được khi tất cả task hoàn thành.
+
+🇬🇧 Brief description of what will be accomplished when all tasks are complete.
+
+---
+
+## 2. Task Overview
 
 | ID | Title | Root | Type | Est. | Deps | Status |
 |----|-------|------|------|------|------|--------|
-| T1 | `<title>` | `<root>` | New | 1h | - | ⏳ |
-| T2 | `<title>` | `<root>` | Modify | 2h | T1 | ⏳ |
-| T3 | `<title>` | `<root>` | New | 1h | T1, T2 | ⏳ |
-| T4 | `<title>` | `<root>` | Test | 1h | T1-T3 | ⏳ |
+| T-001 | `<title>` | `<root>` | New | 1h | - | ⏳ |
+| T-002 | `<title>` | `<root>` | Modify | 2h | T-001 | ⏳ |
+| T-003 | `<title>` | `<root>` | New | 1h | T-001 | ⏳ |
 
 **Legend:**
-- Type: `New` = Create new, `Modify` = Change existing, `Delete` = Remove, `Test` = Write tests
+- Type: `New` = Create new, `Modify` = Change existing, `Delete` = Remove
 - Status: ⏳ Pending, 🔄 In Progress, ✅ Done, ❌ Blocked
 
-### Execution Flow
+---
+
+## 3. Execution Flow
 
 ```mermaid
 flowchart LR
-    T1[T1: Setup] --> T2[T2: Core Logic]
-    T1 --> T3[T3: UI Component]
-    T2 --> T4[T4: Integration]
-    T3 --> T4
-    T4 --> T5[T5: Tests]
+    T001[T-001: Setup] --> T002[T-002: Core Logic]
+    T001 --> T003[T-003: UI Component]
+    T002 --> T004[T-004: Integration]
+    T003 --> T004
 ```
 
 ---
 
-### Task Details
+## 4. Task Details
 
-#### T1 — `<Title>`
+### T-001 — `<Title>`
 
-| Aspect | Value |
-|--------|-------|
+| Aspect | Detail |
+|--------|--------|
 | Root | `<root-name>` |
 | Type | New / Modify / Delete |
 | Estimated | `<time>` |
-| Dependencies | None / T`<N>` |
+| Dependencies | None |
 | FR Covered | FR-001, FR-002 |
 
-**Files:**
+#### Description
+
+🇻🇳 Mô tả chi tiết task này làm gì, tại sao cần thiết, và cách triển khai.
+
+🇬🇧 Detailed description of what this task does, why it's needed, and how to implement.
+
+#### Files
 
 | Action | Path |
 |--------|------|
 | Create | `<file-path>` |
 | Modify | `<file-path>` |
 
-**Contracts:**
+#### Implementation
+
+🇻🇳 Ghi chú triển khai chi tiết, các điểm cần lưu ý, edge cases cần xử lý.
+
+🇬🇧 Detailed implementation notes, points to watch out for, edge cases to handle.
 
 ```typescript
-// Interface or function signature
+// Key code snippet or interface
 interface Example {
   field: type;
 }
-
-function doSomething(input: Type): ReturnType {
-  // implementation
-}
 ```
 
-**Done Criteria:**
+#### Done Criteria
+
 - [ ] Criterion 1
 - [ ] Criterion 2
 
-**Verification:**
+#### Verification
+
 ```bash
 # Commands to verify
 pnpm lint
-pnpm test -- --filter=<test-pattern>
+pnpm test
 ```
 
 ---
 
-#### T2 — `<Title>`
+### T-002 — `<Title>`
 
-| Aspect | Value |
-|--------|-------|
+| Aspect | Detail |
+|--------|--------|
 | Root | `<root-name>` |
 | Type | New / Modify / Delete |
 | Estimated | `<time>` |
-| Dependencies | T1 |
+| Dependencies | T-001 |
 | FR Covered | FR-001 |
 
-**Files:**
+#### Description
+
+🇻🇳 Mô tả chi tiết task này.
+
+🇬🇧 Detailed description of this task.
+
+#### Files
 
 | Action | Path |
 |--------|------|
 | Create | `<file-path>` |
 
-**Contracts:**
+#### Implementation
+
+🇻🇳 Ghi chú triển khai chi tiết.
+
+🇬🇧 Detailed implementation notes.
 
 ```typescript
-// Interface or function signature
+// Key code snippet
 ```
 
-**Done Criteria:**
+#### Done Criteria
+
 - [ ] Criterion 1
 
-**Verification:**
+#### Verification
+
 ```bash
-# Commands to verify
+# Commands
 ```
 
 ---
 
-#### T3 — `<Title>`
+### T-003 — `<Title>`
 
-| Aspect | Value |
-|--------|-------|
+| Aspect | Detail |
+|--------|--------|
 | Root | `<root-name>` |
 | Type | New / Modify / Delete |
 | Estimated | `<time>` |
-| Dependencies | T1 |
+| Dependencies | T-001 |
 | FR Covered | FR-002 |
 
-**Files:**
+#### Description
+
+🇻🇳 Mô tả chi tiết task này.
+
+🇬🇧 Detailed description of this task.
+
+#### Files
 
 | Action | Path |
 |--------|------|
 | Create | `<file-path>` |
 
-**Contracts:**
+#### Implementation
 
-```typescript
-// Interface or function signature
-```
+🇻🇳 Ghi chú triển khai chi tiết.
 
-**Done Criteria:**
+🇬🇧 Detailed implementation notes.
+
+#### Done Criteria
+
 - [ ] Criterion 1
-
-**Verification:**
-```bash
-# Commands to verify
-```
 
 ---
 
-### Cross-Root Integration Tasks
+## 5. Cross-Root Integration Tasks
 
-#### T`<N>` — Integration: `<root1>` ↔ `<root2>`
+### T-00X — Integration: `<root1>` ↔ `<root2>`
 
-| Aspect | Value |
-|--------|-------|
+| Aspect | Detail |
+|--------|--------|
 | Type | Integration |
-| Dependencies | T`<X>`, T`<Y>` |
+| Dependencies | T-00Y, T-00Z |
 
-**Integration Points:**
+#### Description
+
+🇻🇳 Giải thích cách các roots tích hợp với nhau và những lưu ý.
+
+🇬🇧 Explain how roots integrate and any considerations.
+
+#### Integration Points
 
 | From | To | Contract |
 |------|-----|----------|
 | `<root1>/<file>` | `<root2>/<file>` | Package / API / Event |
 
-**Verification:**
+#### Verification
+
 - [ ] Integration flow works end-to-end
 - [ ] Data consistency verified
 
 ---
 
-### Rollback Plan
+## 6. Requirements Coverage
 
-| Task | Rollback Action |
-|------|-----------------|
-| T1 | `git revert` or delete created files |
-| T2 | Restore from backup / revert changes |
+| Requirement | Tasks | Status |
+|-------------|-------|--------|
+| FR-001 | T-001, T-002 | ⬜ |
+| FR-002 | T-003 | ⬜ |
+| NFR-001 | T-002 | ⬜ |
 
-### Risk per Task
+---
+
+## 7. Risk per Task
 
 | Task | Risk | Mitigation |
 |------|------|------------|
-| T1 | `<risk>` | `<mitigation>` |
-| T2 | `<risk>` | `<mitigation>` |
+| T-001 | `<risk>` | `<mitigation>` |
+| T-002 | `<risk>` | `<mitigation>` |
 
-### Approval Status
+---
+
+## 8. Rollback Plan
+
+| Task | Rollback Action |
+|------|-----------------|
+| T-001 | `git revert` or delete created files |
+| T-002 | Restore from backup / revert changes |
+
+---
+
+## 9. Environment Requirements
+
+🇻🇳 Liệt kê các biến môi trường hoặc setup cần có trước khi bắt đầu.
+
+🇬🇧 List environment variables or setup needed before starting.
+
+```env
+# Required before starting
+VARIABLE_NAME=value
+```
+
+---
+
+## 10. Open Questions
+
+🇻🇳
+- Câu hỏi 1: ...
+- Câu hỏi 2: ...
+
+🇬🇧
+- Question 1: ...
+- Question 2: ...
+
+---
+
+## Approval
 
 | Role | Name | Status | Date |
 |------|------|--------|------|
@@ -195,127 +270,10 @@ pnpm test -- --filter=<test-pattern>
 
 ---
 
-## 🇬🇧 ENGLISH
+## Next Step
 
-### 1. Goal
+🇻🇳 Sau khi phê duyệt, tiến hành **Phase 3: Implementation**.
 
-> Brief description of what will be accomplished when all tasks are complete.
-
-### 2. Task Descriptions
-
-#### T1 — `<Title>`
-
-**Purpose:** What this task accomplishes and why it's needed.
-
-**Implementation Notes:**
-- Key point 1
-- Key point 2
-- Watch out for: ...
-
-**Side Effects:**
-- Effect 1: ...
-
----
-
-#### T2 — `<Title>`
-
-**Purpose:** ...
-
-**Implementation Notes:**
-- ...
-
----
-
-#### T3 — `<Title>`
-
-**Purpose:** ...
-
-**Implementation Notes:**
-- ...
-
----
-
-### 3. Integration Notes
-
-Explanation of how the tasks connect and any special considerations for cross-root work.
-
-### 4. Risks & Concerns
-
-#### Risk 1: `<Title>`
-
-**Description:** ...
-
-**Mitigation:** ...
-
-### 5. Open Questions
-
-- Question 1: ...
-- Question 2: ...
-
----
-
-## 🇻🇳 TIẾNG VIỆT
-
-### 1. Mục tiêu
-
-> Mô tả ngắn gọn những gì sẽ đạt được khi tất cả task hoàn thành.
-
-### 2. Mô tả Task
-
-#### T1 — `<Tiêu đề>`
-
-**Mục đích:** Task này đạt được gì và tại sao cần thiết.
-
-**Ghi chú Triển khai:**
-- Điểm chính 1
-- Điểm chính 2
-- Cần lưu ý: ...
-
-**Tác dụng phụ:**
-- Tác dụng 1: ...
-
----
-
-#### T2 — `<Tiêu đề>`
-
-**Mục đích:** ...
-
-**Ghi chú Triển khai:**
-- ...
-
----
-
-#### T3 — `<Tiêu đề>`
-
-**Mục đích:** ...
-
-**Ghi chú Triển khai:**
-- ...
-
----
-
-### 3. Ghi chú Tích hợp
-
-Giải thích cách các task kết nối với nhau và các lưu ý đặc biệt cho công việc đa root.
-
-### 4. Rủi ro & Quan ngại
-
-#### Rủi ro 1: `<Tiêu đề>`
-
-**Mô tả:** ...
-
-**Giảm thiểu:** ...
-
-### 5. Câu hỏi Mở
-
-- Câu hỏi 1: ...
-- Câu hỏi 2: ...
-
----
-
-## ⏭️ Next Step
-
-> After approval, proceed to Phase 3 (Implementation)
-> Sau khi phê duyệt, tiến hành Phase 3 (Triển khai)
+🇬🇧 After approval, proceed to **Phase 3: Implementation**.
 
 Reply: `approved` or `revise: <feedback>`
