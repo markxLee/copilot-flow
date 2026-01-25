@@ -276,23 +276,72 @@ Found <N> critical and <M> major issues that must be addressed:
 
 ## ⏸️ STOP — Review Complete / DỪNG — Review Hoàn thành
 
+```yaml
+REVIEW_COMPLETION_FLOW:
+  # CRITICAL: This flow MUST be followed exactly
+  # State MUST be updated BEFORE suggesting next steps
+  
+  on_review_complete:
+    1_update_state_file:
+      action: "IMMEDIATELY update .workflow-state.yaml"
+      required: true
+      path: "<docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml"
+      
+    2_update_impl_log:
+      action: "Update impl-log.md with review result"
+      required: true
+      
+    3_output_next_steps:
+      action: "Show explicit next prompt commands"
+      required: true
+```
+
 ### Verdict: <APPROVE / REQUEST CHANGES>
 
 <If APPROVE>
-✅ Task T-XXX changes approved.
 
-**Next Steps:**
-1. User commits changes (if ready)
-2. Run `next task` to proceed to T-YYY
-3. Or `status` to see overall progress
+**STEP 1: Update State (MUST DO FIRST)**
+
+Update `.workflow-state.yaml`:
+```yaml
+phases:
+  phase_3_impl:
+    tasks:
+      - id: T-XXX
+        status: completed          # ← CHANGE from in-progress
+        reviewed_at: "<timestamp>"
+        review_verdict: approved
+
+status:
+  current_task: "T-YYY"           # ← CHANGE to next task
+  last_action: "T-XXX approved"   # ← UPDATE
+  next_action: "Implement T-YYY"  # ← UPDATE
+```
+
+**STEP 2: Update impl-log.md**
+
+Mark task as completed with timestamp.
+
+**STEP 3: Show Next Steps**
+
+✅ Task T-XXX approved and marked **completed**.
+
+**To start next task:**
+```
+/phase-3-impl T-YYY
+```
+OR
+```
+/phase-3-impl next
+```
 
 <If REQUEST CHANGES>
 ❌ Task T-XXX needs fixes.
 
 **Next Steps:**
-1. Run `fix plan` to create fix plan
-2. Apply fixes
-3. Run `review` again to re-check
+```
+/code-fix-plan T-XXX
+```
 ```
 
 ---
@@ -300,37 +349,45 @@ Found <N> critical and <M> major issues that must be addressed:
 ## State Updates / Cập nhật State
 
 ```yaml
-# After review
-status:
-  last_action: "Code review for T-XXX"
-
-# If APPROVE
-tasks:
-  T-XXX:
-    status: approved
-    reviewed_at: <timestamp>
-    review_verdict: approved
-
-status:
-  next_action: "Proceed to next task or commit changes"
-
-# If REQUEST CHANGES
-tasks:
-  T-XXX:
-    status: needs-fixes
-    reviewed_at: <timestamp>
-    review_verdict: request-changes
-    issues:
-      critical: <N>
-      major: <M>
-
-status:
-  next_action: "Fix issues found in code review"
-  blockers:
-    - type: code_review_findings
-      description: "<N> critical, <M> major issues"
-      waiting_for: fixes
-      since: <now>
+STATE_UPDATE_ENFORCEMENT:
+  # ⚠️ CRITICAL: State MUST be updated BEFORE outputting next steps
+  # This is NON-NEGOTIABLE to prevent state drift
+  
+  timing: IMMEDIATELY after determining verdict
+  method: Use replace_string_in_file to update .workflow-state.yaml
+  
+  IF_APPROVE:
+    update_task:
+      status: "completed"         # NOT "approved", use "completed"
+      reviewed_at: "<ISO_timestamp>"
+      review_verdict: "approved"
+    
+    update_status:
+      current_task: "<next_task_id>"  # Move to next incomplete task
+      last_action: "T-XXX completed and approved"
+      next_action: "Implement <next_task_id>"
+    
+    update_impl_log:
+      action: "Add completion timestamp and ✅ status"
+      
+  IF_REQUEST_CHANGES:
+    update_task:
+      status: "needs-fixes"
+      reviewed_at: "<ISO_timestamp>"
+      review_verdict: "request-changes"
+      issues_count:
+        critical: <N>
+        major: <M>
+    
+    update_status:
+      last_action: "Code review found issues in T-XXX"
+      next_action: "Fix <N> critical, <M> major issues"
+      blockers:
+        - type: code_review_findings
+          task: "T-XXX"
+          description: "<N> critical, <M> major issues"
+          waiting_for: fixes
+          since: "<ISO_timestamp>"
 ```
 
 ---
@@ -357,17 +414,32 @@ MUST:
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
-  # CRITICAL: Always output explicit next prompt
+  # CRITICAL: STATE MUST BE UPDATED FIRST, THEN OUTPUT NEXT STEPS
+  # Sequence: 1) Update state → 2) Update impl-log → 3) Output message
+  
+  sequence:
+    step_1: "UPDATE .workflow-state.yaml (task status = completed)"
+    step_2: "UPDATE impl-log.md (add completion entry)"
+    step_3: "OUTPUT next steps with explicit prompts"
   
   if_verdict: APPROVE
+    state_update_first: |
+      # MUST update state file with:
+      tasks.T-XXX.status: "completed"
+      tasks.T-XXX.reviewed_at: "<ISO_timestamp>"
+      status.current_task: "T-YYY"
+      status.last_action: "T-XXX completed"
+    
     if: more_tasks_remaining
-    action: |
-      Output EXACTLY:
-      
+    output: |
       ---
-      ## ✅ Review Approved for T-XXX
+      ## ✅ T-XXX Approved & Marked Completed
       
-      **Next task:**
+      State updated:
+      - T-XXX status: completed ✅
+      - Next task: T-YYY
+      
+      **Continue implementation:**
       ```
       /phase-3-impl T-YYY
       ```
@@ -378,11 +450,13 @@ NEXT_PROMPT_ENFORCEMENT:
       ---
     
     if: all_tasks_complete
-    action: |
-      Output EXACTLY:
-      
+    output: |
       ---
       ## ✅ All Tasks Complete
+      
+      State updated:
+      - T-XXX status: completed ✅
+      - All 12/12 tasks done
       
       **Proceed to testing:**
       ```
@@ -391,11 +465,17 @@ NEXT_PROMPT_ENFORCEMENT:
       ---
 
   if_verdict: REQUEST_CHANGES
-    action: |
-      Output EXACTLY:
-      
+    state_update_first: |
+      # MUST update state file with:
+      tasks.T-XXX.status: "needs-fixes"
+      status.next_action: "Fix issues in T-XXX"
+    
+    output: |
       ---
       ## ⚠️ Changes Requested for T-XXX
+      
+      State updated:
+      - T-XXX status: needs-fixes
       
       **Create fix plan:**
       ```

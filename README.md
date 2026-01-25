@@ -387,17 +387,32 @@ Each root can have additional instructions that are NOT synced:
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      PHASE 3: IMPLEMENTATION                        │
+│                  (Two-Gate Model with Review Options)               │
 ├─────────────────────────────────────────────────────────────────────┤
 │  ┌──────────────────────────────────────────────────────────────┐   │
 │  │  FOR EACH TASK:                                              │   │
-│  │  /phase-3-impl T-XXX → implement → ⏸️ STOP                   │   │
+│  │                                                              │   │
+│  │  /phase-3-impl T-XXX                                         │   │
 │  │       │                                                      │   │
 │  │       ▼                                                      │   │
-│  │  /code-review T-XXX → APPROVE? ──yes──→ /phase-3-impl T-YYY  │   │
+│  │  [Show plan: task + requirements + approach]                 │   │
 │  │       │                                                      │   │
-│  │       │ REQUEST CHANGES                                      │   │
 │  │       ▼                                                      │   │
-│  │  /code-fix-plan T-XXX → fix → /code-review T-XXX             │   │
+│  │  ⏸️ GATE 1: Confirm approach?                                │   │
+│  │       │                                                      │   │
+│  │       │ /impl go                                             │   │
+│  │       ▼                                                      │   │
+│  │  [Make code changes + update state]                          │   │
+│  │       │                                                      │   │
+│  │       ▼                                                      │   │
+│  │  ⏸️ GATE 2: Choose review method                             │   │
+│  │       │                                                      │   │
+│  │       ├── /impl approved ───────→ next task (manual review)  │   │
+│  │       │                                                      │   │
+│  │       └── /code-review T-XXX ──→ AI review ──→ next task     │   │
+│  │                                      │                       │   │
+│  │                                      └── fixes needed?       │   │
+│  │                                          /code-fix-plan      │   │
 │  └──────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
                                     │ /phase-4-tests
@@ -448,9 +463,11 @@ Generic commands like `go`, `approved` can cause phase skipping in long conversa
 | `/spec-review` | Review spec (recommended before Phase 2) |
 | `/phase-2-tasks` | Start Phase 2: Task Planning |
 | `/task-plan-review` | Review task plan (recommended before Phase 3) |
-| `/phase-3-impl T-XXX` | Implement specific task |
-| `/phase-3-impl next` | Implement next incomplete task |
-| `/code-review T-XXX` | Review task changes |
+| `/phase-3-impl T-XXX` | Plan specific task (shows approach, waits for approval) |
+| `/phase-3-impl next` | Plan next incomplete task |
+| `/impl go` | Proceed with implementation after plan approved |
+| `/impl approved` | Mark task complete after manual review (skip AI review) |
+| `/code-review T-XXX` | Review task changes (AI review) |
 | `/code-fix-plan T-XXX` | Plan fixes for review issues |
 | `/code-fix-apply T-XXX` | Apply approved fixes |
 | `/phase-4-tests` | Start Phase 4: Testing |
@@ -490,7 +507,63 @@ Generic commands like `go`, `approved` can cause phase skipping in long conversa
 
 ---
 
-## 📝 Workflow Artifacts / Artifacts Workflow
+## � Phase 3 Implementation Flow / Flow Triển khai Phase 3
+
+Phase 3 uses a **Two-Gate Model** with flexible review options:
+
+### Gate 1: Planning Approval
+
+```
+/phase-3-impl T-XXX
+      ↓
+[Copilot reads: state → tasks.md → impl-log.md → spec.md]
+      ↓
+[Shows: task summary + requirements + approach + files]
+      ↓
+⏸️ STOP: "Confirm approach? /impl go"
+```
+
+**Why?** Lets you verify the approach BEFORE code is written. Prevents wasted effort on wrong direction.
+
+### Gate 2: Review Options
+
+After implementation, choose your review style:
+
+| Command | When to Use | Flow |
+|---------|-------------|------|
+| `/impl approved` | Already tested manually | Mark complete → next task |
+| `/code-review T-XXX` | Want AI to review | AI reviews → approve/fix → next task |
+
+### Typical Workflows
+
+**Workflow A: Manual Review + Batch AI (Recommended for experienced devs)**
+```
+/phase-3-impl T-001 → /impl go → [manual test] → /impl approved
+/phase-3-impl T-002 → /impl go → [manual test] → /impl approved
+/phase-3-impl T-003 → /impl go → [manual test] → /impl approved
+...
+/code-review         ← AI reviews ALL changes at once
+/phase-4-tests
+```
+
+**Workflow B: AI Review Per Task (Good for complex features)**
+```
+/phase-3-impl T-001 → /impl go → /code-review T-001 → approved
+/phase-3-impl T-002 → /impl go → /code-review T-002 → approved
+...
+/phase-4-tests
+```
+
+**Workflow C: Hybrid (Mix based on task complexity)**
+```
+/phase-3-impl T-001 → /impl go → /impl approved      # Simple task
+/phase-3-impl T-002 → /impl go → /code-review T-002  # Complex task
+...
+```
+
+---
+
+## �📝 Workflow Artifacts / Artifacts Workflow
 
 All artifacts are stored in `docs/runs/<branch-slug>/`:
 

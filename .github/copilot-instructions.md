@@ -176,9 +176,11 @@ MANDATORY_CHECK:
 | `/spec-review` | Review spec quality |
 | `/phase-2-tasks` | Start Phase 2: Task Planning |
 | `/task-plan-review` | Review task plan quality |
-| `/phase-3-impl T-XXX` | Implement specific task |
-| `/phase-3-impl next` | Implement next task |
-| `/code-review T-XXX` | Review task changes |
+| `/phase-3-impl T-XXX` | Plan specific task (shows approach first) |
+| `/phase-3-impl next` | Plan next task (shows approach first) |
+| `/impl go` | Proceed with implementation after plan approved |
+| `/impl approved` | Mark complete after manual review (skip AI review) |
+| `/code-review T-XXX` | Review task changes (AI review) |
 | `/code-fix-plan T-XXX` | Plan fixes for review issues |
 | `/code-fix-apply T-XXX` | Apply approved fixes |
 | `/phase-4-tests` | Start Phase 4: Testing |
