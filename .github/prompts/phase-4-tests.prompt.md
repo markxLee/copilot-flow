@@ -38,7 +38,7 @@ pre_checks:
      if_not: STOP - "Phase 3 not complete. <N> tasks remaining."
      
   2. Load implementation summary:
-     from: <impl_root>/docs/runs/<branch-slug>/03_impl/impl-log.md
+     from: <docs_root>/docs/runs/<branch-slug>/03_impl/impl-log.md
      
   3. Identify testable components:
      - Files changed in Phase 3

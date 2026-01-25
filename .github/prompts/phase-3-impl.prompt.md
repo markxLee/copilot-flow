@@ -46,7 +46,7 @@ pre_checks:
      if_not: STOP - "Phase 2 not approved. Run task-plan-review first."
      
   2. Load task plan:
-     path: <impl_root>/docs/runs/<branch-slug>/02_tasks/tasks.md
+     path: <docs_root>/docs/runs/<branch-slug>/02_tasks/tasks.md
      
   3. Determine current task:
      - If first entry to Phase 3: task = first incomplete task

@@ -1,139 +1,80 @@
-# Analysis & Solution Design / Phân tích & Thiết kế Giải pháp
-# Template v2.0 - Bilingual inline format
+# Analysis & Solution Design
+# Template v3.0 - Hybrid Bilingual Format (Shared Data + Language Zones)
 
 ---
 
-## 📋 TL;DR
+## 📊 SHARED DATA
+<!-- Technical data - no translation needed / Dữ liệu kỹ thuật - không cần dịch -->
 
-| Aspect / Khía cạnh | Detail / Chi tiết |
-|-------------------|-------------------|
-| Feature / Tính năng | `<name>` |
-| Status / Trạng thái | Draft / Bản nháp |
-| Affected Roots / Roots ảnh hưởng | `<root1>`, `<root2>` |
-| Complexity / Độ phức tạp | Low / Medium / High |
-| Estimated Effort / Ước lượng | `<time>` |
+### TL;DR
 
----
+| Aspect | Value |
+|--------|-------|
+| Feature | `<name>` |
+| Status | Draft / In Review / Approved |
+| Affected Roots | `<root1>`, `<root2>` |
+| Complexity | Low / Medium / High |
+| Estimated Effort | `<time>` |
 
-## 1. Request Analysis / Phân tích Yêu cầu
+### Clarifying Questions
 
-### 1.1 Problem Statement / Mô tả Vấn đề
+| # | Question | Answer | Status |
+|---|----------|--------|--------|
+| 1 | `<question>` | `<answer>` | Open / Resolved |
+| 2 | `<question>` | `<answer>` | Open / Resolved |
 
-**Current behavior / Hành vi hiện tại:**
-- EN: ...
-- VI: ...
+### Existing Patterns Found
 
-**Desired behavior / Hành vi mong muốn:**
-- EN: ...
-- VI: ...
+| Location | Pattern | Reusable |
+|----------|---------|----------|
+| `<file-path>` | `<pattern-name>` | Yes / No / Partial |
 
-**Gap / Khoảng cách:**
-- EN: ...
-- VI: ...
+### Dependencies
 
-### 1.2 Clarifying Questions / Câu hỏi Làm rõ
+| Package | Version | Installed |
+|---------|---------|-----------|
+| `<package>` | `<version>` | Yes / No |
 
-> ⚠️ Must be answered before proceeding / Cần trả lời trước khi tiếp tục
-
-| # | Question / Câu hỏi | Answer / Trả lời |
-|---|-------------------|------------------|
-| 1 | EN: ... / VI: ... | |
-| 2 | EN: ... / VI: ... | |
-
-### 1.3 Assumptions / Giả định
-
-- EN: ... / VI: ...
-- EN: ... / VI: ...
-
-### 1.4 Constraints / Ràng buộc
-
-- EN: ... / VI: ...
-- EN: ... / VI: ...
-
----
-
-## 2. Solution Research / Nghiên cứu Giải pháp
-
-### 2.1 Existing Patterns / Pattern Hiện có
-
-| Location / Vị trí | Pattern | Applicable / Áp dụng được |
-|-------------------|---------|---------------------------|
-| `<file-path>` | ... | Yes / No / Partial |
-
-### 2.2 Similar Implementations / Triển khai Tương tự
-
-| Location / Vị trí | Description / Mô tả | Learnings / Bài học |
-|-------------------|---------------------|---------------------|
-| `<file-path>` | EN: ... / VI: ... | EN: ... / VI: ... |
-
-### 2.3 Dependencies / Phụ thuộc
-
-| Package | Purpose / Mục đích | Installed / Đã cài |
-|---------|--------------------|--------------------|
-| ... | EN: ... / VI: ... | Yes / No |
-
----
-
-## 3. Solution Design / Thiết kế Giải pháp
-
-### 3.1 Overview / Tổng quan
-
-**EN:**
-> 1-2 paragraph description of the solution approach
-
-**VI:**
-> Mô tả 1-2 đoạn về hướng tiếp cận giải pháp
-
-### 3.2 Approach Comparison / So sánh Các Hướng tiếp cận
+### Approach Comparison Matrix
 
 | Aspect | Option A | Option B | Option C |
 |--------|----------|----------|----------|
-| Description / Mô tả | ... | ... | ... |
-| Pros / Ưu điểm | ... | ... | ... |
-| Cons / Nhược điểm | ... | ... | ... |
-| Effort / Công sức | Low/Med/High | Low/Med/High | Low/Med/High |
+| Description | ... | ... | ... |
+| Effort | Low/Med/High | Low/Med/High | Low/Med/High |
+| Risk | Low/Med/High | Low/Med/High | Low/Med/High |
+| Maintainability | Low/Med/High | Low/Med/High | Low/Med/High |
 
-**Chosen / Đã chọn:** `Option X`
+**Chosen:** `Option X`
 
-**Rationale / Lý do:**
-- EN: ...
-- VI: ...
+### Components
 
-### 3.3 Components / Thành phần
+| Component | Root | Type |
+|-----------|------|------|
+| `<name>` | `<root>` | New / Modify / Delete |
 
-| Component | Root | Purpose / Mục đích |
-|-----------|------|-------------------|
-| `<name>` | `<root>` | EN: ... / VI: ... |
+### Data Flow
 
-### 3.4 Data Flow / Luồng Dữ liệu
-
-| Step | Action / Hành động | From / Từ | To / Đến |
-|------|-------------------|-----------|----------|
+| Step | Action | From | To |
+|------|--------|------|-----|
 | 1 | ... | ... | ... |
 | 2 | ... | ... | ... |
 
----
+### Cross-Root Impact
 
-## 4. Cross-Root Impact / Ảnh hưởng Đa Root
+| Root | Change Type | Sync Required |
+|------|-------------|---------------|
+| `<root1>` | Code / Config / Both | Yes / No |
+| `<root2>` | Code / Config / Both | Yes / No |
 
-### 4.1 Affected Roots Summary / Tóm tắt Roots Ảnh hưởng
+### Integration Points
 
-| Root | Changes / Thay đổi | Sync Required / Cần đồng bộ |
-|------|-------------------|----------------------------|
-| `<root1>` | EN: ... / VI: ... | Yes / No |
-| `<root2>` | EN: ... / VI: ... | Yes / No |
+| From | To | Type | Contract |
+|------|-----|------|----------|
+| `<root1>` | `<root2>` | API / Package / Event | `<interface>` |
 
-### 4.2 Integration Points / Điểm Tích hợp
+### Diagrams
 
-| From / Từ | To / Đến | Type / Loại | Contract / Hợp đồng |
-|-----------|----------|-------------|---------------------|
-| `<root1>` | `<root2>` | API / Package / Event | ... |
-
----
-
-## 5. Diagrams / Sơ đồ
-
-### 5.1 Flow Overview / Tổng quan Luồng xử lý
+#### Flow Overview
 
 ```mermaid
 flowchart TD
@@ -145,11 +86,7 @@ flowchart TD
     E --> F
 ```
 
-**Legend / Chú thích:**
-- EN: ...
-- VI: ...
-
-### 5.2 Sequence Diagram / Sơ đồ Tuần tự
+#### Sequence Diagram
 
 ```mermaid
 sequenceDiagram
@@ -163,43 +100,180 @@ sequenceDiagram
     A-->>U: Result
 ```
 
----
+### Decision Log
 
-## 6. Decision Log / Nhật ký Quyết định
+| ID | Date | Decision | Chosen Option |
+|----|------|----------|---------------|
+| D1 | YYYY-MM-DD | `<decision-title>` | Option X |
+| D2 | YYYY-MM-DD | `<decision-title>` | Option Y |
 
-### Decision 1: `<Title>`
+### Risk Assessment
 
-| Aspect | Detail |
-|--------|--------|
-| Date / Ngày | YYYY-MM-DD |
-| Context / Bối cảnh | EN: ... / VI: ... |
-| Options / Lựa chọn | 1) ... 2) ... 3) ... |
-| Decision / Quyết định | Option X |
-| Rationale / Lý do | EN: ... / VI: ... |
-| Consequences / Hệ quả | EN: ... / VI: ... |
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| `<risk-1>` | Low/Med/High | Low/Med/High | `<mitigation>` |
+| `<risk-2>` | Low/Med/High | Low/Med/High | `<mitigation>` |
 
----
+### Approval Status
 
-## 7. Risk Assessment / Đánh giá Rủi ro
-
-| Risk / Rủi ro | Likelihood / Khả năng | Impact / Tác động | Mitigation / Giảm thiểu |
-|---------------|----------------------|-------------------|------------------------|
-| EN: ... / VI: ... | Low/Med/High | Low/Med/High | EN: ... / VI: ... |
-
----
-
-## 8. Approval / Phê duyệt
-
-| Role / Vai trò | Name / Tên | Status / Trạng thái | Date / Ngày |
-|----------------|------------|---------------------|-------------|
-| Author / Tác giả | ... | ✅ Done | ... |
+| Role | Name | Status | Date |
+|------|------|--------|------|
+| Author | ... | ✅ Done | ... |
 | Reviewer | ... | ⏳ Pending | ... |
 
 ---
 
-## Next Step / Bước tiếp theo
+## 🇬🇧 ENGLISH
+
+### 1. Problem Statement
+
+#### Current Behavior
+> Describe what the system currently does (or doesn't do)
+
+#### Desired Behavior
+> Describe what the system should do after this change
+
+#### Gap Analysis
+> Explain the gap between current and desired state
+
+### 2. Assumptions
+
+- Assumption 1: ...
+- Assumption 2: ...
+
+### 3. Constraints
+
+- Constraint 1: ...
+- Constraint 2: ...
+
+### 4. Solution Overview
+
+> 1-2 paragraph description of the chosen solution approach.
+> Explain WHY this approach was chosen over alternatives.
+
+### 5. Rationale for Chosen Approach
+
+**Why Option X over Option Y?**
+
+- Reason 1: ...
+- Reason 2: ...
+- Reason 3: ...
+
+### 6. Similar Implementations & Learnings
+
+| Location | What We Learned |
+|----------|-----------------|
+| `<file-path>` | ... |
+
+### 7. Decision Details
+
+#### Decision D1: `<title>`
+
+**Context:** ...
+
+**Options Considered:**
+1. Option A: ...
+2. Option B: ...
+3. Option C: ...
+
+**Decision:** Option X
+
+**Rationale:** ...
+
+**Consequences:** ...
+
+### 8. Risk Details
+
+#### Risk 1: `<title>`
+
+**Description:** ...
+
+**Mitigation Strategy:** ...
+
+### 9. Notes & Concerns
+
+- Note 1: ...
+- Concern 1: ...
+
+---
+
+## 🇻🇳 TIẾNG VIỆT
+
+### 1. Mô tả Vấn đề
+
+#### Hành vi Hiện tại
+> Mô tả hệ thống hiện đang làm gì (hoặc không làm gì)
+
+#### Hành vi Mong muốn
+> Mô tả hệ thống nên làm gì sau thay đổi này
+
+#### Phân tích Khoảng cách
+> Giải thích khoảng cách giữa trạng thái hiện tại và mong muốn
+
+### 2. Giả định
+
+- Giả định 1: ...
+- Giả định 2: ...
+
+### 3. Ràng buộc
+
+- Ràng buộc 1: ...
+- Ràng buộc 2: ...
+
+### 4. Tổng quan Giải pháp
+
+> Mô tả 1-2 đoạn về hướng tiếp cận giải pháp đã chọn.
+> Giải thích TẠI SAO chọn hướng này thay vì các phương án khác.
+
+### 5. Lý do Chọn Hướng tiếp cận
+
+**Tại sao Option X thay vì Option Y?**
+
+- Lý do 1: ...
+- Lý do 2: ...
+- Lý do 3: ...
+
+### 6. Triển khai Tương tự & Bài học
+
+| Vị trí | Bài học Rút ra |
+|--------|----------------|
+| `<file-path>` | ... |
+
+### 7. Chi tiết Quyết định
+
+#### Quyết định D1: `<tiêu đề>`
+
+**Bối cảnh:** ...
+
+**Các lựa chọn Đã cân nhắc:**
+1. Option A: ...
+2. Option B: ...
+3. Option C: ...
+
+**Quyết định:** Option X
+
+**Lý do:** ...
+
+**Hệ quả:** ...
+
+### 8. Chi tiết Rủi ro
+
+#### Rủi ro 1: `<tiêu đề>`
+
+**Mô tả:** ...
+
+**Chiến lược Giảm thiểu:** ...
+
+### 9. Ghi chú & Quan ngại
+
+- Ghi chú 1: ...
+- Quan ngại 1: ...
+
+---
+
+## ⏭️ Next Step
 
 > After approval, proceed to Phase 1 (Specification)
 > Sau khi phê duyệt, tiến hành Phase 1 (Đặc tả)
 
-Reply / Trả lời: `approved` or `revise: <feedback>`
+Reply: `approved` or `revise: <feedback>`

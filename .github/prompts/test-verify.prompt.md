@@ -34,7 +34,7 @@ TRIGGER_RULES:
 ```yaml
 pre_checks:
   1. Verify test batches exist:
-     path: <impl_root>/docs/runs/<branch-slug>/04_tests/tests.md
+     path: <docs_root>/docs/runs/<branch-slug>/04_tests/tests.md
      if_not: STOP - "No test documentation. Run phase-4-tests first."
      
   2. Load test results:

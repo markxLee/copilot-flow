@@ -50,26 +50,43 @@ Each work unit follows ALL phases below.
 List of workspace roots that will be modified by this work unit.
 MUST be identified in Phase 0.
 
-### Implementation Root (impl-root)
-The designated root where ALL workflow artifacts are stored.
-This root will be pushed to git for reviewer access.
+### Tooling Root (tooling_root)
+The root containing all workflow tooling: prompts, templates, shared instructions.
+This is STATIC and does not change per-feature.
 
-Resolution order:
-1. User-specified via `impl_root` in `WORKSPACE_CONTEXT.md`
-2. `copilot-flow/` if exists in workspace
-3. Primary root from `WORKSPACE_CONTEXT.md`
+Resolution:
+- Always: `copilot-flow/` (or `meta.tooling_root` in WORKSPACE_CONTEXT.md)
 
 ```yaml
 # In WORKSPACE_CONTEXT.md
 meta:
-  impl_root: copilot-flow  # Explicit override
+  tooling_root: copilot-flow  # Where prompts/templates live
 ```
 
-**Why a dedicated impl root?**
-- Single location for all workflow docs across multi-root changes
-- Easy to push and create PR for review
-- Keeps implementation docs separate from source code
-- Reviewer can see full context in one place
+### Docs Root (docs_root)
+The root where workflow documentation for a specific feature is stored.
+This is PER-FEATURE and can vary based on primary affected root.
+
+Resolution order:
+1. User choice when starting workflow (asked by Copilot)
+2. `meta.default_docs_root` in `WORKSPACE_CONTEXT.md`
+3. Primary affected root (where most code changes happen)
+
+```yaml
+# In WORKSPACE_CONTEXT.md
+meta:
+  default_docs_root: apphub-vision  # Default for new workflows
+
+# In .workflow-state.yaml (per-feature)
+meta:
+  docs_root: apphub-vision  # This feature's docs location
+```
+
+**Why separate tooling vs docs?**
+- **Tooling Root (static)**: Prompts, templates stay in one place
+- **Docs Root (flexible)**: Workflow docs go with the code for better PR context
+- Reviewers see docs + code changes in same PR
+- No need for separate "docs PR"
 
 ---
 
@@ -101,7 +118,7 @@ All workflow documents MUST use the corresponding bilingual templates:
 Every workflow MUST maintain a state file for resume capability:
 
 ```
-<impl-root>/docs/runs/<branch-slug>/.workflow-state.yaml
+<docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
 ```
 
 ### State File Purpose
@@ -143,19 +160,19 @@ not-started ──▶ in-progress ──▶ awaiting-review ──▶ approved �
 All docs for the current work unit MUST live under:
 
 ```
-<impl-root>/docs/runs/<branch-slug>/
+<docs_root>/docs/runs/<branch-slug>/
 ```
 
-Where `<impl-root>` is determined by resolution order above.
+Where `<docs_root>` is determined per-feature (typically the primary affected root).
 
 ### Branch Naming Convention
-The branch should be created in the `<impl-root>` repository.
+The branch should be created in the `<docs_root>` repository.
 If changes span multiple roots, each root may have its own branch with same name.
 
 ### Required Structure
 
 ```
-<impl-root>/
+<docs_root>/
 └── docs/
     └── runs/
         └── <branch-slug>/
@@ -229,27 +246,31 @@ When changes span multiple roots (separate git repos):
 
 ```yaml
 pr_strategy:
-  impl_root_pr:
-    repo: <impl-root>
+  # When docs_root == primary affected root (RECOMMENDED)
+  # Code + docs in same PR for better context
+  single_pr:
+    repo: <docs_root>  # e.g., apphub-vision
     branch: <branch-slug>
-    contains: All workflow docs
+    contains: Code changes + workflow docs (docs/runs/<branch>/)
     reviewers: [<team>]
     
-  affected_root_prs:
-    - repo: <root1>
+  # When changes span multiple roots
+  multi_pr:
+    primary_pr:
+      repo: <docs_root>  # Contains docs + primary code changes
       branch: <branch-slug>
-      contains: Code changes for root1
-      linked_to: impl_root_pr
+      contains: Workflow docs + primary code changes
       
-    - repo: <root2>
-      branch: <branch-slug>
-      contains: Code changes for root2
-      linked_to: impl_root_pr
+    secondary_prs:
+      - repo: <other-root>
+        branch: <branch-slug>
+        contains: Code changes for other-root
+        linked_to: primary_pr
 
   merge_order:
     1. Review all PRs together
-    2. Merge impl_root_pr first (docs)
-    3. Merge affected_root_prs in dependency order
+    2. Merge primary_pr first (has docs)
+    3. Merge secondary_prs in dependency order
 ```
 
 ---
@@ -902,15 +923,15 @@ format: |
 ### PRs Created
 | Root | PR Link | Status |
 |------|---------|--------|
-| <impl-root> | <link> | Ready for review |
-| <root1> | <link> | Ready for review |
+| <docs_root> | <link> | Ready for review |
+| <other-root> | <link> | Ready for review |
 
 ### Next Steps
-- [ ] Push impl-root branch with all docs
-- [ ] Create PRs for each affected root
+- [ ] Push docs_root branch with docs + code
+- [ ] Create PRs for secondary roots (if any)
 - [ ] Link all PRs together
 - [ ] Request review
-- [ ] Merge in order: impl-root → affected roots
+- [ ] Merge in order: docs_root → secondary roots
 
 Work unit complete! 🎉
 ```
@@ -919,17 +940,23 @@ Work unit complete! 🎉
 
 ## 3) Non-Negotiable Rules
 
-### Impl Root for All Docs
-All workflow artifacts MUST be stored in the designated `impl-root`.
-- Determined by: `WORKSPACE_CONTEXT.md` → `copilot-flow/` → primary root
-- Never scatter docs across multiple roots
-- Enables single PR for all documentation
+### Docs Root for Workflow Docs
+All workflow artifacts MUST be stored in the designated `docs_root`.
+- Per-feature choice (typically primary affected root)
+- Fallback: `WORKSPACE_CONTEXT.md` → `meta.default_docs_root`
+- Templates from: `tooling_root` (copilot-flow)
+- Enables docs + code in same PR
+
+### Templates from Tooling Root
+All templates and prompts MUST come from `tooling_root`.
+- Always: `copilot-flow/docs/templates/`
+- Never copy templates to other roots
 
 ### No Auto Branch Creation
 Copilot MUST NOT create git branches automatically.
 
 ### Branch-scoped Docs
-All docs MUST live under `<impl-root>/docs/runs/<branch-slug>/`
+All docs MUST live under `<docs_root>/docs/runs/<branch-slug>/`
 
 ### No Phase Skipping
 Copilot MUST NOT skip phases or gates.

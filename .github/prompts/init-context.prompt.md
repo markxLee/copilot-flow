@@ -31,36 +31,45 @@ actions:
      - This runs: discovery → cross-root → sync → generate files
      
   3. Extract key info:
-     - meta.impl_root → Where workflow docs go
+     - meta.tooling_root → Where prompts/templates live (STATIC)
+     - meta.default_docs_root → Default for workflow docs
      - meta.primary_root → Main codebase
      - roots → All available roots
      - relationships → Cross-root dependencies
 ```
 
-### Step 2: Verify impl_root / Xác nhận impl_root
+### Step 2: Determine docs_root / Xác nhận docs_root
 
 ```yaml
-verification:
-  1. Read meta.impl_root from WORKSPACE_CONTEXT.md
+determination:
+  # tooling_root is STATIC - always copilot-flow
+  tooling_root: copilot-flow  # From WORKSPACE_CONTEXT.md
   
-  2. If impl_root is set:
-     - Confirm path exists
-     - Confirm has docs/workflow/contract.md
-     - Confirm has docs/templates/
+  # docs_root is PER-FEATURE - determined here
+  docs_root_resolution:
+  
+  1. If RESUMING existing workflow:
+     - Read .workflow-state.yaml → meta.docs_root
+     - Use that value (already chosen previously)
      
-  3. If impl_root NOT set or invalid:
-     - ASK user:
-       "I need to know where to store workflow documentation.
-       Tôi cần biết nơi lưu trữ tài liệu workflow.
-       
-       Options:
-       1. copilot-flow/ (recommended if exists)
-       2. <current-root>/
-       3. Other: ___
-       
-       Which root should be the impl_root?"
+  2. If STARTING new workflow:
+     a. Identify primary affected root from user request
+     b. ASK user to confirm docs_root:
+        "✋ Where should workflow docs live? / Lưu workflow docs ở đâu?
+        
+        Detected primary root: <primary-affected-root>
+        
+        Options:
+        1. **<primary-root>/** (RECOMMENDED - code + docs in same PR)
+        2. **<default_docs_root>/** (default from config)
+        3. Other: ___
+        
+        Which root for docs?"
+     c. Store choice in .workflow-state.yaml → meta.docs_root
      
-  4. Update WORKSPACE_CONTEXT.md with answer
+  3. Verify docs_root is valid:
+     - Path exists in workspace
+     - Has write access
 ```
 
 ### Step 3: Load Cross-Root Workflows / Đọc Cấu hình Đa Root
@@ -98,12 +107,16 @@ workflow_detection:
      normalize: lowercase, hyphens only
      result: <branch-slug>
      
-  2. Check for state file:
-     path: <impl_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+  2. Check for state file in possible docs_roots:
+     search_order:
+       - <default_docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+       - <primary_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+       - All roots: */docs/runs/<branch-slug>/.workflow-state.yaml
      
   3. If state file EXISTS:
-     action: Load and show resume prompt
-     goto: Step 5A (Resume Mode)
+     - Read meta.docs_root from it
+     - Load and show resume prompt
+     - goto: Step 5A (Resume Mode)
      
   4. If state file NOT EXISTS:
      action: Ask what user wants to do
@@ -152,7 +165,8 @@ new_session_actions:
      "## 👋 Welcome / Chào mừng
      
      **Workspace:** <workspace-name>
-     **Impl Root:** `<impl_root>`
+     **Tooling Root:** `<tooling_root>`
+     **Docs Root:** `<docs_root>` (or ask user)
      **Branch:** `<branch-slug>`
      
      No active workflow found for this branch.
@@ -184,20 +198,30 @@ init_workflow:
   trigger: User says "start: <description>" or describes a feature/fix
   
   actions:
-    1. Create branch directory:
-       path: <impl_root>/docs/runs/<branch-slug>/
+    1. Determine docs_root (if not already):
+       - Ask user to confirm (see Step 2)
+       - Default: primary affected root
        
-    2. Create state file from template:
-       source: <impl_root>/docs/templates/workflow-state.template.yaml
-       target: <impl_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+    2. Create branch directory:
+       path: <docs_root>/docs/runs/<branch-slug>/
        
-    3. Initialize state:
+    3. Create state file from template:
+       source: <tooling_root>/docs/templates/workflow-state.template.yaml
+       target: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+       
+    4. Initialize state:
        meta:
          branch_slug: <branch-slug>
-         impl_root: <impl_root>
+         docs_root: <docs_root>
+         tooling_root: <tooling_root>
          feature_name: <from user description>
          created_at: <now>
          last_updated: <now>
+         affected_roots:
+           - root: <primary-root>
+             role: primary
+           - root: <secondary-root>  # if any
+             role: secondary
        status:
          current_phase: 0
          phase_name: analysis
@@ -206,10 +230,10 @@ init_workflow:
          next_action: "Capture work description"
          blockers: []
          
-    4. Create README.md for reviewers:
-       path: <impl_root>/docs/runs/<branch-slug>/README.md
+    5. Create README.md for reviewers:
+       path: <docs_root>/docs/runs/<branch-slug>/README.md
        
-    5. Announce:
+    6. Announce:
        "
        ## ✅ Workflow Initialized / Workflow đã khởi tạo
        
@@ -217,7 +241,9 @@ init_workflow:
        |--------|----- -|
        | Feature | <feature-name> |
        | Branch | `<branch-slug>` |
-       | Docs Location | `<impl_root>/docs/runs/<branch-slug>/` |
+       | Docs Location | `<docs_root>/docs/runs/<branch-slug>/` |
+       | Templates From | `<tooling_root>/docs/templates/` |
+       | Affected Roots | <list of roots> |
        
        ---
        
@@ -227,7 +253,7 @@ init_workflow:
        ```
        "
        
-    6. STOP and wait for user to run /work-intake
+    7. STOP and wait for user to run /work-intake
        # DO NOT auto-run work-intake, let user trigger explicitly
 ```
 
@@ -283,7 +309,8 @@ After initialization, always show:
 
 | Aspect | Value |
 |--------|-------|
-| Impl Root | `<impl_root>` |
+| Tooling Root | `<tooling_root>` |
+| Docs Root | `<docs_root>` |
 | Primary Root | `<primary_root>` |
 | Current Branch | `<branch-slug>` |
 | Workflow Status | <Active / None> |
@@ -291,7 +318,7 @@ After initialization, always show:
 ### Workspace Roots / Các Root
 | Root | Type | Role |
 |------|------|------|
-| <root1> | <type> | <impl_root / code / ui / ...> |
+| <root1> | <type> | <tooling_root / docs_root / code / ui / ...> |
 | <root2> | <type> | <role> |
 
 ### Cross-Root Relationships / Quan hệ Đa Root
@@ -367,9 +394,9 @@ Show when user says "help" / Hiển thị khi user nói "help":
 | 5 | Done Check | ⏸️ Final |
 
 ### Key Paths / Đường dẫn Chính
-- Contract: `<impl_root>/docs/workflow/contract.md`
-- Templates: `<impl_root>/docs/templates/`
-- This workflow: `<impl_root>/docs/runs/<branch-slug>/`
+- Contract: `<tooling_root>/docs/workflow/contract.md`
+- Templates: `<tooling_root>/docs/templates/`
+- This workflow: `<docs_root>/docs/runs/<branch-slug>/`
 - State file: `.workflow-state.yaml`
 
 ### Tips / Mẹo
@@ -396,15 +423,16 @@ action: |
   3. Point me to existing context file"
 ```
 
-### No impl_root defined
+### No tooling_root defined
 ```yaml
 action: |
-  "⚠️ impl_root not defined in WORKSPACE_CONTEXT.md
+  "⚠️ tooling_root not defined in WORKSPACE_CONTEXT.md
   
-  I need to know where to store workflow documentation.
+  I need to know where workflow tooling (prompts/templates) are stored.
+  This is usually the repo containing the copilot-flow system.
   
-  Which root should be the implementation root?
-  (This is where all workflow docs will be stored)
+  Which root contains the workflow tooling?
+  (This is where prompts and templates live)
   
   Available roots:
   - copilot-flow/ (recommended)
@@ -474,7 +502,8 @@ Copilot:
 
 | Aspect | Value |
 |--------|-------|
-| Impl Root | `copilot-flow` |
+| Tooling Root | `copilot-flow` |
+| Docs Root | `apphub-vision` |
 | Primary Root | `apphub-vision` |
 | Current Branch | `feature-add-analytics` |
 | Workflow Status | Active (Phase 3) |
@@ -482,8 +511,8 @@ Copilot:
 ### Workspace Roots / Các Root
 | Root | Type | Role |
 |------|------|------|
-| copilot-flow | docs | impl_root |
-| apphub-vision | monorepo | primary code |
+| copilot-flow | tooling | tooling_root |
+| apphub-vision | monorepo | docs_root, primary code |
 | reviews-assets | library | UI components |
 
 ---

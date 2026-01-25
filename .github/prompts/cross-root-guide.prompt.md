@@ -216,17 +216,17 @@ logic:
   based_on_patterns:
     - If library→consumer exists: suggest "coordinated"
     - If API integration exists: suggest "coordinated"
-    - If impl_root is separate: include "docs_separate"
+    - If docs_root is separate from primary code: include "docs_separate"
     - Always include "independent" as fallback
     
 example:
-  # Detected: library→consumer, impl_root=copilot-flow
+  # Detected: library→consumer, docs_root=apphub-vision
   
   # Result:
   pr_strategies:
     preferred:
       - coordinated    # For library→consumer changes
-      - docs_separate  # impl_root has separate docs
+      - single_pr      # docs_root has code + docs together
       - independent    # For isolated changes
 ```
 
@@ -307,7 +307,7 @@ on_user_confirms_yes:
   3. Generate YAML content from detected patterns
   
   4. WRITE to file:
-     path: <impl_root>/WORKSPACE_CONTEXT.md
+     path: <tooling_root>/WORKSPACE_CONTEXT.md
      action: Replace Section 9 content
      
   5. Confirm:

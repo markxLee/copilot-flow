@@ -91,7 +91,7 @@ Review Mô tả Công việc để xác định có **đủ rõ ràng và đầy
 ```yaml
 steps:
   1. Load Work Description
-     path: <impl_root>/docs/runs/<branch-slug>/00_analysis/work-description.md
+     path: <docs_root>/docs/runs/<branch-slug>/00_analysis/work-description.md
      
   2. Identify work type
      action: FEATURE | BUGFIX | MAINTENANCE | TEST | DOCS

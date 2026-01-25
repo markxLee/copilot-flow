@@ -81,7 +81,7 @@ update_types:
 ```yaml
 pre_checks:
   1. Verify workflow exists:
-     path: <impl_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+     path: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
      if_not: STOP - "No workflow found. Use work-intake for new work."
      
   2. Load current state:

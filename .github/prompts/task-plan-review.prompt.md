@@ -33,7 +33,7 @@ TRIGGER_RULES:
 ```yaml
 pre_checks:
   1. Verify task plan exists:
-     path: <impl_root>/docs/runs/<branch-slug>/02_tasks/tasks.md
+     path: <docs_root>/docs/runs/<branch-slug>/02_tasks/tasks.md
      if_not: STOP - "No task plan found. Run phase-2-tasks first."
      
   2. Load related artifacts:

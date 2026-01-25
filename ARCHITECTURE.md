@@ -10,8 +10,8 @@
 
 ```
 boostcommerce/
-├── copilot-flow/           # Copilot workflows, prompts, shared docs (impl_root)
-├── apphub-vision/          # Clearer App - AI analytics platform (primary)
+├── copilot-flow/           # Workflow tooling: prompts, templates, instructions (tooling_root)
+├── apphub-vision/          # Clearer App - AI analytics platform (primary, default_docs_root)
 ├── reviews-assets/         # UI library + Storybook (@apphubdev/clearer-ui)
 └── boost-pfs-backend/      # Discovery feature microservices (SIP)
 ```
@@ -23,9 +23,9 @@ boostcommerce/
 ### copilot-flow
 | Attribute | Value |
 |-----------|-------|
-| **Purpose** | Shared Copilot workflows and prompts for multi-root workspace |
-| **Type** | documentation |
-| **Role** | `impl_root` - All workflow docs stored here |
+| **Purpose** | Shared Copilot workflows, prompts, and templates for multi-root workspace |
+| **Type** | tooling |
+| **Role** | `tooling_root` - Contains prompts, templates, shared instructions |
 | **Tech** | Markdown |
 | **Package Manager** | - |
 
@@ -34,7 +34,7 @@ boostcommerce/
 |-----------|-------|
 | **Purpose** | Clearer App - AI analytics & automation platform for Shopify |
 | **Type** | monorepo |
-| **Role** | `primary_root` - Main codebase |
+| **Role** | `primary_root`, `default_docs_root` - Main codebase, default for workflow docs |
 | **Tech** | TypeScript, Fastify, Next.js, LangChain, LangGraph, Prisma, React |
 | **Package Manager** | pnpm |
 | **Dev Command** | `pnpm dev` |
@@ -73,14 +73,15 @@ boostcommerce/
            ▼
 ┌─────────────────────┐      api-integration      ┌─────────────────────┐
 │   apphub-vision     │◄─────────────────────────│  boost-pfs-backend  │
-│   (primary_root)    │      (REST API + JWT)     │   (Discovery/SIP)   │
-└─────────────────────┘                           └─────────────────────┘
+│  (primary_root)     │      (REST API + JWT)     │   (Discovery/SIP)   │
+│  (default_docs_root)│                           └─────────────────────┘
+└─────────────────────┘
            ▲
-           │ shared-tooling (prompts & docs)
+           │ shared-tooling (prompts & templates)
            │
 ┌─────────────────────┐
 │    copilot-flow     │
-│    (impl_root)      │
+│   (tooling_root)    │
 └─────────────────────┘
 ```
 
@@ -97,10 +98,10 @@ boostcommerce/
 
 ## 🏗️ Key Architectural Decisions
 
-### ADR-001: Separate impl_root for Workflow Docs
-- **Decision:** Store all Copilot workflow artifacts in `copilot-flow/`
-- **Rationale:** Keep workflow docs separate from source code, easy PR review
-- **Status:** Adopted
+### ADR-001: Separate tooling_root and docs_root
+- **Decision:** Store prompts/templates in `copilot-flow/` (tooling_root), workflow docs per-feature in affected root (docs_root)
+- **Rationale:** Tooling stays centralized, docs go with code for better PR context
+- **Status:** Adopted (v3.0)
 
 ### ADR-002: Versioned UI Library
 - **Decision:** Publish `@apphubdev/clearer-ui` to GitHub Packages

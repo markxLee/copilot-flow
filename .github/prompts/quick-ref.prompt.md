@@ -77,17 +77,18 @@ Một cửa sổ VS Code mở nhiều git repo (thư mục dự án) cùng lúc.
 **Example structure / Ví dụ cấu trúc:**
 ```
 Your Workspace (1 VS Code window)
-├── my-frontend/       ← Git repo 1: React app
-├── my-backend/        ← Git repo 2: Node.js API  
-├── shared-libs/       ← Git repo 3: Shared packages
-└── workflow-docs/     ← Git repo 4: Workflow docs (impl_root)
+├── copilot-flow/      ← Git repo 1: Workflow tooling (tooling_root)
+├── my-frontend/       ← Git repo 2: React app (docs_root for frontend features)
+├── my-backend/        ← Git repo 3: Node.js API  
+└── shared-libs/       ← Git repo 4: Shared packages
 ```
 
 **Key Terms / Thuật ngữ Chính:**
 
 | Term | EN | VI |
 |------|----|----|
-| **impl_root** | Where ALL workflow docs live | Nơi chứa TẤT CẢ docs workflow |
+| **tooling_root** | Where prompts/templates live (STATIC) | Nơi chứa prompts/templates (CỐ ĐỊNH) |
+| **docs_root** | Where THIS feature's workflow docs go (PER-FEATURE) | Nơi chứa docs workflow của feature NÀY |
 | **affected_roots** | Roots where code changes happen | Roots bị thay đổi code |
 | **WORKSPACE_CONTEXT.md** | Config file describing multi-root setup | File cấu hình đa root |
 
@@ -242,7 +243,8 @@ Or run all at once: `setup workspace`
 
 | Path | Purpose |
 |------|---------|
-| `<impl_root>/` | All workflow docs stored here |
+| `<docs_root>/` | Workflow docs for this feature |
+| `<tooling_root>/` | Prompts, templates, contract |
 | `docs/runs/<branch>/` | Current workflow artifacts |
 | `.workflow-state.yaml` | State file (AI reads/writes) |
 | `docs/templates/` | Phase templates |
@@ -428,7 +430,7 @@ rollback → (choose what to undo) → continue
 
 **Fix / Cách sửa:**
 ```
-1. Make sure you're in impl_root (copilot-flow/)
+1. Make sure you're in tooling_root (copilot-flow/)
 2. Check WORKSPACE_CONTEXT.md exists
 3. Say: reset context
 4. Then: init
@@ -461,7 +463,7 @@ rollback → (choose what to undo) → continue
 **Fix / Cách sửa:**
 ```
 1. Say: cross-root (reconfigure relationships)
-2. Check WORKSPACE_CONTEXT.md → meta.impl_root
+2. Check WORKSPACE_CONTEXT.md → meta.tooling_root and meta.default_docs_root
 3. Delete wrong files manually
 4. Say: init → resume
 ```
@@ -492,7 +494,7 @@ rollback → (choose what to undo) → continue
 **Fix / Cách sửa:**
 ```
 1. Check you're on a feature branch (not main)
-2. Verify impl_root path is correct
+2. Verify docs_root path is correct
 3. Check docs/runs/<branch>/ exists
 4. Say: status → then continue from current phase
 ```

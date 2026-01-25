@@ -45,7 +45,7 @@ steps:
   1. STOP all current actions
   
   2. Re-read authoritative sources:
-     - WORKSPACE_CONTEXT.md (impl_root, roots)
+     - WORKSPACE_CONTEXT.md (tooling_root, docs_root, roots)
      - .workflow-state.yaml (current phase, task)
      - Current phase docs (spec, tasks, etc.)
      
@@ -75,7 +75,8 @@ steps:
 
 | Field | Value |
 |-------|-------|
-| impl_root | <root> |
+| tooling_root | <root> |
+| docs_root | <root> |
 | Branch | <branch-slug> |
 | Current Phase | <N>: <name> |
 | Current Task | <T-XXX> (if Phase 3) |

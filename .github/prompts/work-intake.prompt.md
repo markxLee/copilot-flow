@@ -179,7 +179,7 @@ steps:
 
 Save Work Description to:
 ```
-<impl_root>/docs/runs/<branch-slug>/00_analysis/work-description.md
+<docs_root>/docs/runs/<branch-slug>/00_analysis/work-description.md
 ```
 
 Update state file:
@@ -271,7 +271,7 @@ action:
 
 ### Case 6: Missing context / Thiếu ngữ cảnh
 ```yaml
-trigger: WORKSPACE_CONTEXT.md not found or impl_root not set
+trigger: WORKSPACE_CONTEXT.md not found or tooling_root not set
 action:
   1. STOP immediately
   2. Inform user:

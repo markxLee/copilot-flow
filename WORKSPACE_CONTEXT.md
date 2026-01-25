@@ -10,10 +10,11 @@
 
 meta:
   generated: "2026-01-23"
-  schema_version: "2.0"
+  schema_version: "3.0"
   roots_count: 4
   primary_root: apphub-vision
-  impl_root: apphub-vision  # Where ALL workflow docs are stored
+  tooling_root: copilot-flow      # Where prompts, templates, instructions live (STATIC)
+  default_docs_root: apphub-vision  # Default root for workflow docs (can override per-feature)
 
 roots:
   apphub-vision:
@@ -23,7 +24,6 @@ roots:
     runtime: "node>=20"
     frameworks: [fastify, nextjs, langchain, langgraph, prisma, react]
     instructions: ".github/copilot-instructions.md"
-    workflow_docs: copilot-flow  # Redirect to impl_root
     dev_cmd: "pnpm dev"
     build_cmd: "pnpm build"
     test_cmd: "pnpm test"
@@ -35,7 +35,6 @@ roots:
     runtime: "node>=18"
     frameworks: [react, storybook, tailwind, radix-ui]
     instructions: null
-    workflow_docs: copilot-flow  # Redirect to impl_root
     dev_cmd: "npm run scss:watch"
     build_cmd: "npm run scss:production"
     test_cmd: null
@@ -48,19 +47,18 @@ roots:
     runtime: "node>=12"
     frameworks: [express, elasticsearch]
     instructions: ".github/instructions/"
-    workflow_docs: copilot-flow  # Redirect to impl_root
     dev_cmd: "npm run dev"
     build_cmd: "npm run build:common"
     test_cmd: "npm run test"
 
   copilot-flow:
-    type: documentation
+    type: tooling
+    role: tooling_root  # Contains prompts, templates, shared instructions
     pkg_manager: null
     lang: markdown
     runtime: null
     frameworks: []
     instructions: ".github/copilot-instructions.md"
-    workflow_docs: self  # This IS the impl_root
     dev_cmd: null
     build_cmd: null
     test_cmd: null
@@ -107,57 +105,6 @@ relationships:
         ⚠️ MIGRATION RULE: When migrating from Storybook to apps:
         - Import from '../../components/production' → Already in @apphubdev/clearer-ui (DO NOT recreate)
         - Import from './*.stories' → These are page/feature-specific, MUST recreate in app
-        
-        ⚠️ CRITICAL - LAYOUT PATTERN DIFFERENCE:
-        
-        STORYBOOK (không dùng Next.js, serve nhiều app):
-        - Mỗi story tự wrap layout riêng
-        - Pattern: <AppProviders><Layout>...</Layout></AppProviders> trong mỗi story
-        
-        NEXT.JS APP (billing, dashboard - dùng App Router):
-        - Layout định nghĩa 1 LẦN trong app/layout.tsx
-        - Layout tự động áp dụng cho TẤT CẢ pages
-        - Pages KHÔNG wrap layout, chỉ render content trực tiếp
-        - Pattern: layout.tsx chứa <AppProviders><LayoutContent2ColScroll>...</>
-                   page.tsx chỉ chứa <HeaderBlock>...</HeaderBlock> và content
-        
-        SAI (đừng làm thế này trong Next.js app):
-        ```tsx
-        // ❌ page.tsx - WRONG
-        export default function Page() {
-          return (
-            <BillingLayout sidebar={...} topbar={...}>
-              <Content />
-            </BillingLayout>
-          );
-        }
-        ```
-        
-        ĐÚNG:
-        ```tsx
-        // ✅ app/layout.tsx - Layout wrapper
-        export default function RootLayout({ children }) {
-          return (
-            <AppProviders>
-              <LayoutContent2ColScroll sidebar={...} topbar={...}>
-                <LayoutContent2ColScrollMain>
-                  {children}  {/* ← Pages auto-injected here */}
-                </LayoutContent2ColScrollMain>
-              </LayoutContent2ColScroll>
-            </AppProviders>
-          );
-        }
-        
-        // ✅ app/payment-details/page.tsx - Just content
-        export default function PaymentDetailsPage() {
-          return (
-            <>  {/* No layout wrapper needed! */}
-              <HeaderBlock title="Payment details" />
-              <PaymentMethodsList />
-            </>
-          );
-        }
-        ```
         
         Example:
         ```tsx
@@ -490,9 +437,14 @@ cross_root_workflows:
       use_when: "Breaking changes, sync deploy required"
       example: "PR #1 reviews-assets → merge → PR #2 apphub-vision (links to #1)"
 
-    docs_separate:
-      description: "Workflow docs in impl_root, code in other roots"
-      use_when: "Standard workflow with docs"
+    docs_with_code:
+      description: "Workflow docs in same root as primary code changes"
+      use_when: "Standard workflow - docs live with code for better PR context"
+      example: "PR apphub-vision (code + workflow docs in docs/runs/)"
+
+    docs_in_tooling:
+      description: "Workflow docs in tooling_root, code in other roots"
+      use_when: "When workflow docs should be separate from code"
       example: "PR copilot-flow (docs) + PR apphub-vision (code)"
 
 # ================================================================

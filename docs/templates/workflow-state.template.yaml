@@ -2,7 +2,7 @@
 # This file tracks progress and enables resuming work at any point
 # File này theo dõi tiến độ và cho phép tiếp tục công việc bất cứ lúc nào
 #
-# Location: <impl-root>/docs/runs/<branch-slug>/.workflow-state.yaml
+# Location: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
 # Updated: Automatically by Copilot after each action
 # Format: YAML (AI-optimized for fast parsing)
 
@@ -11,11 +11,21 @@
 # ============================================================
 meta:
   branch_slug: <branch-slug>           # Derived from git branch
-  impl_root: <impl-root-name>          # Where workflow docs live
+  docs_root: <docs-root-name>          # Where THIS workflow's docs live
+  tooling_root: copilot-flow           # Where prompts/templates live (static)
   feature_name: <feature-name>         # Human-readable name
   created_at: <ISO-8601-timestamp>     # When workflow started
   last_updated: <ISO-8601-timestamp>   # Last state change
   updated_by: copilot                  # copilot | user
+  
+  # Affected roots tracking / Theo dõi các root bị ảnh hưởng
+  affected_roots:
+    - root: <primary-root-name>
+      role: primary                    # primary | secondary
+      changes: [<file-patterns>]       # What will change
+    - root: <secondary-root-name>
+      role: secondary
+      changes: [<file-patterns>]
 
 # ============================================================
 # CURRENT STATUS - Quick resume point / Điểm tiếp tục nhanh

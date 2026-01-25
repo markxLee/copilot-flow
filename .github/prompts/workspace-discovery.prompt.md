@@ -99,7 +99,7 @@ Generate `WORKSPACE_CONTEXT.md` with this exact YAML structure:
 ```yaml
 # WORKSPACE_CONTEXT.md
 # Generated: <YYYY-MM-DD>
-# Schema: v2.0
+# Schema: v3.0
 # Purpose: AI agent workspace reference (not for human reading)
 
 # ================================================================
@@ -109,13 +109,16 @@ Generate `WORKSPACE_CONTEXT.md` with this exact YAML structure:
 
 meta:
   generated: <YYYY-MM-DD>
-  schema_version: "2.0"
+  schema_version: "3.0"
   roots_count: <number>
   primary_root: <root-name>
+  tooling_root: <root-name>           # Where prompts/templates live (STATIC)
+  default_docs_root: <root-name>      # Default for workflow docs (can override per-feature)
 
 roots:
   <root-name>:
-    type: <monorepo|single-repo|library|static-assets|documentation>
+    type: <monorepo|single-repo|library|static-assets|tooling>
+    role: <tooling_root|null>         # Mark if this is tooling_root
     pkg_manager: <pnpm|npm|yarn|null>
     lang: <typescript|javascript|python|scss|markdown>
     runtime: <node>=20|python>=3.11|null>

@@ -13,7 +13,8 @@
 
 This ensures:
 - Workspace context is loaded
-- impl_root is verified
+- `tooling_root` verified (where prompts/templates live)
+- `docs_root` determined (where THIS feature's docs go)
 - Existing workflow state is detected
 - Session can resume seamlessly
 
@@ -28,49 +29,60 @@ This repository (`copilot-flow`) implements a **multi-phase governed workflow** 
 2. Check for existing workflow state before starting new work
 3. Use bilingual templates for all documentation
 4. STOP for user approval at phase gates
-5. **ALWAYS verify impl_root before creating ANY workflow artifacts**
+5. **ALWAYS verify docs_root before creating ANY workflow artifacts**
 
 **Copilot MUST NOT:**
 - Skip phases or approval gates
 - Create/switch git branches automatically
 - Write workflow docs outside `docs/runs/<branch-slug>/`
 - Start implementation without completing analysis
-- **Create workflow docs in wrong root** - always use impl_root
+- **Create workflow docs in wrong root** - always use docs_root
 
 ---
 
-## ⚠️ CRITICAL: Verify impl_root First
+## ⚠️ CRITICAL: Verify docs_root First
 
 Before creating ANY workflow file, Copilot MUST:
 
 ```yaml
+# Two separate concepts:
+# - tooling_root: Where prompts, templates, instructions live (STATIC - always copilot-flow)
+# - docs_root: Where THIS feature's workflow docs go (PER-FEATURE - flexible)
+
 verification_steps:
-  1. Check if WORKSPACE_CONTEXT.md exists (in any root)
-  2. Read meta.impl_root from WORKSPACE_CONTEXT.md
-  3. If impl_root is set:
-     - Use that root for ALL workflow docs
-     - Path: <impl_root>/docs/runs/<branch-slug>/
-  4. If not set:
-     - Look for copilot-flow/ root
-     - If exists: use copilot-flow as impl_root
-     - If not: use current root but WARN user
-  5. NEVER create docs in wrong root
+  1. Check WORKSPACE_CONTEXT.md:
+     - tooling_root → copilot-flow (for prompts/templates)
+     - default_docs_root → fallback for workflow docs
+     
+  2. Determine docs_root for this feature:
+     a. If resuming: read from .workflow-state.yaml → meta.docs_root
+     b. If new workflow: ASK user where to store docs
+        - Suggest: primary affected root (code + docs in same PR)
+        - Alternative: default_docs_root from WORKSPACE_CONTEXT.md
+     
+  3. Store choice in .workflow-state.yaml → meta.docs_root
+  
+  4. Path for workflow docs:
+     <docs_root>/docs/runs/<branch-slug>/
 ```
 
 **Example Check:**
 ```
-User requests feature work from apphub-vision root
+User requests feature work affecting apphub-vision
 
-Copilot thinks:
-- Current root: apphub-vision
-- Check WORKSPACE_CONTEXT.md → impl_root: copilot-flow
-- Workflow docs go to: copilot-flow/docs/runs/<branch>/
-- Code changes go to: apphub-vision/
+Copilot:
+1. tooling_root: copilot-flow (prompts/templates)
+2. Ask: "Where should workflow docs live?"
+   - Recommend: apphub-vision (code + docs in same PR)
+3. User confirms: apphub-vision
+4. Workflow docs → apphub-vision/docs/runs/<branch>/
+5. Code changes → apphub-vision/
+6. Templates from → copilot-flow/docs/templates/
 ```
 
 ---
 
-## � CRITICAL: Cross-Root Awareness (ALWAYS CHECK)
+## 🔗 CRITICAL: Cross-Root Awareness (ALWAYS CHECK)
 
 **Before ANY work that involves multiple roots or migration between roots:**
 
@@ -252,9 +264,9 @@ When in doubt, ASK: "This seems complex. Should I use the governed workflow?"
 
 ## 📁 Artifact Location
 
-All workflow documents go in:
+All workflow documents go in `<docs_root>/docs/runs/<branch-slug>/`:
 ```
-docs/runs/<branch-slug>/
+<docs_root>/docs/runs/<branch-slug>/
 ├── .workflow-state.yaml    # State tracking (YAML)
 ├── README.md               # Summary for reviewers
 ├── 00_analysis/            # Phase 0 docs
@@ -265,6 +277,8 @@ docs/runs/<branch-slug>/
 └── 05_done/                # Phase 5 docs
 ```
 
+Where `docs_root` is determined per-feature (typically the primary affected root).
+
 ---
 
 ## 🌐 Multi-Root Workspace
@@ -273,54 +287,65 @@ If this is part of a multi-root VS Code workspace:
 
 1. Check `WORKSPACE_CONTEXT.md` for:
    - List of roots and relationships
-   - Designated `impl_root`
+   - `tooling_root` (where prompts/templates live)
+   - `default_docs_root` (fallback for workflow docs)
    - Cross-root dependencies
 
-2. This repo (`copilot-flow`) is typically the `impl_root`:
-   - All workflow docs stored here
-   - PRs for workflow review created here
-   - Code changes happen in other roots
+2. Two key concepts:
+   - `tooling_root` (`copilot-flow`): Static, contains prompts/templates
+   - `docs_root` (per-feature): Where workflow docs for THIS feature go
 
 3. Track affected roots in state file
 
 ---
 
-## 🏠 Implementation Root (impl_root)
+## 🏠 Tooling Root vs Docs Root
 
-### What is impl_root?
-The designated root where ALL workflow artifacts are stored, regardless of which roots are affected by the changes.
+### What is tooling_root?
+The root containing all workflow TOOLING (prompts, templates, instructions).
+This is STATIC and always the same: `copilot-flow/`
 
-### Why?
-- **Single location** for reviewers to see full context
-- **Easy PR** - push one repo, create one PR for docs
-- **Separation** - workflow docs don't pollute source code
-- **Consistency** - same structure across all features
+### What is docs_root?
+The root where workflow DOCUMENTATION for a specific feature is stored.
+This is PER-FEATURE and typically matches the primary affected root.
 
-### Resolution Order
+### Why separate?
+- **Tooling stays centralized** - easy to maintain, version, share
+- **Docs go with code** - reviewers see docs + code in same PR
+- **Better context** - no need for separate "docs-only" PR
+
+### Resolution Order (for docs_root)
 ```yaml
-1. User-specified: WORKSPACE_CONTEXT.md → meta.impl_root
-2. Convention: copilot-flow/ if exists
-3. Fallback: Primary root from WORKSPACE_CONTEXT.md
+1. If resuming: .workflow-state.yaml → meta.docs_root
+2. If new workflow: ASK user, suggest primary affected root
+3. Fallback: WORKSPACE_CONTEXT.md → meta.default_docs_root
 ```
 
 ### In This Workspace
 ```yaml
-impl_root: copilot-flow
-docs_path: copilot-flow/docs/runs/<branch-slug>/
+tooling_root: copilot-flow              # Static - prompts, templates
+default_docs_root: apphub-vision        # Default for new workflows
+
+# Example for a feature affecting apphub-vision:
+docs_root: apphub-vision                # Chosen for this feature
+docs_path: apphub-vision/docs/runs/<branch-slug>/
 ```
 
 ### Cross-Root Changes
 When changes span multiple roots:
 ```yaml
-impl_root (copilot-flow):
-  - All workflow docs
-  - State file
-  - PR for review
+tooling_root (copilot-flow):
+  - Prompts, templates (read-only during workflow)
+  - Shared instructions
 
-affected_roots (other repos):
-  - Actual code changes
-  - Separate PRs linked to impl_root PR
-  - Merged after impl_root PR approved
+docs_root (e.g., apphub-vision):
+  - Workflow docs for THIS feature
+  - State file
+  - PR includes both docs + code changes
+
+other_roots (e.g., reviews-assets):
+  - Code changes only
+  - Separate PR if needed
 ```
 
 ---
@@ -345,7 +370,7 @@ affected_roots (other repos):
 2. **Never skip approval gates** - STOP and wait
 3. **Check blockers** before proceeding
 4. **Log decisions** in state file for context continuity
-5. **Use templates** - don't create docs from scratch
+5. **Use templates** from tooling_root - don't create docs from scratch
 
 ---
 

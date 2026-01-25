@@ -39,7 +39,7 @@ TRIGGER_RULES:
 ```yaml
 pre_checks:
   1. Verify Phase 1 is approved:
-     path: <impl_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+     path: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
      check: phases.phase_1_spec.status == "approved"
      if_not: STOP and ask user to approve Phase 1 first
      
@@ -326,11 +326,11 @@ graph TD
 ```yaml
 artifacts:
   main_tasks:
-    path: <impl_root>/docs/runs/<branch-slug>/02_tasks/tasks.md
-    source: docs/templates/02_tasks.template.md
+    path: <docs_root>/docs/runs/<branch-slug>/02_tasks/tasks.md
+    source: <tooling_root>/docs/templates/02_tasks.template.md
     
   per_root_tasks:  # Optional, for complex multi-root
-    path: <impl_root>/docs/runs/<branch-slug>/02_tasks/<root>-tasks.md
+    path: <docs_root>/docs/runs/<branch-slug>/02_tasks/<root>-tasks.md
     when: >3 roots or >10 tasks per root
 ```
 

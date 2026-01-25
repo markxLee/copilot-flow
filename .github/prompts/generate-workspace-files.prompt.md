@@ -19,7 +19,8 @@
 source: WORKSPACE_CONTEXT.md
 
 extract:
-  - meta.impl_root
+  - meta.tooling_root           # Where prompts/templates live (static)
+  - meta.default_docs_root      # Default for workflow docs
   - All roots (names, paths, types)
   - relationships
   - conventions
@@ -31,7 +32,7 @@ extract:
 ## Step 2: Generate .code-workspace File
 
 ```yaml
-template: docs/templates/code-workspace.template.json
+template: <tooling_root>/docs/templates/code-workspace.template.json
 
 process:
   1. Read template
@@ -44,10 +45,10 @@ process:
        })
   
   3. Keep settings from template (Copilot config)
-  4. Write to: <parent_of_impl_root>/<workspace_name>.code-workspace
+  4. Write to: <parent_of_tooling_root>/<workspace_name>.code-workspace
 
 output_location:
-  # If impl_root is /path/to/copilot-flow
+  # If tooling_root is /path/to/copilot-flow
   # Workspace file goes to /path/to/<workspace_name>.code-workspace
   
   derive_workspace_name:
@@ -74,7 +75,7 @@ example:
 ## Step 3: Generate ARCHITECTURE.md
 
 ```yaml
-template: docs/templates/architecture.template.md
+template: <tooling_root>/docs/templates/architecture.template.md
 
 process:
   1. Read template
@@ -120,7 +121,7 @@ process:
      <ROOT_README_LINKS>: For each root
        - [<root> README](../<root>/README.md)
 
-  3. Write to: <impl_root>/ARCHITECTURE.md
+  3. Write to: <tooling_root>/ARCHITECTURE.md
 
 output:
   "## ✅ Generated Workspace Files
@@ -128,7 +129,7 @@ output:
   | File | Location |
   |------|----------|
   | Workspace file | <path>.code-workspace |
-  | Architecture | <impl_root>/ARCHITECTURE.md |
+  | Architecture | <tooling_root>/ARCHITECTURE.md |
   
   To open workspace:
   ```bash
@@ -140,11 +141,11 @@ output:
 
 ## Step 4: Review/Create Root-Level ARCHITECTURE.md
 
-For each root (except impl_root), check and suggest root-specific architecture docs.
+For each root (except tooling_root), check and suggest root-specific architecture docs.
 
 ```yaml
 for_each_root:
-  root: <root_name> (skip impl_root - it has workspace-level ARCHITECTURE.md)
+  root: <root_name> (skip tooling_root - it has workspace-level ARCHITECTURE.md)
   
   check: Does <root>/ARCHITECTURE.md exist?
   
@@ -246,7 +247,7 @@ auto_regenerate:
 |-------------|--------|
 | `<GENERATED_DATE>` | Current date |
 | `<WORKSPACE_NAME>` | Parent folder name |
-| `<IMPL_ROOT>` | meta.impl_root |
+| `<TOOLING_ROOT>` | meta.tooling_root |
 | `<ROOT_TREE>` | roots section |
 | `<ROOT_DESCRIPTIONS>` | roots + conventions |
 | `<RELATIONSHIP_DIAGRAM>` | relationships section |

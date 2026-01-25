@@ -1,122 +1,47 @@
-# Specification / Đặc tả Kỹ thuật
-# Template v2.0 - Bilingual inline format
+# Specification
+# Template v3.0 - Hybrid Bilingual Format (Shared Data + Language Zones)
 
 ---
 
-## 📋 TL;DR
+## 📊 SHARED DATA
+<!-- Technical data - no translation needed / Dữ liệu kỹ thuật - không cần dịch -->
 
-| Aspect / Khía cạnh | Detail / Chi tiết |
-|-------------------|-------------------|
-| Feature / Tính năng | `<name>` |
-| Status / Trạng thái | Draft / Bản nháp |
-| Requirements / Yêu cầu | `<N>` functional, `<M>` non-functional |
-| Edge Cases / Trường hợp biên | `<X>` identified |
-| Affected Roots / Roots ảnh hưởng | `<root1>`, `<root2>` |
+### TL;DR
 
----
+| Aspect | Value |
+|--------|-------|
+| Feature | `<name>` |
+| Status | Draft / In Review / Approved |
+| Functional Requirements | `<N>` |
+| Non-Functional Requirements | `<M>` |
+| Edge Cases | `<X>` identified |
+| Affected Roots | `<root1>`, `<root2>` |
 
-## 1. Overview / Tổng quan
+### Requirements Matrix
 
-### 1.1 Summary / Tóm tắt
+| ID | Title | Priority | Type | Covered By |
+|----|-------|----------|------|------------|
+| FR-001 | `<title>` | Must / Should / Could | Functional | TC-001, TC-002 |
+| FR-002 | `<title>` | Must / Should / Could | Functional | TC-003 |
+| NFR-001 | `<title>` | Must / Should / Could | Performance | TC-P01 |
+| NFR-002 | `<title>` | Must / Should / Could | Security | TC-S01 |
 
-**EN:**
-> Brief description of what this feature does
+### Scope Boundaries
 
-**VI:**
-> Mô tả ngắn gọn tính năng này làm gì
+| In Scope | Out of Scope |
+|----------|--------------|
+| `<item-1>` | `<item-1>` |
+| `<item-2>` | `<item-2>` |
 
-### 1.2 Goals / Mục tiêu
+### User Flow
 
-| # | Goal / Mục tiêu |
-|---|-----------------|
-| 1 | EN: ... / VI: ... |
-| 2 | EN: ... / VI: ... |
+| Step | Action | System Response | Next Step |
+|------|--------|-----------------|-----------|
+| 1 | User clicks X | Show modal | 2 |
+| 2 | User enters data | Validate input | 3 or Error |
+| 3 | User submits | Save & confirm | End |
 
-### 1.3 Non-Goals / Không thuộc Mục tiêu
-
-| # | Non-Goal / Không thuộc mục tiêu |
-|---|--------------------------------|
-| 1 | EN: ... / VI: ... |
-| 2 | EN: ... / VI: ... |
-
----
-
-## 2. User Stories
-
-| # | Story | Priority / Ưu tiên |
-|---|-------|-------------------|
-| 1 | **EN:** As a `<role>`, I want `<action>`, so that `<benefit>` | Must / Should / Could |
-|   | **VI:** Là `<vai trò>`, tôi muốn `<hành động>`, để `<lợi ích>` | |
-| 2 | **EN:** As a ... | |
-|   | **VI:** Là ... | |
-
----
-
-## 3. Functional Requirements / Yêu cầu Chức năng
-
-### FR-001: `<Title>`
-
-| Aspect | Detail |
-|--------|--------|
-| Description / Mô tả | EN: ... / VI: ... |
-| Priority / Ưu tiên | Must / Should / Could |
-| Acceptance Criteria / Tiêu chí nghiệm thu | |
-
-**Acceptance Criteria / Tiêu chí nghiệm thu:**
-- [ ] EN: ... / VI: ...
-- [ ] EN: ... / VI: ...
-
-### FR-002: `<Title>`
-
-| Aspect | Detail |
-|--------|--------|
-| Description / Mô tả | EN: ... / VI: ... |
-| Priority / Ưu tiên | Must / Should / Could |
-
-**Acceptance Criteria / Tiêu chí nghiệm thu:**
-- [ ] EN: ... / VI: ...
-
----
-
-## 4. Non-Functional Requirements / Yêu cầu Phi Chức năng
-
-### NFR-001: `<Title>` (e.g., Performance / Hiệu năng)
-
-| Aspect | Detail |
-|--------|--------|
-| Description / Mô tả | EN: ... / VI: ... |
-| Metric / Chỉ số đo | ... |
-| Target / Mục tiêu | ... |
-
----
-
-## 5. Scope / Phạm vi
-
-### 5.1 In Scope / Trong phạm vi
-
-| # | Item / Hạng mục |
-|---|-----------------|
-| 1 | EN: ... / VI: ... |
-| 2 | EN: ... / VI: ... |
-
-### 5.2 Out of Scope / Ngoài phạm vi
-
-| # | Item / Hạng mục | Reason / Lý do |
-|---|-----------------|----------------|
-| 1 | EN: ... / VI: ... | ... |
-
----
-
-## 6. UX / Flow / Luồng xử lý
-
-### 6.1 User Flow / Luồng Người dùng
-
-| Step | Action / Hành động | Expected Result / Kết quả mong đợi |
-|------|--------------------|------------------------------------|
-| 1 | EN: ... / VI: ... | EN: ... / VI: ... |
-| 2 | EN: ... / VI: ... | EN: ... / VI: ... |
-
-### 6.2 Flow Diagram / Sơ đồ Luồng
+### Flow Diagram
 
 ```mermaid
 flowchart TD
@@ -126,122 +51,293 @@ flowchart TD
     C -->|Invalid| E[Error]
 ```
 
----
+### Data Models
 
-## 7. Data & Contracts / Dữ liệu & Hợp đồng
-
-### 7.1 Entities / Thực thể
-
-| Entity | Fields / Trường | Description / Mô tả |
-|--------|-----------------|---------------------|
-| `<EntityName>` | `field1: type` | EN: ... / VI: ... |
-|                | `field2: type` | EN: ... / VI: ... |
-
-### 7.2 API Endpoints
-
-| Method | Endpoint | Description / Mô tả |
-|--------|----------|---------------------|
-| `GET` | `/api/v1/...` | EN: ... / VI: ... |
-| `POST` | `/api/v1/...` | EN: ... / VI: ... |
-
-**Request / Response Examples:**
-```json
-// Request
-{
-  "field": "value"
+```typescript
+// Entity definitions
+interface Entity {
+  id: string;
+  field1: type;
+  field2: type;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-// Response
-{
-  "status": "success",
-  "data": {}
+enum Status {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive'
 }
 ```
 
----
+### API Contracts
 
-## 8. Cross-Root Impact / Ảnh hưởng Đa Root
+#### Endpoint: `GET /api/v1/resource`
 
-### 8.1 Changes per Root / Thay đổi theo Root
+```typescript
+// Request
+interface GetResourceRequest {
+  id: string;
+  filters?: {
+    status?: Status;
+  };
+}
+
+// Response
+interface GetResourceResponse {
+  status: 'success' | 'error';
+  data: Entity;
+}
+```
+
+#### Endpoint: `POST /api/v1/resource`
+
+```typescript
+// Request
+interface CreateResourceRequest {
+  field1: type;
+  field2: type;
+}
+
+// Response
+interface CreateResourceResponse {
+  status: 'success' | 'error';
+  data: {
+    id: string;
+  };
+}
+```
+
+### Changes by Root
 
 #### Root: `<root-name>`
 
-| Type / Loại | Path / Đường dẫn | Description / Mô tả |
-|-------------|------------------|---------------------|
-| New / Mới | `<file-path>` | EN: ... / VI: ... |
-| Modify / Sửa | `<file-path>` | EN: ... / VI: ... |
-
-**Conventions to follow / Quy ước cần tuân theo:**
-- From `WORKSPACE_CONTEXT.md`: ...
+| Type | Path | FR Covered |
+|------|------|------------|
+| Create | `<file-path>` | FR-001 |
+| Modify | `<file-path>` | FR-002 |
 
 #### Root: `<root-name-2>`
 
-| Type / Loại | Path / Đường dẫn | Description / Mô tả |
-|-------------|------------------|---------------------|
-| ... | ... | ... |
+| Type | Path | FR Covered |
+|------|------|------------|
+| Create | `<file-path>` | FR-001 |
 
-### 8.2 Sync Requirements / Yêu cầu Đồng bộ
+### Sync Requirements
 
-| From / Từ | To / Đến | Sync Type / Loại đồng bộ | Reason / Lý do |
-|-----------|----------|-------------------------|----------------|
-| `<root1>` | `<root2>` | Immediate / Versioned / None | EN: ... / VI: ... |
+| From | To | Type | Trigger |
+|------|-----|------|---------|
+| `<root1>` | `<root2>` | Immediate / Versioned | On deploy / On change |
 
----
+### Edge Cases Matrix
 
-## 9. Edge Cases / Trường hợp Biên
+| ID | Scenario | Expected Behavior | Priority |
+|----|----------|-------------------|----------|
+| EC-001 | `<scenario>` | `<behavior>` | Must handle |
+| EC-002 | `<scenario>` | `<behavior>` | Should handle |
 
-| # | Scenario / Tình huống | Expected Behavior / Hành vi mong đợi |
-|---|----------------------|-------------------------------------|
-| 1 | EN: ... / VI: ... | EN: ... / VI: ... |
-| 2 | EN: ... / VI: ... | EN: ... / VI: ... |
+### Risks
 
----
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| `<risk-1>` | Low/Med/High | Low/Med/High | `<mitigation>` |
 
-## 10. Risks & Mitigations / Rủi ro & Giảm thiểu
+### Assumptions
 
-| Risk / Rủi ro | Likelihood / Khả năng | Impact / Tác động | Mitigation / Giảm thiểu |
-|---------------|----------------------|-------------------|------------------------|
-| EN: ... / VI: ... | Low/Med/High | Low/Med/High | EN: ... / VI: ... |
+| # | Assumption | Validated |
+|---|------------|-----------|
+| 1 | `<assumption>` | Yes / No / Pending |
 
----
+### Open Questions
 
-## 11. Assumptions / Giả định
+| # | Question | Status | Answer |
+|---|----------|--------|--------|
+| 1 | `<question>` | Open / Resolved | `<answer>` |
 
-| # | Assumption / Giả định | Validated / Đã xác nhận |
-|---|-----------------------|------------------------|
-| 1 | EN: ... / VI: ... | Yes / No / Pending |
+### Dependencies
 
----
+| Dependency | Type | Status |
+|------------|------|--------|
+| `<dependency>` | External / Internal | Ready / Blocked |
 
-## 12. Open Questions / Câu hỏi Mở
+### Approval Status
 
-| # | Question / Câu hỏi | Status / Trạng thái | Answer / Trả lời |
-|---|-------------------|---------------------|------------------|
-| 1 | EN: ... / VI: ... | Open / Resolved | ... |
-
----
-
-## 13. Dependencies / Phụ thuộc
-
-| Dependency / Phụ thuộc | Type / Loại | Status / Trạng thái |
-|------------------------|-------------|---------------------|
-| EN: ... / VI: ... | External / Internal | Ready / Blocked |
-
----
-
-## Approval / Phê duyệt
-
-| Role / Vai trò | Name / Tên | Status / Trạng thái | Date / Ngày |
-|----------------|------------|---------------------|-------------|
-| Author / Tác giả | ... | ✅ Done | ... |
+| Role | Name | Status | Date |
+|------|------|--------|------|
+| Author | ... | ✅ Done | ... |
 | Tech Reviewer | ... | ⏳ Pending | ... |
 | Product Owner | ... | ⏳ Pending | ... |
 
 ---
 
-## Next Step / Bước tiếp theo
+## 🇬🇧 ENGLISH
+
+### 1. Overview
+
+> Brief description of what this feature does and why it's needed.
+> This spec defines the detailed requirements for implementation.
+
+### 2. Goals
+
+1. **Goal 1:** Description of first goal
+2. **Goal 2:** Description of second goal
+
+### 3. Non-Goals
+
+1. **Non-Goal 1:** What this feature explicitly does NOT do
+2. **Non-Goal 2:** Out of scope item
+
+### 4. User Stories
+
+#### US-001: `<Title>`
+> As a `<role>`, I want `<action>`, so that `<benefit>`.
+
+#### US-002: `<Title>`
+> As a `<role>`, I want `<action>`, so that `<benefit>`.
+
+### 5. Functional Requirements
+
+#### FR-001: `<Title>`
+
+**Description:** Detailed description of what this requirement entails.
+
+**Acceptance Criteria:**
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+#### FR-002: `<Title>`
+
+**Description:** ...
+
+**Acceptance Criteria:**
+- [ ] Criterion 1
+
+### 6. Non-Functional Requirements
+
+#### NFR-001: Performance
+
+**Description:** The system must respond within X seconds under Y load.
+
+**Metric:** Response time < 200ms for 95th percentile
+**Target:** 95% of requests
+
+#### NFR-002: Security
+
+**Description:** ...
+
+### 7. Edge Cases
+
+#### EC-001: `<Scenario>`
+
+**When:** Describe the condition
+**Then:** Expected system behavior
+**Rationale:** Why this matters
+
+#### EC-002: `<Scenario>`
+
+**When:** ...
+**Then:** ...
+
+### 8. Error Handling
+
+| Error Condition | User Message | System Action |
+|-----------------|--------------|---------------|
+| Invalid input | "Please check your input" | Log warning, return 400 |
+| Server error | "Something went wrong" | Log error, return 500 |
+
+### 9. Notes
+
+- Additional context or implementation hints
+- Things to be careful about
+
+---
+
+## 🇻🇳 TIẾNG VIỆT
+
+### 1. Tổng quan
+
+> Mô tả ngắn gọn tính năng này làm gì và tại sao cần thiết.
+> Spec này định nghĩa các yêu cầu chi tiết để triển khai.
+
+### 2. Mục tiêu
+
+1. **Mục tiêu 1:** Mô tả mục tiêu đầu tiên
+2. **Mục tiêu 2:** Mô tả mục tiêu thứ hai
+
+### 3. Không thuộc Mục tiêu
+
+1. **Không phải mục tiêu 1:** Tính năng này KHÔNG làm gì
+2. **Không phải mục tiêu 2:** Mục ngoài phạm vi
+
+### 4. User Stories
+
+#### US-001: `<Tiêu đề>`
+> Là `<vai trò>`, tôi muốn `<hành động>`, để `<lợi ích>`.
+
+#### US-002: `<Tiêu đề>`
+> Là `<vai trò>`, tôi muốn `<hành động>`, để `<lợi ích>`.
+
+### 5. Yêu cầu Chức năng
+
+#### FR-001: `<Tiêu đề>`
+
+**Mô tả:** Mô tả chi tiết yêu cầu này bao gồm những gì.
+
+**Tiêu chí Nghiệm thu:**
+- [ ] Tiêu chí 1
+- [ ] Tiêu chí 2
+- [ ] Tiêu chí 3
+
+#### FR-002: `<Tiêu đề>`
+
+**Mô tả:** ...
+
+**Tiêu chí Nghiệm thu:**
+- [ ] Tiêu chí 1
+
+### 6. Yêu cầu Phi Chức năng
+
+#### NFR-001: Hiệu năng
+
+**Mô tả:** Hệ thống phải phản hồi trong X giây dưới tải Y.
+
+**Chỉ số đo:** Thời gian phản hồi < 200ms cho percentile 95
+**Mục tiêu:** 95% requests
+
+#### NFR-002: Bảo mật
+
+**Mô tả:** ...
+
+### 7. Trường hợp Biên
+
+#### EC-001: `<Tình huống>`
+
+**Khi:** Mô tả điều kiện
+**Thì:** Hành vi mong đợi của hệ thống
+**Lý do:** Tại sao điều này quan trọng
+
+#### EC-002: `<Tình huống>`
+
+**Khi:** ...
+**Thì:** ...
+
+### 8. Xử lý Lỗi
+
+| Điều kiện Lỗi | Thông báo cho User | Hành động Hệ thống |
+|---------------|--------------------|--------------------|
+| Input không hợp lệ | "Vui lòng kiểm tra dữ liệu" | Log warning, trả về 400 |
+| Lỗi server | "Đã xảy ra lỗi" | Log error, trả về 500 |
+
+### 9. Ghi chú
+
+- Ngữ cảnh bổ sung hoặc gợi ý triển khai
+- Những điều cần lưu ý
+
+---
+
+## ⏭️ Next Step
 
 > After approval, proceed to Phase 2 (Task Planning)
 > Sau khi phê duyệt, tiến hành Phase 2 (Lập kế hoạch Task)
 
-Reply / Trả lời: `approved` or `revise: <feedback>`
+Reply: `approved` or `revise: <feedback>`

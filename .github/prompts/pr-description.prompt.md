@@ -91,7 +91,7 @@ optional_info:
 
 ### Output File / File Output
 
-Created: `<impl_root>/docs/runs/<branch-slug>/PR_DESCRIPTION.md`
+Created: `<docs_root>/docs/runs/<branch-slug>/PR_DESCRIPTION.md`
 
 ---
 

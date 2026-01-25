@@ -414,18 +414,27 @@ This system is designed for multi-root VS Code workspaces:
 
 | Root | Purpose |
 |------|---------|
-| `copilot-flow` | **impl_root** — All workflow docs stored here |
-| `apphub-vision` | Main application code |
+| `copilot-flow` | **tooling_root** — Prompts, templates, shared instructions |
+| `apphub-vision` | Main application code (default docs_root) |
 | `reviews-assets` | UI component library |
 | `boost-pfs-backend` | Backend services |
 
-### Key Concept: impl_root
+### Key Concepts: tooling_root vs docs_root
 
-All workflow documents are stored in `copilot-flow`, regardless of which roots have code changes. This ensures:
+**tooling_root (STATIC):**
+- Contains prompts, templates, shared instructions
+- Always `copilot-flow/`
+- Never changes per-feature
 
-- Single location for reviewers
-- One PR for workflow docs
-- Code doesn't get cluttered with workflow artifacts
+**docs_root (PER-FEATURE):**
+- Where THIS feature's workflow docs go
+- Typically the primary affected root
+- Docs + code in same PR for better context
+
+This ensures:
+- Tooling stays centralized and easy to maintain
+- Workflow docs go with code for better PR context
+- No separate "docs PR" needed
 
 ---
 
@@ -436,7 +445,8 @@ All workflow documents are stored in `copilot-flow`, regardless of which roots h
 Update this file when workspace structure changes:
 ```yaml
 meta:
-  impl_root: copilot-flow  # Where workflow docs go
+  tooling_root: copilot-flow      # Where prompts/templates live (STATIC)
+  default_docs_root: apphub-vision # Default for workflow docs
 
 roots:
   apphub-vision:
@@ -451,7 +461,11 @@ Tracks current workflow progress:
 ```yaml
 meta:
   branch_slug: feature-add-analytics
-  update_count: 0
+  docs_root: apphub-vision         # Where THIS workflow's docs live
+  tooling_root: copilot-flow       # Where templates come from
+  affected_roots:
+    - root: apphub-vision
+      role: primary
 
 status:
   current_phase: 3
@@ -489,7 +503,8 @@ Dưới đây là ví dụ hoàn chỉnh về sử dụng governed workflow cho 
 │ You: init                                                                    │
 │                                                                              │
 │ Copilot: 📍 Session initialized                                             │
-│          impl_root: copilot-flow                                             │
+│          tooling_root: copilot-flow                                          │
+│          default_docs_root: apphub-vision                                    │
 │          No active workflow found.                                           │
 │          Describe your work to start.                                        │
 │                                                                              │
@@ -705,7 +720,8 @@ Copilot MUST NOT:
 Copilot MUST:
 - ✅ STOP after each phase for approval
 - ✅ Update state after each action
-- ✅ Verify impl_root before creating docs
+- ✅ Verify docs_root before creating workflow docs
+- ✅ Get templates from tooling_root
 - ✅ Provide verification commands (not run them)
 
 ---
@@ -727,8 +743,8 @@ Then: approved (if ready)
 
 ### "Wrong root for docs"
 ```
-Check WORKSPACE_CONTEXT.md
-Ensure impl_root is set correctly
+Check .workflow-state.yaml for docs_root
+Or WORKSPACE_CONTEXT.md for default_docs_root
 ```
 
 ### Resume lost session

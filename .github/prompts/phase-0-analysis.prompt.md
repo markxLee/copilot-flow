@@ -404,18 +404,18 @@ sequenceDiagram
 ```yaml
 artifacts:
   main_doc:
-    path: <impl_root>/docs/runs/<branch-slug>/00_analysis/analysis.md
+    path: <docs_root>/docs/runs/<branch-slug>/00_analysis/analysis.md
     content: Combines 0.1, 0.2, 0.3 outputs
     
   diagrams:
-    path: <impl_root>/docs/runs/<branch-slug>/00_analysis/diagrams/
+    path: <docs_root>/docs/runs/<branch-slug>/00_analysis/diagrams/
     files:
       - flow-overview.md
       - sequence-main.md (if needed)
       - architecture.md (if needed)
       
   decision_log:
-    path: <impl_root>/docs/runs/<branch-slug>/00_analysis/decision-log.md
+    path: <docs_root>/docs/runs/<branch-slug>/00_analysis/decision-log.md
     content: Key decisions and rationale
 ```
 

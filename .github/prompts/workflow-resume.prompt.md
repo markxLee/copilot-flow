@@ -30,12 +30,17 @@ search_order:
   1. Current branch's state file:
      - Run: git rev-parse --abbrev-ref HEAD
      - Normalize to branch-slug
-     - Look for: <impl-root>/docs/runs/<branch-slug>/.workflow-state.yaml
+     - Search in possible docs_roots:
+       a. <default_docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+       b. <primary_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+       c. All roots: */docs/runs/<branch-slug>/.workflow-state.yaml
      
-  2. If not found, check WORKSPACE_CONTEXT.md for impl_root
+  2. If found:
+     - Read meta.docs_root from state file
+     - Use that value for all subsequent operations
   
-  3. If still not found:
-     - List available runs: <impl-root>/docs/runs/*/
+  3. If not found:
+     - List available runs across all roots
      - Ask user which workflow to resume
 ```
 
@@ -46,6 +51,8 @@ Read `.workflow-state.yaml` and extract:
 ```yaml
 quick_status:
   branch: <branch-slug>
+  docs_root: <docs-root>          # Where this workflow's docs live
+  tooling_root: <tooling-root>    # Where templates live
   phase: <current_phase> - <phase_name>
   phase_status: <status>
   current_task: <task-id if in impl phase>

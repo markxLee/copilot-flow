@@ -38,7 +38,7 @@ TRIGGER_RULES:
 ```yaml
 pre_checks:
   1. Verify Phase 0 is approved:
-     path: <impl_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+     path: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
      check: phases.phase_0_analysis.status == "approved"
      if_not: STOP and ask user to approve Phase 0 first
      
@@ -287,11 +287,11 @@ Use the template at `docs/templates/01_spec.template.md` with the following stru
 ```yaml
 artifacts:
   main_spec:
-    path: <impl_root>/docs/runs/<branch-slug>/01_spec/spec.md
-    source: docs/templates/01_spec.template.md
+    path: <docs_root>/docs/runs/<branch-slug>/01_spec/spec.md
+    source: <tooling_root>/docs/templates/01_spec.template.md
     
   cross_root_impact:
-    path: <impl_root>/docs/runs/<branch-slug>/01_spec/cross-root-impact.md
+    path: <docs_root>/docs/runs/<branch-slug>/01_spec/cross-root-impact.md
     when: Multiple roots affected
 ```
 

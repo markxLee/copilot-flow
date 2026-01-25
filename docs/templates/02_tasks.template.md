@@ -1,44 +1,35 @@
-# Task Plan / Kế hoạch Task
-# Template v2.0 - Bilingual inline format
+# Task Plan
+# Template v3.0 - Hybrid Bilingual Format (Shared Data + Language Zones)
 
 ---
 
-## 📋 TL;DR
+## 📊 SHARED DATA
+<!-- Technical data - no translation needed / Dữ liệu kỹ thuật - không cần dịch -->
 
-| Aspect / Khía cạnh | Detail / Chi tiết |
-|-------------------|-------------------|
-| Feature / Tính năng | `<name>` |
-| Total Tasks / Tổng số Task | `<N>` |
-| Estimated Effort / Ước lượng | `<time>` |
-| Affected Roots / Roots ảnh hưởng | `<root1>`, `<root2>` |
-| Execution Order / Thứ tự thực hiện | T1 → T2 → T3 → ... |
+### TL;DR
 
----
+| Aspect | Value |
+|--------|-------|
+| Feature | `<name>` |
+| Total Tasks | `<N>` |
+| Estimated Effort | `<time>` |
+| Affected Roots | `<root1>`, `<root2>` |
+| Execution Order | T1 → T2 → T3 → ... |
 
-## 1. Goal / Mục tiêu
+### Task Overview
 
-**EN:**
-> Brief description of what will be accomplished
+| ID | Title | Root | Type | Est. | Deps | Status |
+|----|-------|------|------|------|------|--------|
+| T1 | `<title>` | `<root>` | New | 1h | - | ⏳ |
+| T2 | `<title>` | `<root>` | Modify | 2h | T1 | ⏳ |
+| T3 | `<title>` | `<root>` | New | 1h | T1, T2 | ⏳ |
+| T4 | `<title>` | `<root>` | Test | 1h | T1-T3 | ⏳ |
 
-**VI:**
-> Mô tả ngắn gọn những gì sẽ đạt được
+**Legend:**
+- Type: `New` = Create new, `Modify` = Change existing, `Delete` = Remove, `Test` = Write tests
+- Status: ⏳ Pending, 🔄 In Progress, ✅ Done, ❌ Blocked
 
----
-
-## 2. Task Overview / Tổng quan Task
-
-| ID | Title / Tiêu đề | Root | Type / Loại | Est. / Ước lượng | Deps / Phụ thuộc |
-|----|-----------------|------|-------------|------------------|------------------|
-| T1 | ... | `<root>` | New / Modify | 1h | - |
-| T2 | ... | `<root>` | New / Modify | 2h | T1 |
-| T3 | ... | `<root>` | New / Modify | 1h | T1, T2 |
-
-**Legend / Chú thích:**
-- Type: `New` = Create new files / Tạo mới, `Modify` = Change existing / Sửa đổi, `Delete` = Remove / Xóa, `Test` = Write tests / Viết test
-
----
-
-## 3. Execution Order / Thứ tự Thực hiện
+### Execution Flow
 
 ```mermaid
 flowchart LR
@@ -51,145 +42,280 @@ flowchart LR
 
 ---
 
-## 4. Tasks by Root / Task theo Root
+### Task Details
 
-### Root: `<root-name>`
+#### T1 — `<Title>`
 
-#### T1 — `<Title / Tiêu đề>`
+| Aspect | Value |
+|--------|-------|
+| Root | `<root-name>` |
+| Type | New / Modify / Delete |
+| Estimated | `<time>` |
+| Dependencies | None / T`<N>` |
+| FR Covered | FR-001, FR-002 |
 
-| Aspect | Detail |
-|--------|--------|
-| **Description / Mô tả** | EN: ... / VI: ... |
-| **Type / Loại** | New / Modify / Delete |
-| **Estimated / Ước lượng** | ... |
-| **Dependencies / Phụ thuộc** | None / T<N> |
+**Files:**
 
-**Files / Tệp:**
+| Action | Path |
+|--------|------|
+| Create | `<file-path>` |
+| Modify | `<file-path>` |
 
-| Action / Hành động | Path / Đường dẫn |
-|-------------------|------------------|
-| Create / Tạo | `<file-path>` |
-| Modify / Sửa | `<file-path>` |
+**Contracts:**
 
-**Implementation / Triển khai:**
-
-| Aspect | Detail |
-|--------|--------|
-| Function/Class | `<name>` |
-| Purpose / Mục đích | EN: ... / VI: ... |
-| Inputs / Đầu vào | `<type>`: description |
-| Outputs / Đầu ra | `<type>`: description |
-| Side Effects / Tác dụng phụ | EN: ... / VI: ... |
-
-**Contracts / Hợp đồng:**
 ```typescript
-// Interface or API contract
+// Interface or function signature
 interface Example {
   field: type;
 }
+
+function doSomething(input: Type): ReturnType {
+  // implementation
+}
 ```
 
-**Done Criteria / Tiêu chí Hoàn thành:**
-- [ ] EN: ... / VI: ...
-- [ ] EN: ... / VI: ...
+**Done Criteria:**
+- [ ] Criterion 1
+- [ ] Criterion 2
 
-**Verification Steps / Bước Kiểm tra:**
-1. EN: ... / VI: ...
-2. EN: ... / VI: ...
-
----
-
-#### T2 — `<Title / Tiêu đề>`
-
-| Aspect | Detail |
-|--------|--------|
-| **Description / Mô tả** | EN: ... / VI: ... |
-| **Type / Loại** | New / Modify / Delete |
-| **Estimated / Ước lượng** | ... |
-| **Dependencies / Phụ thuộc** | T1 |
-
-**Files / Tệp:**
-
-| Action / Hành động | Path / Đường dẫn |
-|-------------------|------------------|
-| Create / Tạo | `<file-path>` |
-
-**Implementation / Triển khai:**
-
-| Aspect | Detail |
-|--------|--------|
-| Function/Class | `<name>` |
-| Purpose / Mục đích | EN: ... / VI: ... |
-| Inputs / Đầu vào | ... |
-| Outputs / Đầu ra | ... |
-
-**Done Criteria / Tiêu chí Hoàn thành:**
-- [ ] EN: ... / VI: ...
-
-**Verification Steps / Bước Kiểm tra:**
-1. EN: ... / VI: ...
+**Verification:**
+```bash
+# Commands to verify
+pnpm lint
+pnpm test -- --filter=<test-pattern>
+```
 
 ---
 
-### Root: `<root-name-2>`
+#### T2 — `<Title>`
 
-#### T3 — `<Title / Tiêu đề>`
+| Aspect | Value |
+|--------|-------|
+| Root | `<root-name>` |
+| Type | New / Modify / Delete |
+| Estimated | `<time>` |
+| Dependencies | T1 |
+| FR Covered | FR-001 |
 
-(Same structure as above / Cấu trúc tương tự như trên)
+**Files:**
+
+| Action | Path |
+|--------|------|
+| Create | `<file-path>` |
+
+**Contracts:**
+
+```typescript
+// Interface or function signature
+```
+
+**Done Criteria:**
+- [ ] Criterion 1
+
+**Verification:**
+```bash
+# Commands to verify
+```
 
 ---
 
-## 5. Cross-Root Integration Tasks / Task Tích hợp Đa Root
+#### T3 — `<Title>`
 
-### T<N> — Integration: `<root1>` ↔ `<root2>`
+| Aspect | Value |
+|--------|-------|
+| Root | `<root-name>` |
+| Type | New / Modify / Delete |
+| Estimated | `<time>` |
+| Dependencies | T1 |
+| FR Covered | FR-002 |
 
-| Aspect | Detail |
-|--------|--------|
-| **Description / Mô tả** | EN: Integration between roots / VI: Tích hợp giữa các roots |
-| **Type / Loại** | Integration |
-| **Dependencies / Phụ thuộc** | T<X>, T<Y> |
+**Files:**
 
-**Integration Points / Điểm Tích hợp:**
+| Action | Path |
+|--------|------|
+| Create | `<file-path>` |
 
-| From / Từ | To / Đến | Contract / Hợp đồng |
-|-----------|----------|---------------------|
+**Contracts:**
+
+```typescript
+// Interface or function signature
+```
+
+**Done Criteria:**
+- [ ] Criterion 1
+
+**Verification:**
+```bash
+# Commands to verify
+```
+
+---
+
+### Cross-Root Integration Tasks
+
+#### T`<N>` — Integration: `<root1>` ↔ `<root2>`
+
+| Aspect | Value |
+|--------|-------|
+| Type | Integration |
+| Dependencies | T`<X>`, T`<Y>` |
+
+**Integration Points:**
+
+| From | To | Contract |
+|------|-----|----------|
 | `<root1>/<file>` | `<root2>/<file>` | Package / API / Event |
 
-**Verification / Kiểm tra:**
-- [ ] EN: Test integration flow / VI: Test luồng tích hợp
-- [ ] EN: Verify data consistency / VI: Kiểm tra tính nhất quán dữ liệu
+**Verification:**
+- [ ] Integration flow works end-to-end
+- [ ] Data consistency verified
 
 ---
 
-## 6. Rollback Plan / Kế hoạch Hoàn tác
+### Rollback Plan
 
-| Task | Rollback Action / Hành động Hoàn tác |
-|------|-------------------------------------|
-| T1 | EN: ... / VI: ... |
-| T2 | EN: ... / VI: ... |
+| Task | Rollback Action |
+|------|-----------------|
+| T1 | `git revert` or delete created files |
+| T2 | Restore from backup / revert changes |
 
----
+### Risk per Task
 
-## 7. Risk per Task / Rủi ro theo Task
+| Task | Risk | Mitigation |
+|------|------|------------|
+| T1 | `<risk>` | `<mitigation>` |
+| T2 | `<risk>` | `<mitigation>` |
 
-| Task | Risk / Rủi ro | Mitigation / Giảm thiểu |
-|------|---------------|------------------------|
-| T1 | EN: ... / VI: ... | EN: ... / VI: ... |
+### Approval Status
 
----
-
-## Approval / Phê duyệt
-
-| Role / Vai trò | Name / Tên | Status / Trạng thái | Date / Ngày |
-|----------------|------------|---------------------|-------------|
-| Author / Tác giả | ... | ✅ Done | ... |
+| Role | Name | Status | Date |
+|------|------|--------|------|
+| Author | ... | ✅ Done | ... |
 | Reviewer | ... | ⏳ Pending | ... |
 
 ---
 
-## Next Step / Bước tiếp theo
+## 🇬🇧 ENGLISH
+
+### 1. Goal
+
+> Brief description of what will be accomplished when all tasks are complete.
+
+### 2. Task Descriptions
+
+#### T1 — `<Title>`
+
+**Purpose:** What this task accomplishes and why it's needed.
+
+**Implementation Notes:**
+- Key point 1
+- Key point 2
+- Watch out for: ...
+
+**Side Effects:**
+- Effect 1: ...
+
+---
+
+#### T2 — `<Title>`
+
+**Purpose:** ...
+
+**Implementation Notes:**
+- ...
+
+---
+
+#### T3 — `<Title>`
+
+**Purpose:** ...
+
+**Implementation Notes:**
+- ...
+
+---
+
+### 3. Integration Notes
+
+Explanation of how the tasks connect and any special considerations for cross-root work.
+
+### 4. Risks & Concerns
+
+#### Risk 1: `<Title>`
+
+**Description:** ...
+
+**Mitigation:** ...
+
+### 5. Open Questions
+
+- Question 1: ...
+- Question 2: ...
+
+---
+
+## 🇻🇳 TIẾNG VIỆT
+
+### 1. Mục tiêu
+
+> Mô tả ngắn gọn những gì sẽ đạt được khi tất cả task hoàn thành.
+
+### 2. Mô tả Task
+
+#### T1 — `<Tiêu đề>`
+
+**Mục đích:** Task này đạt được gì và tại sao cần thiết.
+
+**Ghi chú Triển khai:**
+- Điểm chính 1
+- Điểm chính 2
+- Cần lưu ý: ...
+
+**Tác dụng phụ:**
+- Tác dụng 1: ...
+
+---
+
+#### T2 — `<Tiêu đề>`
+
+**Mục đích:** ...
+
+**Ghi chú Triển khai:**
+- ...
+
+---
+
+#### T3 — `<Tiêu đề>`
+
+**Mục đích:** ...
+
+**Ghi chú Triển khai:**
+- ...
+
+---
+
+### 3. Ghi chú Tích hợp
+
+Giải thích cách các task kết nối với nhau và các lưu ý đặc biệt cho công việc đa root.
+
+### 4. Rủi ro & Quan ngại
+
+#### Rủi ro 1: `<Tiêu đề>`
+
+**Mô tả:** ...
+
+**Giảm thiểu:** ...
+
+### 5. Câu hỏi Mở
+
+- Câu hỏi 1: ...
+- Câu hỏi 2: ...
+
+---
+
+## ⏭️ Next Step
 
 > After approval, proceed to Phase 3 (Implementation)
 > Sau khi phê duyệt, tiến hành Phase 3 (Triển khai)
 
-Reply / Trả lời: `approved` or `revise: <feedback>`
+Reply: `approved` or `revise: <feedback>`

@@ -33,7 +33,7 @@ TRIGGER_RULES:
 ```yaml
 pre_checks:
   1. Verify spec exists:
-     path: <impl_root>/docs/runs/<branch-slug>/01_spec/spec.md
+     path: <docs_root>/docs/runs/<branch-slug>/01_spec/spec.md
      if_not: STOP - "No spec found. Run phase-1-spec first."
      
   2. Load related artifacts:
@@ -312,12 +312,12 @@ Or if you want to override: `approve --force` (not recommended)
 ```yaml
 artifacts:
   review_report:
-    path: <impl_root>/docs/runs/<branch-slug>/01_spec/spec-review.md
+    path: <docs_root>/docs/runs/<branch-slug>/01_spec/spec-review.md
     content: Review results and fix plan
     
   spec_update:
     action: User updates spec.md based on findings
-    path: <impl_root>/docs/runs/<branch-slug>/01_spec/spec.md
+    path: <docs_root>/docs/runs/<branch-slug>/01_spec/spec.md
 ```
 
 ---

@@ -27,11 +27,11 @@ Duy trì coding standards chung bằng cách:
 ## Step 1: Scan Source Files / Quét Files Nguồn
 
 ```yaml
-source_location: <impl_root>/.github/instructions/shared/
+source_location: <tooling_root>/.github/instructions/shared/
 
 actions:
   1. Scan directory for all *.instructions.md files:
-     command: ls <impl_root>/.github/instructions/shared/*.instructions.md
+     command: ls <tooling_root>/.github/instructions/shared/*.instructions.md
      
   2. List found files:
      - coding-practices.instructions.md
@@ -60,16 +60,16 @@ dynamic_source:
 source: WORKSPACE_CONTEXT.md
 
 read_roots:
-  1. Load WORKSPACE_CONTEXT.md from impl_root
+  1. Load WORKSPACE_CONTEXT.md from tooling_root
   2. Extract all roots from Section 2 (WORKSPACE ROOTS)
-  3. Exclude impl_root itself (copilot-flow) - it keeps source files
+  3. Exclude tooling_root itself (copilot-flow) - it keeps source files
   4. Use remaining roots as sync targets
 
 dynamic_targets:
-  roots: <all roots from WORKSPACE_CONTEXT except impl_root>
+  roots: <all roots from WORKSPACE_CONTEXT except tooling_root>
   
   # Example: If WORKSPACE_CONTEXT has:
-  # - copilot-flow (impl_root) → SKIP (source location)
+  # - copilot-flow (tooling_root) → SKIP (source location)
   # - apphub-vision → SYNC
   # - reviews-assets → SYNC
   # - boost-pfs-backend → SYNC
@@ -132,7 +132,7 @@ output:
   <list of files scanned from shared/>
   
   ### Target Roots (from WORKSPACE_CONTEXT)
-  <list of roots excluding impl_root>
+  <list of roots excluding tooling_root>
   
   ### Sync Results
   | File | Synced To |

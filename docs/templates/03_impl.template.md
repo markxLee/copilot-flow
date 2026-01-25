@@ -1,200 +1,310 @@
-# Implementation Log / Nhật ký Triển khai
-# Template v2.0 - Bilingual inline format
+# Implementation Log
+# Template v3.0 - Hybrid Bilingual Format (Shared Data + Language Zones)
 
 ---
 
-## 📋 TL;DR
+## 📊 SHARED DATA
+<!-- Technical data - no translation needed / Dữ liệu kỹ thuật - không cần dịch -->
 
-| Aspect / Khía cạnh | Detail / Chi tiết |
-|-------------------|-------------------|
-| Feature / Tính năng | `<name>` |
-| Current Task / Task hiện tại | T`<N>` - `<title>` |
-| Progress / Tiến độ | `<X>`/`<Total>` tasks completed |
-| Status / Trạng thái | 🟢 On Track / 🟡 At Risk / 🔴 Blocked |
-| Last Updated / Cập nhật lần cuối | YYYY-MM-DD HH:mm |
+### TL;DR
+
+| Aspect | Value |
+|--------|-------|
+| Feature | `<name>` |
+| Current Task | T`<N>` - `<title>` |
+| Progress | `<X>`/`<Total>` tasks completed |
+| Status | 🟢 On Track / 🟡 At Risk / 🔴 Blocked |
+| Last Updated | YYYY-MM-DD HH:mm |
+
+### Progress Overview
+
+| Task | Title | Root | Status | Completed |
+|------|-------|------|--------|-----------|
+| T1 | `<title>` | `<root>` | ✅ Done | YYYY-MM-DD |
+| T2 | `<title>` | `<root>` | 🔄 In Progress | - |
+| T3 | `<title>` | `<root>` | ⏳ Pending | - |
+| T4 | `<title>` | `<root>` | ⏳ Pending | - |
+
+**Legend:**
+- ✅ Done
+- 🔄 In Progress
+- ⏳ Pending
+- ❌ Blocked
+- ⏭️ Skipped
 
 ---
 
-## 1. Progress Overview / Tổng quan Tiến độ
+### Task Implementation Details
 
-| Task | Title / Tiêu đề | Root | Status / Trạng thái | Completed / Hoàn thành |
-|------|-----------------|------|---------------------|------------------------|
-| T1 | ... | `<root>` | ✅ Done | YYYY-MM-DD |
-| T2 | ... | `<root>` | 🔄 In Progress | - |
-| T3 | ... | `<root>` | ⏳ Pending | - |
-| T4 | ... | `<root>` | ⏳ Pending | - |
+#### Task T1 — `<Title>`
 
-**Legend / Chú thích:**
-- ✅ Done / Hoàn thành
-- 🔄 In Progress / Đang thực hiện
-- ⏳ Pending / Chờ xử lý
-- ❌ Blocked / Bị chặn
-- ⏭️ Skipped / Bỏ qua
+| Aspect | Value |
+|--------|-------|
+| Root | `<root-name>` |
+| Started | YYYY-MM-DD HH:mm |
+| Completed | YYYY-MM-DD HH:mm |
+| Status | ✅ Done |
 
----
+**Files Changed:**
 
-## 2. Implementation Details / Chi tiết Triển khai
+| Action | Path | Lines |
+|--------|------|-------|
+| Created | `<file-path>` | +`<N>` |
+| Modified | `<file-path>` | +`<N>`, -`<M>` |
 
-### Task T1 — `<Title / Tiêu đề>`
-
-| Aspect | Detail |
-|--------|--------|
-| **Root** | `<root-name>` |
-| **Started / Bắt đầu** | YYYY-MM-DD HH:mm |
-| **Completed / Hoàn thành** | YYYY-MM-DD HH:mm |
-| **Status / Trạng thái** | ✅ Done |
-
-#### Files Changed / File Thay đổi
-
-| Action / Hành động | Path / Đường dẫn | Lines / Dòng |
-|-------------------|------------------|--------------|
-| Created / Tạo | `<file-path>` | +`<N>` |
-| Modified / Sửa | `<file-path>` | +`<N>`, -`<M>` |
-
-#### What Was Implemented / Đã Triển khai
-
-**EN:**
-> Description of what was actually implemented
-
-**VI:**
-> Mô tả những gì đã được triển khai thực tế
-
-#### Key Code Changes / Thay đổi Code Chính
+**Key Code:**
 
 ```typescript
-// Brief code snippet showing the key change
-// Đoạn code ngắn thể hiện thay đổi chính
+// Brief code snippet showing the key implementation
+export const handler = async (input: Input): Promise<Output> => {
+  // implementation
+};
 ```
 
-#### Commands Run / Lệnh Đã Chạy
+**Commands Run:**
 
 ```bash
-# Commands executed during implementation
-# Các lệnh đã thực thi trong quá trình triển khai
+# Commands executed
+pnpm lint --fix
+pnpm test
 ```
 
-#### Verification / Kiểm tra
+**Verification:**
 
-| Check / Kiểm tra | Status / Trạng thái | Notes / Ghi chú |
-|-----------------|---------------------|-----------------|
-| Compiles / Biên dịch | ✅ Pass | |
+| Check | Status | Notes |
+|-------|--------|-------|
+| Compiles | ✅ Pass | |
 | Lint passes | ✅ Pass | |
-| Manual test / Test thủ công | ✅ Pass | EN: ... / VI: ... |
+| Tests pass | ✅ Pass | |
+| Manual test | ✅ Pass | |
 
-#### Deviations from Plan / Sai lệch so với Kế hoạch
+**Deviations from Plan:**
 
-| Aspect | Planned / Kế hoạch | Actual / Thực tế | Reason / Lý do |
-|--------|-------------------|------------------|----------------|
-| ... | ... | ... | EN: ... / VI: ... |
-
-#### Notes / Ghi chú
-
-- EN: ...
-- VI: ...
+| Aspect | Planned | Actual | Reason |
+|--------|---------|--------|--------|
+| `<aspect>` | `<planned>` | `<actual>` | `<reason>` |
 
 ---
 
-### Task T2 — `<Title / Tiêu đề>`
+#### Task T2 — `<Title>`
 
-| Aspect | Detail |
-|--------|--------|
-| **Root** | `<root-name>` |
-| **Started / Bắt đầu** | YYYY-MM-DD HH:mm |
-| **Completed / Hoàn thành** | - |
-| **Status / Trạng thái** | 🔄 In Progress |
+| Aspect | Value |
+|--------|-------|
+| Root | `<root-name>` |
+| Started | YYYY-MM-DD HH:mm |
+| Completed | - |
+| Status | 🔄 In Progress |
 
-#### Files Changed / File Thay đổi
+**Files Changed:**
 
-| Action / Hành động | Path / Đường dẫn | Lines / Dòng |
-|-------------------|------------------|--------------|
-| ... | ... | ... |
+| Action | Path | Lines |
+|--------|------|-------|
+| Created | `<file-path>` | +`<N>` |
 
-#### What Was Implemented / Đã Triển khai
+**Key Code:**
 
-**EN:**
-> ...
+```typescript
+// Work in progress
+```
 
-**VI:**
-> ...
+**Verification:**
 
-#### Verification / Kiểm tra
-
-| Check / Kiểm tra | Status / Trạng thái | Notes / Ghi chú |
-|-----------------|---------------------|-----------------|
-| ... | ⏳ Pending | |
-
----
-
-## 3. Changes by Root / Thay đổi theo Root
-
-### Root: `<root-name>`
-
-**Summary / Tóm tắt:**
-- Files created / Tệp tạo mới: `<N>`
-- Files modified / Tệp sửa đổi: `<M>`
-- Files deleted / Tệp xóa: `<X>`
-
-| File | Task | Change Type / Loại thay đổi |
-|------|------|---------------------------|
-| `<path>` | T1 | Created / Modified / Deleted |
-| `<path>` | T2 | Created / Modified / Deleted |
-
-### Root: `<root-name-2>`
-
-(Same structure / Cấu trúc tương tự)
+| Check | Status | Notes |
+|-------|--------|-------|
+| Compiles | ⏳ Pending | |
+| Lint passes | ⏳ Pending | |
 
 ---
 
-## 4. Issues Encountered / Vấn đề Gặp phải
+### Changes by Root
 
-### Issue 1: `<Title / Tiêu đề>`
+#### Root: `<root-name>`
 
-| Aspect | Detail |
-|--------|--------|
+| Metric | Value |
+|--------|-------|
+| Files created | `<N>` |
+| Files modified | `<M>` |
+| Files deleted | `<X>` |
+
+| File | Task | Change Type |
+|------|------|-------------|
+| `<path>` | T1 | Created |
+| `<path>` | T2 | Modified |
+
+#### Root: `<root-name-2>`
+
+| Metric | Value |
+|--------|-------|
+| Files created | `<N>` |
+| Files modified | `<M>` |
+| Files deleted | `<X>` |
+
+| File | Task | Change Type |
+|------|------|-------------|
+| `<path>` | T3 | Created |
+
+---
+
+### Issues Encountered
+
+#### Issue 1: `<Title>`
+
+| Aspect | Value |
+|--------|-------|
 | Task | T`<N>` |
-| Severity / Mức độ | Low / Medium / High / Critical |
-| Status / Trạng thái | 🔴 Open / ✅ Resolved |
+| Severity | Low / Medium / High / Critical |
+| Status | 🔴 Open / ✅ Resolved |
 
-**Description / Mô tả:**
-- EN: ...
-- VI: ...
+**Error:**
+```
+<error message or stack trace>
+```
 
-**Resolution / Giải pháp:**
-- EN: ...
-- VI: ...
-
----
-
-## 5. Scope Changes / Thay đổi Phạm vi
-
-| Change / Thay đổi | Type / Loại | Approved By / Phê duyệt bởi | Date / Ngày |
-|-------------------|-------------|----------------------------|-------------|
-| EN: ... / VI: ... | Added / Removed / Modified | ... | YYYY-MM-DD |
+**Resolution:**
+```
+<fix applied>
+```
 
 ---
 
-## 6. Current Blockers / Điểm Chặn Hiện tại
+### Scope Changes
 
-| Blocker / Điểm chặn | Affects Task / Ảnh hưởng Task | Action Required / Hành động cần thiết |
-|--------------------|------------------------------|--------------------------------------|
-| EN: ... / VI: ... | T`<N>` | EN: ... / VI: ... |
+| Change | Type | Approved By | Date |
+|--------|------|-------------|------|
+| `<description>` | Added / Removed / Modified | `<name>` | YYYY-MM-DD |
+
+### Current Blockers
+
+| Blocker | Affects Task | Action Required |
+|---------|--------------|-----------------|
+| `<blocker>` | T`<N>` | `<action>` |
+
+### Quality Checkpoints
+
+| Check | Status |
+|-------|--------|
+| Code compiles without errors | ⬜/✅ |
+| Lint passes | ⬜/✅ |
+| No regression in existing features | ⬜/✅ |
+| Changes match task plan | ⬜/✅ |
 
 ---
 
-## Next Action / Hành động Tiếp theo
+## 🇬🇧 ENGLISH
 
-| Action / Hành động | Status |
-|-------------------|--------|
-| ▶️ Continue to T`<N+1>` / Tiếp tục T`<N+1>` | Reply `next` |
-| ⏸️ Pause implementation / Tạm dừng triển khai | Reply `pause` |
-| 🔄 Fix issue / Sửa lỗi | Reply `fix: <issue>` |
+### 1. Implementation Summary
+
+> High-level summary of what has been implemented so far.
+
+### 2. Task Notes
+
+#### T1 — `<Title>`
+
+**What Was Implemented:**
+> Description of what was actually built
+
+**Challenges Faced:**
+- Challenge 1: ...
+- Challenge 2: ...
+
+**Learnings:**
+- Learning 1: ...
 
 ---
 
-## Quality Checkpoints / Điểm Kiểm tra Chất lượng
+#### T2 — `<Title>`
 
-After each task / Sau mỗi task:
-- [ ] Code compiles without errors / Code biên dịch không lỗi
-- [ ] Lint passes / Lint pass
-- [ ] No regression in existing features / Không ảnh hưởng tính năng hiện có
-- [ ] Changes match task plan / Thay đổi đúng với kế hoạch
+**What Was Implemented:**
+> ...
+
+**Challenges Faced:**
+- ...
+
+---
+
+### 3. Deviations Explanation
+
+Explain any significant deviations from the original task plan and why they were necessary.
+
+### 4. Issue Details
+
+#### Issue 1: `<Title>`
+
+**Description:** What went wrong and why.
+
+**Root Cause:** The underlying reason for the issue.
+
+**Resolution:** How it was fixed.
+
+**Prevention:** How to prevent this in the future.
+
+### 5. Notes for Next Session
+
+- Note 1: ...
+- Note 2: ...
+
+---
+
+## 🇻🇳 TIẾNG VIỆT
+
+### 1. Tóm tắt Triển khai
+
+> Tóm tắt cấp cao về những gì đã được triển khai đến nay.
+
+### 2. Ghi chú Task
+
+#### T1 — `<Tiêu đề>`
+
+**Đã Triển khai:**
+> Mô tả những gì thực sự đã xây dựng
+
+**Thách thức Gặp phải:**
+- Thách thức 1: ...
+- Thách thức 2: ...
+
+**Bài học:**
+- Bài học 1: ...
+
+---
+
+#### T2 — `<Tiêu đề>`
+
+**Đã Triển khai:**
+> ...
+
+**Thách thức Gặp phải:**
+- ...
+
+---
+
+### 3. Giải thích Sai lệch
+
+Giải thích các sai lệch đáng kể so với kế hoạch task ban đầu và tại sao chúng cần thiết.
+
+### 4. Chi tiết Vấn đề
+
+#### Vấn đề 1: `<Tiêu đề>`
+
+**Mô tả:** Điều gì đã xảy ra và tại sao.
+
+**Nguyên nhân Gốc:** Lý do cơ bản gây ra vấn đề.
+
+**Giải pháp:** Cách đã sửa.
+
+**Phòng ngừa:** Cách ngăn chặn điều này trong tương lai.
+
+### 5. Ghi chú cho Phiên tiếp theo
+
+- Ghi chú 1: ...
+- Ghi chú 2: ...
+
+---
+
+## ⏭️ Next Action
+
+| Action | Command |
+|--------|---------|
+| ▶️ Continue to next task | Reply `next` |
+| ⏸️ Pause implementation | Reply `pause` |
+| 🔄 Fix issue | Reply `fix: <issue>` |
+| ✅ All tasks done → Phase 4 | Reply `phase-4` |
