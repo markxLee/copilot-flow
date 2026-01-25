@@ -192,28 +192,29 @@ MANDATORY_CHECK:
 | `/rollback` | Undo implementation changes |
 | `/lite-mode` | Start lite mode for simple tasks |
 
-### Generic Commands (Use with caution)
-| Say | Action | ⚠️ Risk |
-|-----|--------|---------|
-| `resume` / `tiếp tục` | Continue from saved state | ✅ Low |
-| `status` / `trạng thái` | Show workflow status | ✅ Low |
-| `help` / `?` | Show quick reference card | ✅ Low |
-| `lite: <desc>` | Start lite mode for simple tasks | ✅ Low |
-| `rollback` | Undo implementation changes | ✅ Low |
-| ~~`go`~~ / ~~`tiếp`~~ | ~~Execute next action~~ | ❌ HIGH - May skip phases |
-| ~~`approved`~~ / ~~`duyệt`~~ | ~~Approve current phase~~ | ❌ HIGH - May skip phases |
-| ~~`continue`~~ | ~~Continue workflow~~ | ❌ HIGH - May skip phases |
+### Session Commands (Explicit Prompts)
+| Prompt | Action |
+|--------|--------|
+| `/init` | Initialize session, load context |
+| `/workflow-resume` | Continue from saved state |
+| `/workflow-status` | Show current workflow status |
+| `/quick-ref` | Show quick reference card |
+| `/lite-mode <desc>` | Start lite mode for simple tasks |
+| `/rollback` | Undo implementation changes |
+| `/memory-context-hygiene` | Clear confused state |
 
-### Setup Commands
-| Say | Action |
-|-----|--------|
-| `setup workspace` | Run full setup (discovery → cross-root → sync → generate) |
-| `cross-root` | Auto-config & save cross-root relationships |
-| `sync instructions` | Sync shared instructions + detect tech stacks |
-| `suggest instructions` | Analyze tech stacks & suggest missing instructions |
-| `sync vscode settings` | Sync VS Code settings to all roots |
-| `generate workspace file` | Generate .code-workspace from context |
-| `generate architecture` | Generate ARCHITECTURE.md from context |
+### Setup Commands (Explicit Prompts)
+| Prompt | Action |
+|--------|--------|
+| `/setup-workspace` | Run full setup (discovery → cross-root → sync → generate) |
+| `/workspace-discovery` | Scan workspace and create WORKSPACE_CONTEXT.md |
+| `/cross-root-guide` | Auto-config & save cross-root relationships |
+| `/sync-instructions` | Sync shared instructions + detect tech stacks |
+| `/sync-instructions-to <root>` | Sync to specific root only |
+| `/suggest-instructions` | Analyze tech stacks & suggest missing instructions |
+| `/sync-vscode-settings` | Sync VS Code settings to all roots |
+| `/generate-workspace-file` | Generate .code-workspace from context |
+| `/generate-architecture` | Generate ARCHITECTURE.md from context |
 
 ---
 

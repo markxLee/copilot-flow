@@ -1,515 +1,247 @@
-# Copilot Workflow System
+# Copilot Governed Workflow
 
-> A governed, multi-phase workflow for AI-assisted software development.
-> Hệ thống workflow có kiểm soát, đa phase cho phát triển phần mềm với AI.
-
----
-
-## 🎯 Overview / Tổng quan
-
-This repository contains a complete workflow system for GitHub Copilot to manage complex development tasks across multi-root VS Code workspaces.
-
-Repository này chứa hệ thống workflow hoàn chỉnh để GitHub Copilot quản lý các task phát triển phức tạp trên multi-root VS Code workspaces.
-
-### Key Features / Tính năng Chính
-
-- ✅ **6-Phase Workflow** — Analysis → Spec → Tasks → Impl → Tests → Done
-- ✅ **Multi-Root Support** — Work across multiple repositories
-- ✅ **State Management** — Resume work after session breaks
-- ✅ **Review Gates** — Approval required at each phase
-- ✅ **Iteration Support** — Handle requirement changes with versioned docs
-- ✅ **Multilingual Docs** — Flag-based inline format for fast scanning
-- ✅ **PR Automation** — Generate PR descriptions and reviewer notifications
-- ✅ **Shared Instructions** — Sync coding standards across all roots
+> 🇬🇧 A structured, multi-phase workflow system for GitHub Copilot that ensures quality, traceability, and control.
+> 🇻🇳 Hệ thống workflow có cấu trúc cho GitHub Copilot, đảm bảo chất lượng, khả năng truy vết và kiểm soát.
 
 ---
 
-## 🌍 Multilingual Phase Documentation
+## Table of Contents
 
-### Philosophy / Triết lý
-
-🇻🇳 Mỗi developer nên đọc docs bằng ngôn ngữ chính của họ để hiểu nhanh nhất và đưa ra quyết định nhanh nhất. Format song ngữ với flags giúp mỗi người dễ dàng scan và đọc phần họ cần.
-
-🇬🇧 Every developer should read docs in their primary language for fastest comprehension and quickest decision-making. The bilingual format with flags makes it easy for everyone to scan and read their relevant sections.
-
-### Format v4.0: Inline Bilingual with Visual Flags
-
-**Narrative content** uses adjacent paragraphs with country flags:
-
-```markdown
-#### Description
-
-🇻🇳 Tạo BillingLayout wrapper component với sidebar và topbar để bọc 
-tất cả các trang trong billing app.
-
-🇬🇧 Create BillingLayout wrapper component with sidebar and topbar to 
-wrap all pages in the billing app.
-```
-
-**Universal content** (no translation needed):
-- Tables with data/code
-- Code blocks
-- Mermaid diagrams
-- File paths
-- Technical identifiers
-
-### How to Read / Cách Đọc
-
-| Your Role | What to Read |
-|-----------|--------------|
-| Vietnamese developer | Scan for 🇻🇳, read those paragraphs |
-| English reviewer | Scan for 🇬🇧, read those paragraphs |
-| Other languages | Use 🇬🇧 as base, or add new language |
-
-### Adding a New Language / Thêm Ngôn ngữ Mới
-
-To add support for a new language (e.g., Japanese 🇯🇵):
-
-**Step 1:** Update templates in `docs/templates/`
-
-```markdown
-#### Description
-
-🇻🇳 [Vietnamese text]
-
-🇬🇧 [English text]
-
-🇯🇵 [Japanese text]
-```
-
-**Step 2:** Update `user_preferences` in `.workflow-state.yaml`:
-
-```yaml
-user_preferences:
-  language: ja          # Primary language for this user
-  languages_in_docs:    # Languages to include in generated docs
-    - vi
-    - en
-    - ja
-```
-
-**Step 3:** Copilot will generate docs with all specified languages.
-
-### Best Practices / Thực hành Tốt
-
-| Do ✅ | Don't ❌ |
-|-------|---------|
-| Flag before each paragraph | Mix languages in same paragraph |
-| Keep paragraphs short (~2-4 sentences) | Write long paragraphs |
-| Translate meaning, not word-by-word | Use Google Translate directly |
-| Leave technical terms in English | Translate code/identifiers |
-| Put universal content (tables, code) once | Duplicate tables for each language |
-
-### Example: Task Description
-
-```markdown
-### T-005: Create PaymentDetailsPage Route
-
-| Aspect | Detail |
-|--------|--------|
-| Status | ⏸️ Pending |
-| Phase | B - UI Components |
-
-#### Description
-
-🇻🇳 Tạo route `/payment-details` với page component. 
-Page dùng BillingLayout, có HeaderBlock với title.
-
-🇬🇧 Create route `/payment-details` with page component. 
-Page uses BillingLayout, has HeaderBlock with title.
-
-#### Files To Create
-
-| File | Purpose |
-|------|---------|
-| `app/payment-details/page.tsx` | Server component |
-| `payment-details.tsx` | Client component |
-```
-
-### Supported Languages / Ngôn ngữ Hỗ trợ
-
-| Flag | Language | Status |
-|------|----------|--------|
-| 🇻🇳 | Vietnamese | ✅ Built-in |
-| 🇬🇧 | English | ✅ Built-in |
-| 🇯🇵 | Japanese | 📝 Add to templates |
-| 🇰🇷 | Korean | 📝 Add to templates |
-| 🇨🇳 | Chinese | 📝 Add to templates |
-| 🇫🇷 | French | 📝 Add to templates |
-| 🇩🇪 | German | 📝 Add to templates |
+1. [Quick Start](#-quick-start)
+2. [Commands Reference](#-commands-reference)
+3. [Workflow Phases](#-workflow-phases)
+4. [Phase 3: Two-Gate Implementation](#-phase-3-two-gate-implementation)
+5. [Project Structure](#-project-structure)
+6. [Guides](#-guides) ← *Detailed documentation*
+7. [Configuration](#%EF%B8%8F-configuration)
+8. [Example: Full Workflow](#-example-full-workflow)
+9. [Troubleshooting](#-troubleshooting)
+10. [References](#-references)
 
 ---
 
-## 📁 Structure / Cấu trúc
-
-```
-copilot-flow/
-├── .github/
-│   ├── copilot-instructions.md      # Entry point (auto-read by Copilot)
-│   ├── instructions/
-│   │   └── shared/                  # Shared instructions (sync to other roots)
-│   │       ├── coding-practices.instructions.md
-│   │       ├── typescript.instructions.md
-│   │       ├── testing.instructions.md
-│   │       └── code-review.instructions.md
-│   └── prompts/                     # All workflow prompts
-│       ├── init-context.prompt.md
-│       ├── work-intake.prompt.md
-│       ├── work-update.prompt.md
-│       ├── work-review.prompt.md
-│       ├── phase-0-analysis.prompt.md
-│       ├── phase-1-spec.prompt.md
-│       ├── spec-review.prompt.md
-│       ├── phase-2-tasks.prompt.md
-│       ├── task-plan-review.prompt.md
-│       ├── phase-3-impl.prompt.md
-│       ├── code-review.prompt.md
-│       ├── code-fix-plan.prompt.md
-│       ├── code-fix-apply.prompt.md
-│       ├── phase-4-tests.prompt.md
-│       ├── test-verify.prompt.md
-│       ├── phase-5-done.prompt.md
-│       ├── pr-description.prompt.md
-│       ├── pr-notify-reviewers.prompt.md
-│       ├── workflow-resume.prompt.md
-│       ├── memory-context-hygiene.prompt.md
-│       ├── workspace-discovery.prompt.md
-│       ├── workspace-update-root.prompt.md
-│       ├── cross-root-guide.prompt.md   # Auto-config cross-root relationships
-│       ├── sync-instructions.prompt.md  # Sync shared instructions + tech detection
-│       ├── sync-vscode-settings.prompt.md # Sync VS Code settings
-│       ├── generate-workspace-files.prompt.md # Generate .code-workspace & ARCHITECTURE.md
-│       ├── quick-ref.prompt.md          # Quick reference / cheat sheet
-│       ├── rollback.prompt.md           # Undo implementation changes
-│       └── lite-mode.prompt.md          # Streamlined workflow for simple tasks
-├── docs/
-│   ├── workflow/
-│   │   └── contract.md              # Workflow rules & contract
-│   ├── templates/                   # Phase document templates
-│   │   ├── 00_analysis.template.md
-│   │   ├── 01_spec.template.md
-│   │   ├── 02_tasks.template.md
-│   │   ├── 03_impl.template.md
-│   │   ├── 04_tests.template.md
-│   │   ├── 05_done.template.md
-│   │   ├── workflow-state.template.yaml
-│   │   ├── vscode-settings.template.json  # VS Code settings template
-│   │   ├── code-workspace.template.json   # .code-workspace template
-│   │   └── architecture.template.md       # ARCHITECTURE.md template
-│   └── runs/                        # Active workflow artifacts
-│       └── <branch-slug>/           # Per-branch workflow docs
-├── WORKSPACE_CONTEXT.md             # Multi-root workspace info
-└── README.md                        # This file
-
-# Generated files (not in repo, created per-workspace):
-# ../<workspace>.code-workspace      # Generated by `setup workspace`
-# ./ARCHITECTURE.md                  # Generated by `setup workspace`
-```
-
----
-
-## 🚀 Quick Start / Bắt đầu Nhanh
+## 🚀 Quick Start
 
 ### 1. First-Time Setup (One-time)
 
-Open all roots in VS Code, then say to Copilot:
+**What is Multi-Root Workspace?**
+
+A VS Code workspace containing multiple project folders (roots) that work together. This workflow system is designed for teams working across multiple repositories.
+
+**Setup Steps:**
+
+1. Open VS Code
+2. Add folders: `File → Add Folder to Workspace...` (add each repo)
+3. Save workspace: `File → Save Workspace As...`
+4. Tell Copilot:
 ```
-setup workspace
+/setup-workspace
 ```
 
-This runs 4 steps:
-1. **Discovery** → Creates WORKSPACE_CONTEXT.md
-2. **Cross-root** → Configures cross-root patterns  
-3. **Sync instructions** → Copies coding standards + detects tech stacks
-4. **Generate files** → Creates .code-workspace + ARCHITECTURE.md
+This runs 4 steps automatically:
+| Step | Prompt | Creates |
+|------|--------|--------|
+| 1. Discovery | `/workspace-discovery` | `WORKSPACE_CONTEXT.md` |
+| 2. Cross-root | `/cross-root-guide` | Updates `WORKSPACE_CONTEXT.md` |
+| 3. Sync instructions | `/sync-instructions` | `.github/instructions/` in each root |
+| 4. Generate files | `/generate-workspace-file` | `.code-workspace` + `ARCHITECTURE.md` |
 
-### 2. Open Workspace (After Setup)
+### 2. Open Workspace
 
 ```bash
-# Open generated workspace file
 code <workspace-name>.code-workspace
 ```
 
-### 3. Start a New Session
+### 3. Start a Session
 
-Say to Copilot:
 ```
-init
+/init
 ```
-
-Copilot will:
-- Load workspace context
-- Check for existing workflow
-- Report current state
+Copilot will load context, check for existing workflow, and report status.
 
 ### 4. Start New Work
 
-Say:
+Tell Copilot what you want to do:
 ```
 Add analytics tracking to dashboard
 ```
+Copilot automatically runs `/work-intake` → asks clarifying questions → `/work-review` → then guides you through phases 0-5.
 
-Copilot will:
-- Run `work-intake` to capture requirements
-- Run `work-review` to verify readiness
-- Guide you through phases 0-5
-
-### 5. Quick Fix (Lite Mode)
-
-For simple tasks that don't need full workflow:
-```
-lite: fix typo in error message
-```
-
-Copilot will:
-- Skip phases 0-2 (no analysis/spec/tasks)
-- Implement directly
-- Quick review and done
-
----
-
-## � Shared Instructions / Instructions Dùng Chung
-
-Maintain consistent coding standards across all workspace roots.
-
-### Structure / Cấu trúc
+### 5. Simple Tasks (Lite Mode)
 
 ```
-copilot-flow/.github/instructions/shared/    # Master copies (edit here)
-├── coding-practices.instructions.md         # Error handling, code style
-├── typescript.instructions.md               # TypeScript standards
-└── testing.instructions.md                  # Test conventions
-
-<other-roots>/.github/instructions/          # Synced copies (auto-generated)
-├── coding-practices.instructions.md         # ← Synced
-├── typescript.instructions.md               # ← Synced
-└── <root-specific>.instructions.md          # ← Root-specific (not synced)
+/lite-mode fix typo in error message
 ```
+Skips phases 0-2, implements directly.
 
-### Sync Instructions / Đồng bộ Instructions
-
-```bash
-# Sync shared instructions to all roots + analyze tech stacks
-sync instructions
-
-# Sync to specific root only
-sync instructions to apphub-vision
-
-# Sync except specific root
-sync instructions except reviews-assets
-
-# Sync without tech stack analysis
-sync instructions --skip-analysis
-
-# Only analyze tech stacks, don't sync
-suggest instructions
-
-# Analyze specific root
-suggest instructions for python-service
-```
-
-**Auto Tech Stack Detection**: When syncing, Copilot automatically:
-1. Detects each root's tech stack (Python, Go, Java, etc.)
-2. Compares with existing shared instructions
-3. Suggests creating missing instructions from templates
-
-### Adding New Shared Instructions / Thêm Instructions Mới
-
-1. Create file in `copilot-flow/.github/instructions/shared/`
-2. Run `sync instructions`
-3. File will be copied to all workspace roots
-
-### Root-Specific Instructions / Instructions Riêng
-
-Each root can have additional instructions that are NOT synced:
-- `apphub-vision`: prisma.instructions.md, ai-api.instructions.md
-- `reviews-assets`: storybook.instructions.md
-- `boost-pfs-backend`: api-design.instructions.md
-
----\n\n## 📊 Workflow Diagram with Explicit Prompts / Sơ đồ Workflow với Prompt Tường minh
+### 🤔 Which Mode to Use?
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     WORKSPACE SETUP (one-time)                      │
-├─────────────────────────────────────────────────────────────────────┤
-│  Step 1: workspace-discovery  →  Creates WORKSPACE_CONTEXT.md       │
-│  Step 2: cross-root           →  Configure cross-root patterns      │
-│  Step 3: sync instructions    →  Sync standards + detect tech stack │
-│  Step 4: generate files       →  .code-workspace + ARCHITECTURE.md  │
-│                                                                     │
-│  Quick setup: say "setup workspace" → runs all 4 steps              │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         SESSION START                               │
-├─────────────────────────────────────────────────────────────────────┤
-│  init  →  Check existing workflow  →  Resume or New?                │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                    ┌───────────────┴───────────────┐
-                    ▼                               ▼
-            ┌──────────────┐               ┌──────────────┐
-            │   RESUME     │               │   NEW WORK   │
-            │   resume     │               │ /work-intake │
-            └──────────────┘               └──────────────┘
-                    │                               │
-                    │                               ▼
-                    │                      ┌──────────────┐
-                    │                      │ /work-review │
-                    │                      └──────────────┘
-                    │                               │
-                    └───────────────┬───────────────┘
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                        PHASE 0: ANALYSIS                            │
-│                        /phase-0-analysis                            │
-├─────────────────────────────────────────────────────────────────────┤
-│  → analysis.md  →  ⏸️ STOP (approval required)                      │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │ /phase-1-spec
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      PHASE 1: SPECIFICATION                         │
-│                         /phase-1-spec                               │
-├─────────────────────────────────────────────────────────────────────┤
-│  → spec.md  →  /spec-review (recommended)  →  ⏸️ STOP               │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │ /phase-2-tasks
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                       PHASE 2: TASK PLANNING                        │
-│                         /phase-2-tasks                              │
-├─────────────────────────────────────────────────────────────────────┤
-│  → tasks.md  →  /task-plan-review (recommended)  →  ⏸️ STOP         │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │ /phase-3-impl T-001
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      PHASE 3: IMPLEMENTATION                        │
-│                  (Two-Gate Model with Review Options)               │
-├─────────────────────────────────────────────────────────────────────┤
-│  ┌──────────────────────────────────────────────────────────────┐   │
-│  │  FOR EACH TASK:                                              │   │
-│  │                                                              │   │
-│  │  /phase-3-impl T-XXX                                         │   │
-│  │       │                                                      │   │
-│  │       ▼                                                      │   │
-│  │  [Show plan: task + requirements + approach]                 │   │
-│  │       │                                                      │   │
-│  │       ▼                                                      │   │
-│  │  ⏸️ GATE 1: Confirm approach?                                │   │
-│  │       │                                                      │   │
-│  │       │ /impl go                                             │   │
-│  │       ▼                                                      │   │
-│  │  [Make code changes + update state]                          │   │
-│  │       │                                                      │   │
-│  │       ▼                                                      │   │
-│  │  ⏸️ GATE 2: Choose review method                             │   │
-│  │       │                                                      │   │
-│  │       ├── /impl approved ───────→ next task (manual review)  │   │
-│  │       │                                                      │   │
-│  │       └── /code-review T-XXX ──→ AI review ──→ next task     │   │
-│  │                                      │                       │   │
-│  │                                      └── fixes needed?       │   │
-│  │                                          /code-fix-plan      │   │
-│  └──────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │ /phase-4-tests
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         PHASE 4: TESTING                            │
-│                         /phase-4-tests                              │
-├─────────────────────────────────────────────────────────────────────┤
-│  → tests → user runs tests → report results → ⏸️ STOP               │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │ /phase-5-done
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                        PHASE 5: DONE CHECK                          │
-│                         /phase-5-done                               │
-├─────────────────────────────────────────────────────────────────────┤
-│  → DoD verification  →  done.md  →  ⏸️ STOP                         │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │ pr
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                          POST-COMPLETION                            │
-├─────────────────────────────────────────────────────────────────────┤
-│  pr-description  →  PR_DESCRIPTION.md                               │
-│  pr-notify-reviewers  →  Slack/Teams message                        │
-│  User: git commit, push, create PR                                  │
-└─────────────────────────────────────────────────────────────────────┘
+Is this a quick fix (< 30 min, clear scope)?
+├─ YES → /lite-mode <description>
+└─ NO → Full workflow:
+         Is the requirement clear?
+         ├─ YES → Just describe work, Copilot handles intake
+         └─ NO → /work-intake (explicit capture)
 ```
 
 ---
 
-## 🎮 Commands / Các Lệnh
+## 🎮 Commands Reference
 
-### ⚠️ IMPORTANT: Use Explicit Prompt References
+### Setup Commands (One-time / Occasional)
 
-Generic commands like `go`, `approved` can cause phase skipping in long conversations. 
-**Always use explicit `/prompt-name` to ensure correct flow.**
+| Prompt | Action |
+|--------|--------|
+| `/setup-workspace` | Run full setup (discovery → cross-root → sync → generate) |
+| `/workspace-discovery` | Scan workspace and create WORKSPACE_CONTEXT.md |
+| `/cross-root-guide` | Auto-config & save cross-root relationships |
+| `/sync-instructions` | Sync shared instructions + detect tech stacks |
+| `/sync-instructions-to <root>` | Sync to specific root only |
+| `/sync-instructions-except <root>` | Sync to all except one root |
+| `/suggest-instructions` | Analyze tech stacks & suggest missing instructions |
+| `/sync-vscode-settings` | Sync VS Code settings to all roots |
+| `/generate-workspace-file` | Generate .code-workspace from context |
+| `/generate-architecture` | Generate ARCHITECTURE.md from context |
 
-### Explicit Prompt References (RECOMMENDED)
+### Session Commands (Every Session)
 
-| Prompt | When to Use |
-|--------|-------------|
-| `/work-intake` | Capture work description |
-| `/work-review` | Review work readiness |
-| `/work-update` | Handle requirement changes & iterations |
-| `/phase-0-analysis` | Start Phase 0: Analysis |
-| `/phase-1-spec` | Start Phase 1: Specification |
-| `/spec-review` | Review spec (recommended before Phase 2) |
-| `/phase-2-tasks` | Start Phase 2: Task Planning |
-| `/task-plan-review` | Review task plan (recommended before Phase 3) |
-| `/phase-3-impl T-XXX` | Plan specific task (shows approach, waits for approval) |
-| `/phase-3-impl next` | Plan next incomplete task |
-| `/impl go` | Proceed with implementation after plan approved |
-| `/impl approved` | Mark task complete after manual review (skip AI review) |
-| `/code-review T-XXX` | Review task changes (AI review) |
-| `/code-fix-plan T-XXX` | Plan fixes for review issues |
-| `/code-fix-apply T-XXX` | Apply approved fixes |
-| `/phase-4-tests` | Start Phase 4: Testing |
-| `/test-verify` | Verify test coverage & quality |
-| `/phase-5-done` | Start Phase 5: Done Check |
-| `/pr-description` | Generate PR description |
-| `/pr-notify-reviewers` | Generate reviewer notification |
-| `/workflow-resume` | Resume from saved state |
-| `/rollback` | Undo implementation changes |
-| `/lite-mode` | Start lite mode for simple tasks |
+| Prompt | Action |
+|--------|--------|
+| `/init` | Initialize session, load context |
+| `/workflow-resume` | Continue from saved state |
+| `/workflow-status` | Show current workflow status |
+| `/quick-ref` | Show quick reference card (all commands) |
 
-### Session Commands (Safe)
+### 🔄 Session Recovery Guide
 
-| Say | Action |
-|-----|--------|
-| `init` / `start` | Initialize session, load context |
-| `resume` / `tiếp tục` | Continue from saved state |
-| `status` / `trạng thái` | Show current workflow status |
-| `help` / `?` | Show quick reference card |
+**When to use each command:**
 
-### ⚠️ Risky Commands (Avoid in long conversations)
+| Scenario | Command | Why |
+|----------|---------|-----|
+| Start of day / new chat | `/init-context` | Loads context + checks for existing workflow |
+| VS Code restarted | `/init-context` | Same - context needs reload |
+| Changed device / computer | `/init-context` → `resume` | State is in git, just reload |
+| Session lost mid-phase | `/workflow-resume` | Reads `.workflow-state.yaml` directly |
+| Copilot giving wrong answers | `/memory-context-hygiene` | Clears confused context |
+| Long conversation (50+ messages) | `/memory-context-hygiene` | Prevents context overflow |
 
-| Command | Risk | Alternative |
-|---------|------|-------------|
-| ~~`approved`~~ / ~~`duyệt`~~ | ❌ May skip phases | Use explicit `/phase-X-xxx` |
-| ~~`go`~~ / ~~`tiếp`~~ | ❌ May skip phases | Use explicit `/phase-X-xxx` |
-| ~~`continue`~~ | ❌ May skip phases | Use explicit `/phase-X-xxx` |
-| ~~`review`~~ | ❌ Ambiguous scope | Use `/spec-review`, `/task-plan-review`, `/code-review T-XXX` |
+**Recovery Flow:**
+```
+Session lost?
+├─ Have uncommitted work? → Commit first, then `/init-context`
+├─ Already committed? → `/init-context` → say `resume`
+└─ Copilot confused? → `/memory-context-hygiene` → `/workflow-resume`
+```
+
+**Multi-device workflow:**
+```
+Device A: Working on Phase 3
+    ↓ commit + push
+Device B: git pull → /init → resume → continue Phase 3
+```
+
+### Workflow Phase Prompts
+
+> ⚠️ **Use explicit `/prompt-name`** to prevent phase skipping in long conversations.
+
+| Prompt | Phase | Action |
+|--------|-------|--------|
+| `/work-intake` | Pre | Capture work description |
+| `/work-review` | Pre | Review work readiness |
+| `/work-update` | Any | Handle requirement changes |
+| `/phase-0-analysis` | 0 | Start Analysis & Design |
+| `/phase-1-spec` | 1 | Start Specification |
+| `/spec-review` | 1 | Review spec quality |
+| `/phase-2-tasks` | 2 | Start Task Planning |
+| `/task-plan-review` | 2 | Review task plan quality |
+| `/phase-3-impl T-XXX` | 3 | Plan specific task (shows approach first) |
+| `/phase-3-impl next` | 3 | Plan next incomplete task |
+| `/impl go` | 3 | Proceed with implementation |
+| `/impl approved` | 3 | Mark task complete (manual review) |
+| `/code-review T-XXX` | 3 | AI review for task |
+| `/code-fix-plan T-XXX` | 3 | Plan fixes for review issues |
+| `/code-fix-apply T-XXX` | 3 | Apply approved fixes |
+| `/phase-4-tests` | 4 | Start Testing phase |
+| `/test-verify` | 4 | Verify test coverage |
+| `/phase-5-done` | 5 | Start Done Check |
+| `/pr-description` | Post | Generate PR description |
+| `/pr-notify-reviewers` | Post | Generate reviewer notification |
 
 ### Safety Commands
 
-| Say | Action |
-|-----|--------|
-| `rollback` | Undo implementation changes |
-| `reset context` | Clear confused state |
-| `abort` | Cancel current operation |
+| Prompt | Action |
+|--------|--------|
+| `/workflow-resume` | Resume from saved state |
+| `/rollback` | Undo implementation changes |
+| `/lite-mode` | Start lite mode |
+| `/memory-context-hygiene` | Clear confused state |
+
+### ⚠️ Avoid These Commands (May Skip Phases)
+
+| Risky | Use Instead |
+|-------|-------------|
+| ~~`approved`~~ | Explicit `/phase-X-xxx` |
+| ~~`go`~~ | `/impl go` |
+| ~~`continue`~~ | Explicit `/phase-X-xxx` |
+| ~~`review`~~ | `/spec-review`, `/code-review T-XXX` |
 
 ---
 
-## � Phase 3 Implementation Flow / Flow Triển khai Phase 3
+## 📊 Workflow Phases
 
-Phase 3 uses a **Two-Gate Model** with flexible review options:
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ SETUP (one-time): /setup-workspace                                  │
+└──────────────────────────────────┬──────────────────────────────────┘
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ SESSION: /init → resume OR new work OR lite mode                    │
+└──────────────────────────────────┬──────────────────────────────────┘
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ WORK INTAKE: /work-intake → /work-review → ⏸️ READY?                │
+└──────────────────────────────────┬──────────────────────────────────┘
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ P0: /phase-0-analysis → analysis.md            → ⏸️ APPROVAL        │
+├─────────────────────────────────────────────────────────────────────┤
+│ P1: /phase-1-spec     → spec.md → [/spec-review]     → ⏸️ APPROVAL  │
+├─────────────────────────────────────────────────────────────────────┤
+│ P2: /phase-2-tasks    → tasks.md → [/task-plan-review] → ⏸️ APPROVAL│
+├─────────────────────────────────────────────────────────────────────┤
+│ P3: /phase-3-impl T-XXX (Two-Gate Model per task)                   │
+│     ├─ GATE 1: Plan → /impl go                                      │
+│     └─ GATE 2: /impl approved OR [/code-review] → [/code-fix-*]     │
+├─────────────────────────────────────────────────────────────────────┤
+│ P4: /phase-4-tests    → tests.md → [/test-verify]  → ⏸️ APPROVAL    │
+├─────────────────────────────────────────────────────────────────────┤
+│ P5: /phase-5-done     → done.md                → ⏸️ APPROVAL        │
+└──────────────────────────────────┬──────────────────────────────────┘
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ POST: /pr-description → /pr-notify-reviewers → git push             │
+└─────────────────────────────────────────────────────────────────────┘
+
+[...] = Optional review prompts - use when quality check needed
+```
+
+### Phase Summary
+
+| Phase | Name | Output | Gate | Review Prompt |
+|-------|------|--------|------|---------------|
+| 0 | Analysis & Design | `analysis.md` | ⏸️ Approval | - |
+| 1 | Specification | `spec.md` | ⏸️ Approval | `/spec-review` |
+| 2 | Task Planning | `tasks.md` | ⏸️ Approval | `/task-plan-review` |
+| 3 | Implementation | `impl-log.md` | ⏸️ Two-Gate | `/code-review`, `/code-fix-*` |
+| 4 | Testing | `tests.md` | ⏸️ Coverage ≥70% | `/test-verify` |
+| 5 | Done Check | `done.md` | ⏸️ DoD verification | - |
+
+---
+
+## 🔧 Phase 3: Two-Gate Implementation
+
+Phase 3 has **two gates** to prevent wrong implementations:
 
 ### Gate 1: Planning Approval
 
@@ -523,118 +255,124 @@ Phase 3 uses a **Two-Gate Model** with flexible review options:
 ⏸️ STOP: "Confirm approach? /impl go"
 ```
 
-**Why?** Lets you verify the approach BEFORE code is written. Prevents wasted effort on wrong direction.
+**Why?** Lets you verify the approach BEFORE code is written.
 
 ### Gate 2: Review Options
 
-After implementation, choose your review style:
+After implementation completes:
 
 | Command | When to Use | Flow |
 |---------|-------------|------|
 | `/impl approved` | Already tested manually | Mark complete → next task |
-| `/code-review T-XXX` | Want AI to review | AI reviews → approve/fix → next task |
+| `/code-review T-XXX` | Want AI review | AI reviews → approve/fix → next task |
 
-### Typical Workflows
+### Recommended Workflows
 
-**Workflow A: Manual Review + Batch AI (Recommended for experienced devs)**
+**Workflow A: Manual Review + Batch AI** ⭐ Recommended
 ```
 /phase-3-impl T-001 → /impl go → [manual test] → /impl approved
 /phase-3-impl T-002 → /impl go → [manual test] → /impl approved
-/phase-3-impl T-003 → /impl go → [manual test] → /impl approved
 ...
 /code-review         ← AI reviews ALL changes at once
 /phase-4-tests
 ```
 
-**Workflow B: AI Review Per Task (Good for complex features)**
+**Workflow B: AI Review Per Task**
 ```
-/phase-3-impl T-001 → /impl go → /code-review T-001 → approved
-/phase-3-impl T-002 → /impl go → /code-review T-002 → approved
+/phase-3-impl T-001 → /impl go → /code-review T-001
+/phase-3-impl T-002 → /impl go → /code-review T-002
 ...
 /phase-4-tests
 ```
 
-**Workflow C: Hybrid (Mix based on task complexity)**
+**Workflow C: Hybrid**
 ```
-/phase-3-impl T-001 → /impl go → /impl approved      # Simple task
-/phase-3-impl T-002 → /impl go → /code-review T-002  # Complex task
+/phase-3-impl T-001 → /impl go → /impl approved      # Simple
+/phase-3-impl T-002 → /impl go → /code-review T-002  # Complex
 ...
 ```
 
 ---
 
-## �📝 Workflow Artifacts / Artifacts Workflow
-
-All artifacts are stored in `docs/runs/<branch-slug>/`:
+## 📁 Project Structure
 
 ```
-docs/runs/feature-add-analytics/
-├── .workflow-state.yaml       # State tracking (AI reads/writes)
-├── README.md                  # Summary for human reviewers
-├── 00_analysis/
-│   └── analysis.md
-├── 01_spec/
-│   └── spec.md
-├── 02_tasks/
-│   └── tasks.md
-├── 03_impl/
-│   └── impl-log.md
-├── 04_tests/
-│   └── tests.md
-├── 05_done/
-│   └── done.md
-└── PR_DESCRIPTION.md
-```
-
-### Iteration Naming
-
-When requirements change, new docs use suffix:
-```
-spec.md          → Original
-spec-update-1.md → First iteration
-spec-update-2.md → Second iteration
+copilot-flow/
+├── .github/
+│   ├── copilot-instructions.md   # Entry point for Copilot
+│   ├── prompts/                  # All workflow prompts
+│   │   ├── init-context.prompt.md
+│   │   ├── work-intake.prompt.md
+│   │   ├── phase-0-analysis.prompt.md
+│   │   ├── phase-1-spec.prompt.md
+│   │   ├── phase-2-tasks.prompt.md
+│   │   ├── phase-3-impl.prompt.md
+│   │   ├── phase-4-tests.prompt.md
+│   │   ├── phase-5-done.prompt.md
+│   │   ├── code-review.prompt.md
+│   │   └── ...
+│   └── instructions/
+│       └── shared/               # Master copies of shared instructions
+│           ├── coding-practices.instructions.md
+│           ├── typescript.instructions.md
+│           └── testing.instructions.md
+├── docs/
+│   ├── workflow/
+│   │   └── contract.md           # Full workflow contract
+│   ├── templates/                # Phase document templates (v4.0)
+│   │   ├── analysis.template.md
+│   │   ├── spec.template.md
+│   │   ├── tasks.template.md
+│   │   ├── impl-log.template.md
+│   │   ├── tests.template.md
+│   │   └── done.template.md
+│   └── runs/
+│       └── <branch-slug>/        # Per-branch workflow docs
+├── WORKSPACE_CONTEXT.md          # Multi-root workspace info
+└── README.md                     # This file
 ```
 
 ---
 
-## 🌐 Multi-Root Workspace / Workspace Đa Root
+## 📚 Guides
 
-This system is designed for multi-root VS Code workspaces:
+Detailed documentation is available in separate guides:
 
-| Root | Purpose |
-|------|---------|
-| `copilot-flow` | **tooling_root** — Prompts, templates, shared instructions |
-| `apphub-vision` | Main application code (default docs_root) |
-| `reviews-assets` | UI component library |
-| `boost-pfs-backend` | Backend services |
+| Guide | Description |
+|-------|-------------|
+| ⭐ [Workflow Example](docs/guides/workflow-example.md) | **Complete end-to-end example** from setup to PR |
+| [Setup Guide](docs/guides/setup.md) | Step-by-step workspace setup, configuration, verification |
+| [Multilingual Guide](docs/guides/multilingual.md) | Why bilingual, format rules, adding new languages |
+| [Workflow Contract](docs/workflow/contract.md) | Full workflow rules and specifications |
 
-### Key Concepts: tooling_root vs docs_root
+### Quick Reference
 
-**tooling_root (STATIC):**
-- Contains prompts, templates, shared instructions
-- Always `copilot-flow/`
-- Never changes per-feature
+**Shared Instructions:** `copilot-flow/.github/instructions/shared/` → synced to all roots
 
-**docs_root (PER-FEATURE):**
-- Where THIS feature's workflow docs go
-- Typically the primary affected root
-- Docs + code in same PR for better context
+**Multi-Root Concepts:**
+- `tooling_root`: Where prompts/templates live (always `copilot-flow`)
+- `docs_root`: Where workflow docs go (per-feature, typically primary affected root)
 
-This ensures:
-- Tooling stays centralized and easy to maintain
-- Workflow docs go with code for better PR context
-- No separate "docs PR" needed
+**Bilingual Format (v4.0):** See [Multilingual Guide](docs/guides/multilingual.md)
+```markdown
+## 🇬🇧 Title / 🇻🇳 Tiêu đề
+
+🇬🇧 English content.
+
+🇻🇳 Vietnamese content.
+```
+
+**Workflow Artifacts:** `<docs_root>/docs/runs/<branch-slug>/`
 
 ---
 
-## ⚙️ Configuration / Cấu hình
+## ⚙️ Configuration
 
 ### WORKSPACE_CONTEXT.md
 
-Update this file when workspace structure changes:
 ```yaml
 meta:
-  tooling_root: copilot-flow      # Where prompts/templates live (STATIC)
+  tooling_root: copilot-flow       # Where prompts/templates live
   default_docs_root: apphub-vision # Default for workflow docs
 
 roots:
@@ -644,14 +382,13 @@ roots:
     # ...
 ```
 
-### State File (.workflow-state.yaml)
+### .workflow-state.yaml
 
-Tracks current workflow progress:
 ```yaml
 meta:
   branch_slug: feature-add-analytics
-  docs_root: apphub-vision         # Where THIS workflow's docs live
-  tooling_root: copilot-flow       # Where templates come from
+  docs_root: apphub-vision
+  tooling_root: copilot-flow
   affected_roots:
     - root: apphub-vision
       role: primary
@@ -665,307 +402,258 @@ status:
 phases:
   phase_0_analysis:
     status: approved
-  phase_1_spec:
-    status: approved
   # ...
 ```
 
 ---
 
-## � Example: Full Workflow Run / Ví dụ: Chạy Workflow Đầy đủ
-
-Below is a complete example of using the governed workflow for a real feature.
-Dưới đây là ví dụ hoàn chỉnh về sử dụng governed workflow cho một tính năng thực.
-
-### Scenario / Tình huống
-
-> **Feature Request:** Add Google Analytics 4 tracking to the dashboard
-> **Yêu cầu:** Thêm tracking Google Analytics 4 vào dashboard
-
-### Step-by-Step / Từng bước
+## 📋 Example: Full Workflow
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ SESSION START                                                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ You: init                                                                    │
-│                                                                              │
-│ Copilot: 📍 Session initialized                                             │
-│          tooling_root: copilot-flow                                          │
-│          default_docs_root: apphub-vision                                    │
-│          No active workflow found.                                           │
-│          Describe your work to start.                                        │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ WORK INTAKE (capturing requirements)                                         │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ You: Add analytics tracking to dashboard to understand user behavior         │
-│                                                                              │
-│ Copilot: ## 📋 Work Description                                              │
-│          | Work Type | FEATURE |                                             │
-│          | Title | Add Analytics Tracking |                                  │
-│          | Affected Roots | apphub-vision |                                  │
-│                                                                              │
-│          ### Missing Information ⚠️                                          │
-│          1. Which analytics provider? (GA4, Mixpanel, custom?)               │
-│          2. Which events to track? (page views, clicks, custom?)             │
-│          3. PII handling? (anonymous or user IDs?)                           │
-│                                                                              │
-│ You: Use GA4, track page views and button clicks, anonymous only             │
-│                                                                              │
-│ Copilot: ✅ Work description complete. Running work-review...                │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ WORK REVIEW (confirming scope)                                               │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ Copilot: ## 🔍 Work Review                                                   │
-│          | Verdict | ✅ READY |                                              │
-│                                                                              │
-│          ### Acceptance Criteria                                             │
-│          - [ ] GA4 SDK integrated                                            │
-│          - [ ] Page view events sent on navigation                           │
-│          - [ ] Button click events tracked                                   │
-│          - [ ] No PII in event data                                          │
-│                                                                              │
-│          Ready to proceed? Say `approved` to continue.                       │
-│                                                                              │
-│ You: approved                                                                │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ PHASE 0: ANALYSIS (⏸️ approval gate)                                         │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ Copilot: ## 🔬 Phase 0: Analysis                                             │
-│                                                                              │
-│          ### Research Summary                                                │
-│          - Dashboard uses Next.js App Router                                 │
-│          - No existing analytics integration                                 │
-│          - GA4 can use gtag.js or @analytics/google-analytics                │
-│                                                                              │
-│          ### Design Options                                                  │
-│          | Option | Pros | Cons |                                            │
-│          | gtag.js | Simple | Manual setup |                                 │
-│          | @analytics/google-analytics | Type-safe | Extra dep |             │
-│                                                                              │
-│          ### Recommendation                                                  │
-│          Use gtag.js with custom hook for simplicity.                        │
-│                                                                              │
-│          ⏸️ STOP: Approve to proceed to Specification.                       │
-│                                                                              │
-│ You: approved                                                                │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ PHASE 1: SPECIFICATION (⏸️ approval gate)                                    │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ Copilot: ## 📝 Phase 1: Specification                                        │
-│                                                                              │
-│          ### Functional Requirements                                         │
-│          FR-001: Initialize GA4 on app load                                  │
-│          FR-002: Track page views on route change                            │
-│          FR-003: Track button clicks with event name                         │
-│                                                                              │
-│          ### Non-Functional Requirements                                     │
-│          NFR-001: No impact on Core Web Vitals                               │
-│          NFR-002: Graceful degradation if GA blocked                         │
-│                                                                              │
-│          ⏸️ STOP: Approve to proceed to Task Planning.                       │
-│                                                                              │
-│ You: approved                                                                │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ PHASE 2: TASK PLANNING (⏸️ approval gate)                                    │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ Copilot: ## 📋 Phase 2: Task Planning                                        │
-│                                                                              │
-│          | ID | Task | Root | Est |                                          │
-│          | T-001 | Create analytics hook | apphub-vision | 30m |             │
-│          | T-002 | Add GA script to layout | apphub-vision | 15m |           │
-│          | T-003 | Integrate page tracking | apphub-vision | 30m |           │
-│          | T-004 | Add click tracking HOC | apphub-vision | 45m |            │
-│                                                                              │
-│          Total: 4 tasks, ~2 hours                                            │
-│                                                                              │
-│          ⏸️ STOP: Approve to start implementation.                           │
-│                                                                              │
-│ You: approved                                                                │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ PHASE 3: IMPLEMENTATION (⏸️ per-task review)                                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ Copilot: ## 🔧 Implementing T-001: Create analytics hook                     │
-│                                                                              │
-│          Created: apps/dashboard/src/hooks/useAnalytics.ts                   │
-│                                                                              │
-│          ⏸️ STOP: Review changes. Say `next task` when ready.                │
-│                                                                              │
-│ You: next task                                                               │
-│                                                                              │
-│ Copilot: ## 🔧 Implementing T-002: Add GA script to layout                   │
-│          ...                                                                 │
-│                                                                              │
-│ (repeat for T-003, T-004)                                                    │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ PHASE 4: TESTING (⏸️ approval gate)                                          │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ Copilot: ## 🧪 Phase 4: Testing                                              │
-│                                                                              │
-│          Created tests for useAnalytics hook                                 │
-│          Run: pnpm --filter dashboard test                                   │
-│                                                                              │
-│          ⏸️ STOP: Run tests and report results.                              │
-│                                                                              │
-│ You: Tests pass, 85% coverage                                                │
-│                                                                              │
-│ Copilot: ✅ Coverage meets threshold. Proceeding to Done Check.              │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ PHASE 5: DONE CHECK (⏸️ final approval)                                      │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│ Copilot: ## ✅ Phase 5: Done Check                                           │
-│                                                                              │
-│          ### Definition of Done                                              │
-│          - [x] All acceptance criteria met                                   │
-│          - [x] Tests pass (85% coverage)                                     │
-│          - [x] No lint errors                                                │
-│          - [x] Docs updated                                                  │
-│                                                                              │
-│          ⏸️ STOP: Approve to generate PR description.                        │
-│                                                                              │
-│ You: approved                                                                │
-│                                                                              │
-│ Copilot: 📄 Generated PR_DESCRIPTION.md                                      │
-│          Ready to commit and push!                                           │
-│                                                                              │
-│          Say `notify` to generate reviewer message.                          │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Key Takeaways / Điểm chính
-
-1. **Every phase has a STOP gate** — You stay in control
-2. **State is saved** — Resume anytime with `resume`
-3. **Questions are asked upfront** — No surprises later
-4. **One task at a time** — Easier to review
-5. **Artifacts generated** — Full documentation trail
-
----
-
-## �📋 Phase Summary / Tóm tắt Phase
-
-| Phase | Name | Output | Gate |
-|-------|------|--------|------|
-| 0 | Analysis & Design | analysis.md | ⏸️ Approval |
-| 1 | Specification | spec.md | ⏸️ Approval + Review |
-| 2 | Task Planning | tasks.md | ⏸️ Approval + Review |
-| 3 | Implementation | impl-log.md | ⏸️ Per-task review |
-| 4 | Testing | tests.md | ⏸️ Coverage ≥70% |
-| 5 | Done Check | done.md | ⏸️ DoD verification |
-
----
-
-## 🔒 Safety Rules / Quy tắc An toàn
-
-Copilot MUST NOT:
-- ❌ Perform git write operations (add, commit, push)
-- ❌ Skip approval gates
-- ❌ Implement multiple tasks at once
-- ❌ Run tests automatically
-- ❌ Create docs in wrong root
-
-Copilot MUST:
-- ✅ STOP after each phase for approval
-- ✅ Update state after each action
-- ✅ Verify docs_root before creating workflow docs
-- ✅ Get templates from tooling_root
-- ✅ Provide verification commands (not run them)
-
----
-
-## 🆘 Troubleshooting / Xử lý Sự cố
-
-### "No workflow found"
-```
-Say: init
-Then: <describe your work>
-```
-
-### "Phase X not approved"
-```
-Complete the review for Phase X first:
-Say: review
-Then: approved (if ready)
-```
-
-### "Wrong root for docs"
-```
-Check .workflow-state.yaml for docs_root
-Or WORKSPACE_CONTEXT.md for default_docs_root
-```
-
-### Resume lost session
-```
-Say: resume
-Copilot will load state from .workflow-state.yaml
+┌─────────────────────────────────────────────────────────────────────────┐
+│ You: /init                                                              │
+│                                                                         │
+│ Copilot: 📍 Session initialized                                         │
+│          tooling_root: copilot-flow                                     │
+│          No active workflow found. Describe your work.                  │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│ You: Add GA4 tracking to dashboard                                      │
+│                                                                         │
+│ Copilot: ## 📋 Work Description                                         │
+│          | Type | FEATURE |                                             │
+│          | Title | Add Analytics Tracking |                             │
+│                                                                         │
+│          ### Missing Information ⚠️                                     │
+│          1. Which events to track?                                      │
+│          2. PII handling?                                               │
+│                                                                         │
+│ You: Track page views and clicks, anonymous only                        │
+│                                                                         │
+│ Copilot: ✅ Ready. Running /work-review...                              │
+│          | Verdict | ✅ READY |                                         │
+│          Say "approved" to proceed.                                     │
+│                                                                         │
+│ You: approved                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│ Copilot: ## Phase 0: Analysis                                           │
+│          - Dashboard uses Next.js App Router                            │
+│          - Recommend: gtag.js with custom hook                          │
+│          ⏸️ STOP: Approve to proceed.                                   │
+│                                                                         │
+│ You: approved                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│ Copilot: ## Phase 1: Specification                                      │
+│          FR-001: Initialize GA4 on app load                             │
+│          FR-002: Track page views on navigation                         │
+│          ⏸️ STOP: Approve to proceed.                                   │
+│                                                                         │
+│ You: approved                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│ Copilot: ## Phase 2: Task Planning                                      │
+│          | ID | Task | Est |                                            │
+│          | T-001 | Create analytics hook | 30m |                        │
+│          | T-002 | Add GA script | 15m |                                │
+│          ⏸️ STOP: Approve to start implementation.                      │
+│                                                                         │
+│ You: approved                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│ Copilot: ## Phase 3: Implementation                                     │
+│          Planning T-001: Create analytics hook                          │
+│          Approach: Create useAnalytics.ts with...                       │
+│          ⏸️ GATE 1: /impl go to proceed                                 │
+│                                                                         │
+│ You: /impl go                                                           │
+│                                                                         │
+│ Copilot: ✅ Created apps/dashboard/src/hooks/useAnalytics.ts            │
+│          ⏸️ GATE 2: /impl approved or /code-review T-001                │
+│                                                                         │
+│ You: /impl approved                                                     │
+│                                                                         │
+│ (repeat for T-002...)                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│ Copilot: ## Phase 4: Testing                                            │
+│          Created tests. Run: pnpm test                                  │
+│          ⏸️ STOP: Report results.                                       │
+│                                                                         │
+│ You: Tests pass, 85% coverage                                           │
+│                                                                         │
+│ Copilot: ✅ Proceeding to Phase 5.                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│ Copilot: ## Phase 5: Done Check                                         │
+│          - [x] All criteria met                                         │
+│          - [x] Tests pass                                               │
+│          ⏸️ STOP: Approve to generate PR.                               │
+│                                                                         │
+│ You: approved                                                           │
+│                                                                         │
+│ Copilot: 📄 Generated PR_DESCRIPTION.md                                 │
+│          Ready to commit and push!                                      │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📚 Related Documents / Tài liệu Liên quan
+## 🆘 Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| "No workflow found" | Run `/init`, then describe work |
+| "Phase X not approved" | Complete review, then approve |
+| "Wrong root for docs" | Check `docs_root` in `.workflow-state.yaml` |
+| Session lost | Run `/workflow-resume` to reload state |
+| Copilot confused | Run `/memory-context-hygiene` or start new chat |
+| Wrong implementation | Run `/rollback` to undo |
+
+---
+
+## ❓ FAQ
+
+<details>
+<summary><b>Q: What if requirements change mid-Phase 3?</b></summary>
+
+Use `/work-update` to:
+1. Document the change
+2. Update spec.md → creates `spec-update-1.md`
+3. Add new tasks → creates `tasks-update-1.md`
+4. Continue with `/phase-3-impl T-XXX`
+
+</details>
+
+<details>
+<summary><b>Q: Can I skip Phase 2 for small features?</b></summary>
+
+Not recommended. Even small features benefit from task breakdown.
+**Alternative:** Use `/lite-mode` for truly simple changes.
+
+</details>
+
+<details>
+<summary><b>Q: How to handle urgent hotfix?</b></summary>
+
+```
+/lite-mode HOTFIX: fix critical login bug
+```
+Lite mode skips analysis/spec/tasks, goes straight to implementation.
+Still tracks changes in `.workflow-state.yaml`.
+
+</details>
+
+<details>
+<summary><b>Q: What if Copilot gets confused or stuck?</b></summary>
+
+```
+/memory-context-hygiene
+```
+Resets Copilot's context. Then `/workflow-resume` to continue from state.
+
+</details>
+
+<details>
+<summary><b>Q: Can multiple people work on same workflow?</b></summary>
+
+Yes. State is in `.workflow-state.yaml`.
+- Person A: `/phase-3-impl T-001` → `/impl approved`
+- Person B: `/workflow-resume` → `/phase-3-impl T-002`
+
+Commit state file frequently to keep in sync.
+
+</details>
+
+<details>
+<summary><b>Q: I switched to another computer, how to continue?</b></summary>
+
+```bash
+# On new device:
+git pull                    # Get latest state file
+code workspace.code-workspace
+```
+Then in Copilot:
+```
+/init-context
+```
+Copilot will detect existing workflow and ask if you want to resume.
+
+</details>
+
+<details>
+<summary><b>Q: What's the difference between /init-context and /workflow-resume?</b></summary>
+
+| Command | Does What |
+|---------|----------|
+| `//init-context` | Full initialization: loads WORKSPACE_CONTEXT.md, checks branch, finds workflow state, shows options |
+| `/workflow-resume` | Direct resume: reads `.workflow-state.yaml` immediately, shows current phase |
+
+**Use `/init-context`** at start of session (recommended).
+**Use `/workflow-resume`** when you know workflow exists and want quick resume.
+
+</details>
+
+<details>
+<summary><b>Q: When should I use /memory-context-hygiene?</b></summary>
+
+Use when Copilot:
+- Repeats itself or gives contradictory answers
+- Forgets what phase you're in
+- Suggests wrong files or approaches
+- Conversation is very long (50+ messages)
+
+After running `/memory-context-hygiene`, follow with `/workflow-resume` to reload state.
+
+</details>
+
+---
+
+## 📚 References
 
 | Document | Purpose |
 |----------|---------|
-| [Workflow Contract](docs/workflow/contract.md) | Full rules and contract |
-| [Templates](docs/templates/) | Phase document templates |
+| ⭐ [Workflow Example](docs/guides/workflow-example.md) | Complete end-to-end example |
+| [Setup Guide](docs/guides/setup.md) | Detailed workspace setup |
+| [Multilingual Guide](docs/guides/multilingual.md) | Bilingual format, adding languages |
+| [Workflow Contract](docs/workflow/contract.md) | Full rules and specifications |
+| [Templates](docs/templates/) | Phase document templates (v4.0) |
 | [Copilot Instructions](.github/copilot-instructions.md) | Entry point for Copilot |
+| [WORKSPACE_CONTEXT.md](WORKSPACE_CONTEXT.md) | Multi-root workspace config |
 
 ---
 
-## 🏷️ Version / Phiên bản
+## 🔒 Safety Rules
 
-- **Workflow Version:** 2.0
-- **Template Version:** 4.0 (Inline Bilingual with Visual Flags)
-- **Last Updated:** 2026-01-25
-- **Features:** Multi-root, State Management, Multilingual Docs, Iterations
+**Copilot MUST:**
+- ✅ STOP after each phase for approval
+- ✅ Update state after each action
+- ✅ Show plan before implementation (Gate 1)
+- ✅ Get templates from tooling_root
+
+**Copilot MUST NOT:**
+- ❌ Run git write operations (add, commit, push)
+- ❌ Skip approval gates
+- ❌ Implement multiple tasks at once
+- ❌ Run tests automatically
 
 ---
 
-## 📄 License / Giấy phép
+## 🏷️ Version
 
-Internal use only / Chỉ sử dụng nội bộ
+| Item | Version |
+|------|---------|
+| Workflow | 2.0 |
+| Template Format | 4.0 (Inline Bilingual with Visual Flags) |
+| Last Updated | 2026-01-25 |
 
 ---
 
