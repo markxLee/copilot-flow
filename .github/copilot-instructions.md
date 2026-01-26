@@ -5,6 +5,38 @@
 
 ---
 
+## ⚠️ CRITICAL: Session Continuity (AI có memory giữa sessions)
+
+```yaml
+PROBLEM: AI KHÔNG nhớ gì từ session trước
+SOLUTION: Auto-detect workflow từ WORKSPACE_CONTEXT.md + git branch
+
+ON_EVERY_NEW_SESSION:
+  # Khi user nói "init", "resume", "tiếp tục", hoặc bắt đầu session mới:
+  
+  1. READ WORKSPACE_CONTEXT.md first:
+     file: copilot-flow/WORKSPACE_CONTEXT.md (hoặc tìm trong workspace)
+     extract: meta.default_docs_root → "apphub-vision"
+     
+  2. GET current branch FROM default_docs_root (QUAN TRỌNG!):
+     command: git -C <default_docs_root> rev-parse --abbrev-ref HEAD
+     example: git -C apphub-vision rev-parse --abbrev-ref HEAD
+     result: "feature/bp-32-add-payment-detail"
+     
+  3. EXTRACT slug (strip prefix):
+     prefixes: feature/, bugfix/, hotfix/, fix/, feat/, chore/, refactor/
+     result: "bp-32-add-payment-detail"
+     
+  4. CHECK for existing workflow:
+     path: "<default_docs_root>/docs/runs/<slug>/.workflow-state.yaml"
+     example: "apphub-vision/docs/runs/bp-32-add-payment-detail/.workflow-state.yaml"
+     
+  5. IF EXISTS → READ state file and RESUME workflow
+     IF NOT → ASK user to start new workflow
+```
+
+---
+
 ## 🚀 Session Start - Run Init First
 
 **On EVERY new conversation**, Copilot SHOULD:

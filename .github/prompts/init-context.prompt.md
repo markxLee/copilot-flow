@@ -101,27 +101,54 @@ cross_root_detection:
 ### Step 4: Check for Existing Workflow / Kiểm tra Workflow đang có
 
 ```yaml
-workflow_detection:
-  1. Get current branch:
-     command: git rev-parse --abbrev-ref HEAD
-     normalize: lowercase, hyphens only
-     result: <branch-slug>
-     
-  2. Check for state file in possible docs_roots:
-     search_order:
-       - <default_docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
-       - <primary_root>/docs/runs/<branch-slug>/.workflow-state.yaml
-       - All roots: */docs/runs/<branch-slug>/.workflow-state.yaml
-     
-  3. If state file EXISTS:
-     - Read meta.docs_root from it
-     - Read meta.base_branch from it
-     - Load and show resume prompt
-     - goto: Step 5A (Resume Mode)
-     
-  4. If state file NOT EXISTS:
-     action: Ask what user wants to do
-     goto: Step 5B (New Session Mode)
+CRITICAL_AUTO_DETECT_WORKFLOW:
+  # ⚠️ AI KHÔNG có memory giữa sessions
+  # PHẢI auto-detect workflow từ WORKSPACE_CONTEXT.md + git branch
+  
+  step_1_read_workspace_context_first:
+    # ĐỌC WORKSPACE_CONTEXT.md TRƯỚC để biết default_docs_root
+    file: copilot-flow/WORKSPACE_CONTEXT.md
+    extract: meta.default_docs_root
+    example: "apphub-vision"
+    
+  step_2_get_branch_from_docs_root:
+    # QUAN TRỌNG: Chạy git TẠI default_docs_root, không phải tại tooling_root
+    command: git -C <default_docs_root> rev-parse --abbrev-ref HEAD
+    example: git -C apphub-vision rev-parse --abbrev-ref HEAD
+    result: "feature/bp-32-add-payment-detail"
+    
+  step_3_extract_slug:
+    # Strip common branch prefixes
+    prefixes_to_strip:
+      - "feature/"
+      - "bugfix/"
+      - "hotfix/"
+      - "fix/"
+      - "feat/"
+      - "chore/"
+      - "refactor/"
+    
+    example: |
+      input:  "feature/bp-32-add-payment-detail"
+      output: "bp-32-add-payment-detail"
+      
+  step_4_construct_path:
+    pattern: "<default_docs_root>/docs/runs/<slug>/.workflow-state.yaml"
+    example: "apphub-vision/docs/runs/bp-32-add-payment-detail/.workflow-state.yaml"
+    
+  step_5_check_and_act:
+    if_file_exists:
+      action: |
+        1. READ .workflow-state.yaml
+        2. Display workflow status (phase, task, progress)
+        3. Suggest explicit next action prompt
+        4. goto: Step 5A (Resume Mode)
+        
+    if_file_not_exists:
+      action: |
+        1. Inform user: "No workflow found for branch `<branch>` (slug: `<slug>`)"
+        2. Ask: "Start new workflow? Describe your work or say `/work-intake`"
+        3. goto: Step 5B (New Session Mode)
 ```
 
 ### Step 4B: Detect Base Branch (ALWAYS CONFIRM) / Xác định Branch Gốc

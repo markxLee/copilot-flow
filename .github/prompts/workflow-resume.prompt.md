@@ -26,22 +26,56 @@ TRIGGER_RULES:
 ### Step 1: Locate State File / Tìm file trạng thái
 
 ```yaml
-search_order:
-  1. Current branch's state file:
-     - Run: git rev-parse --abbrev-ref HEAD
-     - Normalize to branch-slug
-     - Search in possible docs_roots:
-       a. <default_docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
-       b. <primary_root>/docs/runs/<branch-slug>/.workflow-state.yaml
-       c. All roots: */docs/runs/<branch-slug>/.workflow-state.yaml
-     
-  2. If found:
-     - Read meta.docs_root from state file
-     - Use that value for all subsequent operations
+CRITICAL_WORKFLOW_DETECTION:
+  # AI không có memory giữa sessions
+  # PHẢI detect workflow từ WORKSPACE_CONTEXT.md + git branch
   
-  3. If not found:
-     - List available runs across all roots
-     - Ask user which workflow to resume
+  step_1_read_workspace_context_first:
+    # ĐỌC WORKSPACE_CONTEXT.md TRƯỚC để biết default_docs_root
+    file: copilot-flow/WORKSPACE_CONTEXT.md
+    extract: meta.default_docs_root
+    example: "apphub-vision"
+    
+  step_2_get_branch_from_docs_root:
+    # QUAN TRỌNG: Chạy git TẠI default_docs_root, không phải tại tooling_root!
+    # Vì mỗi root có thể có branch khác nhau
+    command: git -C <default_docs_root> rev-parse --abbrev-ref HEAD
+    example: git -C apphub-vision rev-parse --abbrev-ref HEAD
+    result: "feature/bp-32-add-payment-detail"
+    
+  step_3_extract_slug:
+    # Strip common prefixes to get slug
+    prefixes_to_strip:
+      - "feature/"
+      - "bugfix/"
+      - "hotfix/"
+      - "fix/"
+      - "feat/"
+      - "chore/"
+      - "refactor/"
+    
+    logic: |
+      branch = "feature/bp-32-add-payment-detail"
+      slug = branch.replace(/^(feature|bugfix|hotfix|fix|feat|chore|refactor)\//, '')
+      slug = "bp-32-add-payment-detail"
+    
+  step_4_construct_state_path:
+    pattern: "<default_docs_root>/docs/runs/<slug>/.workflow-state.yaml"
+    example: "apphub-vision/docs/runs/bp-32-add-payment-detail/.workflow-state.yaml"
+    
+  step_5_check_exists:
+    if_exists:
+      action: READ and RESUME workflow
+      output: Show workflow status and suggest next action
+      
+    if_not_exists:
+      action: ASK user
+      message: |
+        "Không tìm thấy workflow cho branch `<branch>` (slug: `<slug>`)
+        
+        Bạn muốn:
+        1. Bắt đầu workflow mới? → `/work-intake`
+        2. Tìm workflow khác? → Cho tôi biết branch name"
 ```
 
 ### Step 2: Parse State / Đọc trạng thái
