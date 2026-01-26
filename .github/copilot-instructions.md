@@ -203,6 +203,7 @@ MANDATORY_CHECK:
 | `/work-intake` | Capture work description |
 | `/work-review` | Review work readiness |
 | `/work-update` | Handle requirement changes & iterations |
+| `/add-task` | Add new task mid-Phase 3 (syncs all docs) |
 | `/phase-0-analysis` | Start Phase 0: Analysis |
 | `/phase-1-spec` | Start Phase 1: Specification |
 | `/spec-review` | Review spec quality |
@@ -417,6 +418,7 @@ other_roots (e.g., reviews-assets):
 | `.github/prompts/init-context.prompt.md` | Initialize session context |
 | `.github/prompts/work-intake.prompt.md` | Capture work description |
 | `.github/prompts/work-update.prompt.md` | Handle requirement changes & iterations |
+| `.github/prompts/add-task.prompt.md` | Add task mid-Phase 3 with doc sync |
 | `.github/prompts/work-review.prompt.md` | Review readiness gate |
 | `.github/prompts/phase-0-analysis.prompt.md` | Phase 0: Analysis & Design |
 | `.github/prompts/phase-1-spec.prompt.md` | Phase 1: Specification |

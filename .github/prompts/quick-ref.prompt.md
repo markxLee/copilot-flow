@@ -273,6 +273,7 @@ Luôn dùng `/prompt-name` tường minh để đảm bảo đúng flow.
 | `/work-intake` | Capture work description | Thu thập mô tả công việc |
 | `/work-review` | After work-intake, check readiness | Sau work-intake, kiểm tra sẵn sàng |
 | `/work-update` | Handle requirement changes | Xử lý thay đổi yêu cầu |
+| `/add-task` | Add task mid-Phase 3 (syncs all docs) | Thêm task giữa Phase 3 (đồng bộ docs) |
 | `/phase-0-analysis` | Start Phase 0 Analysis | Bắt đầu Phase 0 Phân tích |
 | `/phase-1-spec` | Start Phase 1 Specification | Bắt đầu Phase 1 Đặc tả |
 | `/spec-review` | Review spec (before Phase 2) | Review spec (trước Phase 2) |
