@@ -170,7 +170,7 @@ Device B: git pull → /init → resume → continue Phase 3
 | `/pr-description` | Post | Generate PR description |
 | `/pr-notify-reviewers` | Post | Generate reviewer notification |
 
-### Safety Commands
+### Safety & Quality Commands
 
 | Prompt | Action |
 |--------|--------|
@@ -178,6 +178,9 @@ Device B: git pull → /init → resume → continue Phase 3
 | `/rollback` | Undo implementation changes |
 | `/lite-mode` | Start lite mode |
 | `/memory-context-hygiene` | Clear confused state |
+| `/strict-review` | Self-review before PR (critical reviewer) |
+| `/strict-review <file>` | Review specific file |
+| `/strict-review --pr` | Full PR review with hater prediction |
 
 ### ⚠️ Avoid These Commands (May Skip Phases)
 

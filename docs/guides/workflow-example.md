@@ -16,9 +16,10 @@
 7. [Part 6: Phase 3 - Implementation](#-part-6-phase-3---implementation)
 8. [Part 7: Phase 4 - Testing](#-part-7-phase-4---testing)
 9. [Part 8: Phase 5 - Done Check](#-part-8-phase-5---done-check)
-10. [Part 9: PR & Notification](#-part-9-pr--notification)
-11. [Bonus: Handling Changes](#-bonus-handling-changes)
-12. [Quick Reference Card](#-quick-reference-card)
+10. [Part 8.5: Self-Review Before PR](#-part-85-self-review-before-pr-optional-but-recommended) ← **NEW**
+11. [Part 9: PR & Notification](#-part-9-pr--notification)
+12. [Bonus: Handling Changes](#-bonus-handling-changes)
+13. [Quick Reference Card](#-quick-reference-card)
 
 ---
 
@@ -1012,13 +1013,149 @@ Copilot: ### 🎯 Final Verdict / 🇻🇳 Kết luận Cuối cùng
          
          ### 🇬🇧 Next Steps / 🇻🇳 Bước Tiếp theo
          
-         1. `/pr-description` → Generate PR description
-         2. `/pr-notify-reviewers` → Generate notification message
-         3. `git add . && git commit` → Commit changes
-         4. `git push` → Push to remote
-         5. Create PR on GitHub/GitLab
+         1. `/strict-review --pr` → Self-review before creating PR
+         2. `/pr-description` → Generate PR description
+         3. `/pr-notify-reviewers` → Generate notification message
+         4. `git add . && git commit` → Commit changes
+         5. `git push` → Push to remote
+         6. Create PR on GitHub/GitLab
          
-         Say `/pr-description` to continue.
+         Say `/strict-review --pr` to self-review first.
+
+---
+
+## 🔍 Part 8.5: Self-Review Before PR (Optional but Recommended)
+
+> Use `/strict-review` to catch issues before reviewers do.
+
+### Step 8.5.1: Run Strict Self-Review
+
+```
+You: /strict-review --pr
+
+Copilot: ## 🔍 Strict Code Review
+         
+         ### Summary
+         | Verdict | 🟡 NEEDS WORK |
+         | Files | 7 |
+         | Issues | 🔴0 🟠2 🟡3 🟢2 🔵4 |
+         
+         ---
+         
+         ### 🔮 Predicted Criticisms for THIS Code
+         
+         #### What Each Hater Will Say
+         - **Architecture Astronaut:** `notificationStore.ts:L15` — "Why not use a notification service class instead of raw store?"
+         - **Performance Paranoiac:** `useNotificationSocket.ts:L42` — "Should debounce reconnection attempts"
+         - **Type Terrorist:** `NotificationToast.tsx:L28` — "notification.data is typed as any"
+         - **Security Sheriff:** `useNotificationSocket.ts:L55` — "WebSocket URL from env without validation"
+         
+         #### Top 5 Weak Spots
+         | # | Location | Issue | Hater | Defense Needed |
+         |---|----------|-------|-------|----------------|
+         | 1 | useNotificationSocket.ts:L42 | No reconnect backoff | Performance | Add exponential backoff |
+         | 2 | NotificationToast.tsx:L28 | any type | Type Terrorist | Define proper type |
+         | 3 | notificationStore.ts:L67 | No max notifications limit | Memory | Add limit |
+         | 4 | useNotificationSocket.ts:L55 | No URL validation | Security | Validate URL |
+         | 5 | NotificationCenter.tsx:L89 | Missing loading state | UX | Add skeleton |
+         
+         #### Predicted PR Questions
+         1. "Why Zustand instead of React Context at notificationStore.ts?"
+         2. "What happens if WebSocket disconnects mid-notification?"
+         3. "How do you handle notification overflow?"
+         
+         ---
+         
+         ### 🟠 High Priority
+         
+         #### [HIGH-001] Missing reconnection backoff
+         **File:** `useNotificationSocket.ts:L42` | **Category:** Performance
+         **Problem:** Immediate reconnection on disconnect can cause server hammering
+         **Fix:** Add exponential backoff (1s, 2s, 4s, 8s... max 30s)
+         
+         #### [HIGH-002] Untyped notification data
+         **File:** `NotificationToast.tsx:L28` | **Category:** Type Safety
+         **Problem:** `notification.data` is typed as `any`
+         **Fix:** Define `NotificationPayload` interface in types.ts
+         
+         ---
+         
+         ### 🟡 Medium Priority
+         - [MED-001] No max notifications limit in store (memory concern)
+         - [MED-002] Missing loading state in NotificationCenter
+         - [MED-003] WebSocket URL not validated before connection
+         
+         ---
+         
+         ### ✅ What's Good
+         - Clean separation of concerns (store, hook, components)
+         - Proper cleanup in useEffect
+         - Good test coverage (78%)
+         - Consistent naming conventions
+         
+         ---
+         
+         ### 🛡️ Pre-emptive Defense Suggestions
+         1. Add comment at `notificationStore.ts:L15`: `// Using Zustand for: persistence, devtools, minimal boilerplate`
+         2. Add reconnect backoff logic at `useNotificationSocket.ts:L42`
+         3. Define `NotificationPayload` type to replace `any`
+         4. Add max notification limit (e.g., 100) with FIFO eviction
+         
+         ---
+         
+         💡 **Recommendation:** Fix HIGH issues before creating PR.
+         
+         Reply:
+         - `fix` → I'll create a fix plan for these issues
+         - `skip` → Proceed to PR anyway
+         - `<issue-id>` → Focus on specific issue
+```
+
+### Step 8.5.2: Fix Critical Issues (Optional)
+
+```
+You: fix
+
+Copilot: ## 🔧 Fix Plan for Self-Review Issues
+         
+         ### Fixes to Apply
+         
+         | # | Issue | File | Fix |
+         |---|-------|------|-----|
+         | 1 | HIGH-001 | useNotificationSocket.ts | Add exponential backoff |
+         | 2 | HIGH-002 | NotificationToast.tsx | Define NotificationPayload type |
+         | 3 | MED-001 | notificationStore.ts | Add max limit (100) |
+         
+         ⏸️ STOP: Apply these fixes? Say `go` to proceed.
+
+You: go
+
+Copilot: ✅ Applied fixes:
+         
+         - `useNotificationSocket.ts` → Added exponential backoff (1s-30s)
+         - `types.ts` → Added NotificationPayload interface
+         - `NotificationToast.tsx` → Updated to use NotificationPayload
+         - `notificationStore.ts` → Added MAX_NOTIFICATIONS = 100
+         
+         Run `/strict-review` again to verify, or continue to `/pr-description`.
+
+You: /strict-review --pr
+
+Copilot: ## 🔍 Strict Code Review
+         
+         ### Summary
+         | Verdict | 🟢 APPROVED |
+         | Files | 8 |
+         | Issues | 🔴0 🟠0 🟡1 🟢3 🔵2 |
+         
+         ### Remaining Minor Issues
+         - [LOW-001] Consider adding JSDoc to public functions
+         - [NITPICK-001] Inconsistent import ordering
+         
+         ### ✅ All HIGH issues resolved!
+         
+         Ready for PR. Continue with `/pr-description`.
+```
 
 ---
 
@@ -1424,12 +1561,14 @@ Copilot: ## 📋 Quick Reference Card
          | `/pr-description` | Generate PR description |
          | `/pr-notify-reviewers` | Generate notification |
          
-         ### Safety
+         ### Safety & Quality
          | Prompt | Action |
          |--------|--------|
          | `/rollback` | Undo changes |
          | `/memory-context-hygiene` | Clear confused state |
          | `/lite-mode <desc>` | Quick task mode |
+         | `/strict-review` | Self-review before PR (critical reviewer) |
+         | `/strict-review --pr` | Full PR review with hater prediction |
 ```
 
 ---
