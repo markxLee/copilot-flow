@@ -6,6 +6,47 @@ Bạn đóng vai trò **Kiểm toán Chất lượng Test và Phân tích Độ 
 
 ---
 
+## ⚠️ CRITICAL: Coverage Gate / Cổng Độ phủ (BẮT BUỘC)
+
+```yaml
+##############################################
+#  MINIMUM TEST COVERAGE: 70% (NON-NEGOTIABLE)
+##############################################
+
+coverage_gate:
+  minimum: 70%
+  scope: ALL changed files from Phase 3
+  
+  BEFORE_VERIFICATION:
+    1. ASK user for coverage report if not provided
+    2. Calculate overall coverage %
+    3. Check EACH file's coverage individually
+    
+  COVERAGE_CHECK_MANDATORY:
+    - MUST have coverage data before proceeding
+    - MUST report exact % for each changed file
+    - MUST FAIL verification if any file < 70% (unless justified)
+    
+  IF_COVERAGE_MISSING:
+    action: STOP
+    message: |
+      ⚠️ Coverage data required!
+      Please run: pnpm test --coverage
+      And provide the coverage report.
+      
+  IF_COVERAGE_BELOW_70:
+    action: FAIL verification
+    message: |
+      ❌ Coverage below 70% threshold!
+      Files below threshold:
+      - <file>: <X>% (needs +<Y>%)
+      
+      Must add more tests before Phase 5.
+      Return to /phase-4-tests to add tests.
+```
+
+---
+
 ## Trigger / Kích hoạt
 
 ```yaml
@@ -25,7 +66,7 @@ TRIGGER_RULES:
   prerequisites:
     - All test batches written and executed
     - User has run tests and reported results
-```
+    - **COVERAGE REPORT PROVIDED (required for verification)**
 
 ---
 
@@ -74,12 +115,23 @@ checklist:
 ### 2. Coverage Analysis / Phân tích Độ phủ
 
 ```yaml
+##############################################
+#  🎯 COVERAGE ≥ 70% IS MANDATORY FOR PASS
+##############################################
+
 checklist:
-  - Overall coverage ≥ 70%: ⬜
+  - ⚠️ COVERAGE REPORT PROVIDED: ⬜  # MUST check first!
+  - 🎯 Overall coverage ≥ 70%: ⬜     # BLOCKING - cannot PASS if ❌
+  - 🎯 EACH changed file ≥ 70%: ⬜    # BLOCKING - check individually
   - All new files have tests: ⬜
   - All modified functions tested: ⬜
   - Critical paths covered: ⬜
   - Edge cases covered: ⬜
+  
+coverage_blocking_rule: |
+  If coverage < 70%:
+    verdict = FAIL (no exceptions without user approval)
+    action = Return to /phase-4-tests
 ```
 
 ### 3. Test Quality / Chất lượng Test
@@ -257,17 +309,35 @@ Lines        : <X>% ( <covered>/<total> )
 ## Verdict Decision / Quyết định Kết luận
 
 ```yaml
+##############################################
+#  VERDICT RULES (STRICTLY ENFORCED)
+##############################################
+
 PASS_criteria:
-  - All tests passing
-  - Coverage ≥ 70%
-  - No critical issues
-  - All FR covered by tests
+  ALL_REQUIRED:  # Must meet ALL criteria
+    - All tests passing
+    - 🎯 Coverage ≥ 70% (MANDATORY - check FIRST)
+    - No critical issues
+    - All FR covered by tests
+    - Coverage report provided and verified
 
 FAIL_criteria:
-  - Any test failing
-  - Coverage < 70% without justified exclusions
-  - Critical issues unresolved
-  - FR without test coverage
+  ANY_ONE_FAILS:  # Fail if ANY criterion met
+    - Any test failing
+    - ❌ Coverage < 70% (AUTOMATIC FAIL - no negotiation)
+    - Coverage report not provided
+    - Critical issues unresolved
+    - FR without test coverage
+    
+coverage_exception:
+  allowed_only_if:
+    - User EXPLICITLY approves exception
+    - Justification documented in tests.md
+    - Only for: generated code, type definitions, config files
+  NOT_allowed:
+    - "We can skip coverage for this file"
+    - "Coverage is close enough at 65%"
+    - Assuming user approval without asking
 ```
 
 ---

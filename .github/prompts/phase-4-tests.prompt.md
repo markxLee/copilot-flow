@@ -6,6 +6,34 @@ Bạn đóng vai trò **Kỹ sư Test và Chuyên gia Đảm bảo Chất lượ
 
 ---
 
+## ⚠️ CRITICAL: Coverage Requirement / Yêu cầu Độ phủ (BẮT BUỘC)
+
+```yaml
+##############################################
+#  MINIMUM TEST COVERAGE: 70% (NON-NEGOTIABLE)
+##############################################
+
+coverage_rule:
+  minimum: 70%
+  scope: ALL changed files from Phase 3
+  enforced: ALWAYS - no exceptions without explicit user approval
+  
+  on_coverage_check:
+    MUST_DO:
+      - Run coverage command BEFORE declaring batch complete
+      - Report exact coverage % in output
+      - If < 70%: Add more tests until ≥ 70%
+      - Document coverage per file
+      
+    MUST_NOT:
+      - Skip coverage check
+      - Declare batch complete without coverage report
+      - Accept < 70% without explicit user approval
+      - Move to test-verify without meeting 70%
+```
+
+---
+
 ## Trigger / Kích hoạt
 
 ```yaml
@@ -25,7 +53,7 @@ TRIGGER_RULES:
   prerequisites:
     - ALL Phase 3 tasks must have status "approved"
     - code-review passed for ALL tasks
-```
+    - UNDERSTAND: Must achieve ≥70% coverage
 
 ---
 
@@ -64,18 +92,21 @@ Viết tests để xác nhận implementation từ Phase 3. Đảm bảo tính �
 
 **MUST / PHẢI:**
 - Write tests in BATCHES (not all at once)
-- Target ≥70% coverage on changed code
+- **🎯 ACHIEVE ≥70% COVERAGE** on ALL changed files (CRITICAL)
+- **📊 RUN AND REPORT COVERAGE** for each batch before marking complete
 - Document failures explicitly
 - Analyze why tests fail (not just fix silently)
-- Update tests.md after each batch
+- Update tests.md after each batch with coverage %
 - STOP after each batch for review
 
 **MUST NOT / KHÔNG ĐƯỢC:**
 - Skip failing tests
 - Modify implementation without approval
-- Declare tests complete prematurely
+- **❌ SKIP COVERAGE CHECK** - always run coverage command
+- **❌ DECLARE COMPLETE without coverage report showing ≥70%**
 - Claim completion when coverage < 70%
 - Run tests automatically (user runs manually)
+- **❌ PROCEED TO test-verify if any file < 70% coverage**
 
 ---
 
