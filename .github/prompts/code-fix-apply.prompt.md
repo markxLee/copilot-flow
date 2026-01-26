@@ -12,7 +12,7 @@ Bạn đóng vai trò **Người Thực thi Sửa Code Có Kiểm soát**.
 TRIGGER_RULES:
   explicit_only: true
   accepted_triggers:
-    - "/code-fix-apply T-XXX"  # Explicit prompt reference with task ID (REQUIRED)
+    - "/code-fix-apply"  # Apply all fixes from approved fix plan
     
   rejected_triggers:
     - "apply fixes", "áp dụng"         # ⚠️ TOO VAGUE
@@ -23,8 +23,8 @@ TRIGGER_RULES:
     in long conversations where context may be confused.
     
   prerequisites:
-    - Fix plan created and approved for task T-XXX
-    - User explicitly approved the fix plan
+    - Fix plan created via /code-fix-plan
+    - User explicitly approved the fix plan (said "approved")
 ```
 
 ---
@@ -35,17 +35,23 @@ TRIGGER_RULES:
 pre_checks:
   1. Verify fix plan exists and approved:
      check: User explicitly said "approved" for fix plan
-     if_not: STOP - "Fix plan not approved. Review the plan first."
+     if_not: STOP - "Fix plan not approved. Run `/code-fix-plan` first."
      
   2. Load fix plan:
-     from: Previous code-fix-plan output
+     sources:
+       - Previous /code-fix-plan output in conversation
+       - state.status.blockers (for affected tasks)
+     includes:
+       - All findings mapped to fixes
+       - Tasks affected (may be 1 or many)
+       - Batch structure
      
   3. Identify current batch:
      - If first apply: batch = 1 (critical + major)
      - If continuing: batch = next incomplete batch
      
-  4. Verify target root:
-     from: tasks[current_task].root
+  4. Determine affected roots:
+     from: Fix plan context (may be multiple tasks, multiple roots)
 ```
 
 ---
@@ -136,8 +142,9 @@ steps:
 
 | Field | Value |
 |-------|-------|
-| Task | T-XXX: <title> |
-| Root | <target_root> |
+| Fix Mode | All Review Findings / Single Task |
+| Tasks Affected | T-003, T-007 / T-XXX only |
+| Root(s) | <target_root(s)> |
 | Batch | <N> of <total> |
 | Fixes | <count> fixes |
 
@@ -263,18 +270,23 @@ After verification, reply `review` to re-run code review.
 ```yaml
 # When applying batch
 status:
-  last_action: "Applying fix batch <N> for T-XXX"
+  last_action: "Applying fix batch <N>"
 
+# For each affected task
 tasks:
   T-XXX:
+    status: fixing
+    current_fix_batch: <N>
+  T-YYY:
     status: fixing
     current_fix_batch: <N>
 
 # After batch applied
 status:
-  last_action: "Applied fix batch <N> for T-XXX"
+  last_action: "Applied fix batch <N> (<count> fixes)"
   next_action: "Verify fixes then re-review"
 
+# For each affected task
 tasks:
   T-XXX:
     fix_plan:
@@ -286,6 +298,8 @@ tasks:
 tasks:
   T-XXX:
     status: awaiting-review  # Ready for re-review
+  T-YYY:
+    status: awaiting-review
 ```
 
 ---
@@ -355,17 +369,18 @@ if_user_rejects_fix:
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
   after_fixes_verified:
-    recommended: "/code-review T-XXX"
-    command: "Run: /code-review T-XXX to re-review after fixes"
+    recommended: "/code-review"
+    command: "Run: /code-review to re-review after fixes"
+    note: "Will batch review all affected changes"
     
   if_more_batches:
-    recommended: "/code-fix-apply T-XXX"
-    command: "Run: /code-fix-apply T-XXX to apply next batch"
+    recommended: "/code-fix-apply"
+    command: "Run: /code-fix-apply to apply next batch"
     
   DO_NOT_SAY:
     - "Reply verified to continue"
     - "Say review to proceed"
     
   MUST_SAY:
-    - "Run `/code-review T-XXX` to re-review after fixes"
+    - "Run `/code-review` to re-review after fixes"
 ```

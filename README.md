@@ -159,9 +159,11 @@ Device B: git pull → /init → resume → continue Phase 3
 | `/phase-3-impl next` | 3 | Plan next incomplete task |
 | `/impl go` | 3 | Proceed with implementation |
 | `/impl approved` | 3 | Mark task complete (manual review) |
-| `/code-review T-XXX` | 3 | AI review for task |
-| `/code-fix-plan T-XXX` | 3 | Plan fixes for review issues |
-| `/code-fix-apply T-XXX` | 3 | Apply approved fixes |
+| `/code-review T-XXX` | 3 | AI review for specific task |
+| `/code-review` | 3 | AI review all completed tasks (batch) |
+| `/code-fix-plan` | 3 | Plan fixes for ALL review findings |
+| `/code-fix-plan T-XXX` | 3 | Plan fixes for specific task only |
+| `/code-fix-apply` | 3 | Apply approved fixes |
 | `/phase-4-tests` | 4 | Start Testing phase |
 | `/test-verify` | 4 | Verify test coverage |
 | `/phase-5-done` | 5 | Start Done Check |

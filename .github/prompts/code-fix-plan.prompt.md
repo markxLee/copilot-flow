@@ -12,7 +12,8 @@ Bạn đóng vai trò **Kỹ sư Cấp cao và Người Lập kế hoạch Khắ
 TRIGGER_RULES:
   explicit_only: true
   accepted_triggers:
-    - "/code-fix-plan T-XXX"  # Explicit prompt reference with task ID (REQUIRED)
+    - "/code-fix-plan"        # Fix all issues from last code review
+    - "/code-fix-plan T-XXX"  # Fix issues for specific task only (optional filter)
     
   rejected_triggers:
     - "fix plan", "kế hoạch sửa"        # ⚠️ TOO VAGUE
@@ -23,7 +24,41 @@ TRIGGER_RULES:
     in long conversations where context may be confused.
     
   prerequisites:
-    - code-review verdict = REQUEST CHANGES for task T-XXX
+    - Last code-review verdict = REQUEST CHANGES
+    - Issues exist in state blockers or last review output
+```
+
+---
+
+## Mode Detection / Phát hiện Chế độ
+
+```yaml
+mode_detection:
+  if_has_task_id:
+    mode: single_task
+    source: |
+      - Issues from last review for T-XXX only
+      - state.tasks.T-XXX.issues (if saved)
+    use_when: Want to fix one task at a time
+    
+  if_no_task_id:
+    mode: all_review_findings
+    source: |
+      - ALL issues from last code review (single or batch)
+      - state.status.blockers (code_review_findings)
+      - May span multiple tasks if batch review
+    use_when:
+      - After batch review with issues in multiple tasks
+      - Want to fix everything at once
+      
+  output_mode_in_context:
+    required: true
+    format: |
+      | Mode | Value |
+      |------|-------|
+      | Fix Mode | All Review Findings / Single Task (T-XXX) |
+      | Source | Last batch review / Last T-XXX review |
+      | Tasks Affected | T-003, T-007 / T-XXX only |
 ```
 
 ---
@@ -32,17 +67,30 @@ TRIGGER_RULES:
 
 ```yaml
 pre_checks:
-  1. Verify review was done:
-     check: tasks[current_task].review_verdict == "request-changes"
-     if_not: STOP - "No review findings. Run `review` first."
+  1. Verify review was done with issues:
+     check: |
+       - Last code review verdict == REQUEST_CHANGES
+       - OR state.status.blockers contains code_review_findings
+     if_not: STOP - "No review findings. Run `/code-review` first."
      
   2. Load review findings:
-     from: Last code review output OR state.tasks[current_task].issues
-     
-  3. Get current task context:
-     - Task ID and description
-     - Files changed
-     - Target root
+     sources_priority:
+       1. Last code review output in conversation (most recent)
+       2. state.status.blockers.code_review_findings
+       3. state.tasks[*].issues (for affected tasks)
+       
+  3. Determine scope:
+     if_task_id_provided:
+       scope: Filter findings for T-XXX only
+       context: Single task fix
+     if_no_task_id:
+       scope: ALL findings from last review
+       context: May include multiple tasks
+       
+  4. Get affected context:
+     - List of affected tasks (may be 1 or many)
+     - Files changed across all affected tasks
+     - Target roots
 ```
 
 ---
@@ -100,10 +148,11 @@ batch_strategy:
 
 | Field | Value |
 |-------|-------|
-| Task | T-XXX: <title> |
-| Root | <target_root> |
-| Review Verdict | REQUEST CHANGES |
-| Issues to Fix | <N> critical, <M> major, <P> minor |
+| Fix Mode | All Review Findings / Single Task (T-XXX) |
+| Source Review | Batch review / Single task review |
+| Tasks Affected | T-003, T-007 / T-XXX only |
+| Root(s) | <target_root(s)> |
+| Total Issues | <N> critical, <M> major, <P> minor |
 
 ---
 
@@ -116,6 +165,53 @@ batch_strategy:
 ---
 
 ### Finding → Fix Mapping / Ánh xạ Phát hiện → Sửa
+
+<If multiple tasks affected, group by task first>
+
+#### Task T-003: <task title>
+
+##### Critical Fixes / Sửa Nghiêm trọng
+
+| Finding | File | Proposed Fix | Risk |
+|---------|------|--------------|------|
+| T003-CRIT-001 | `path/file.ts:L42` | <fix description> | Low/Med/High |
+
+**T003-CRIT-001: <Issue title>**
+- **Issue:** <what's wrong>
+- **Fix:** <exactly what to change>
+- **Lines:** L42-L45
+- **Risk:** <potential side effects>
+
+##### Major Fixes / Sửa Chính
+
+| Finding | File | Proposed Fix | Risk |
+|---------|------|--------------|------|
+| T003-MAJ-001 | `path/file.ts:L70` | <fix description> | Low |
+
+---
+
+#### Task T-007: <task title>
+
+##### Critical Fixes / Sửa Nghiêm trọng
+
+| Finding | File | Proposed Fix | Risk |
+|---------|------|--------------|------|
+| T007-CRIT-001 | `path/other.ts:L20` | <fix description> | Med |
+
+---
+
+#### Build/Lint Issues (Cross-task)
+
+<If issues from automated checks, not specific to one task>
+
+| Finding | Type | File | Proposed Fix |
+|---------|------|------|--------------|
+| BUILD-001 | TypeScript | `types.ts:L15` | <fix description> |
+| LINT-001 | ESLint | `utils.ts:L30` | <fix description> |
+
+---
+
+<If single task mode, simpler format>
 
 #### Critical Fixes / Sửa Nghiêm trọng
 
@@ -213,10 +309,12 @@ pnpm test         # Must pass
 
 ## ⏸️ STOP — Fix Plan Complete / DỪNG — Kế hoạch Sửa Hoàn thành
 
-### Fix plan ready for Task T-XXX
-### Kế hoạch sửa sẵn sàng cho Task T-XXX
+### Fix plan ready
+### Kế hoạch sửa sẵn sàng
 
 **Summary:**
+- Fix Mode: <All Review Findings / Single Task T-XXX>
+- Tasks Affected: <T-003, T-007 / T-XXX>
 - Critical fixes: <N>
 - Major fixes: <M>
 - Minor fixes: <P> (optional)
@@ -238,18 +336,22 @@ Reply `adjust <finding>` to modify a fix approach.
 ```yaml
 # After fix plan created
 status:
-  last_action: "Created fix plan for T-XXX"
+  last_action: "Created fix plan for review findings"
   next_action: "Awaiting fix plan approval"
-
+  
+# For each affected task
 tasks:
   T-XXX:
     status: fix-planning
     fix_plan:
       created_at: <timestamp>
-      critical_count: <N>
-      major_count: <M>
-      minor_count: <P>
-      batches: <B>
+      issues_count: <N>
+      approved: false
+  T-YYY:
+    status: fix-planning
+    fix_plan:
+      created_at: <timestamp>
+      issues_count: <M>
       approved: false
 ```
 
@@ -289,13 +391,14 @@ MUST:
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
   after_plan_approved:
-    recommended: "/code-fix-apply T-XXX"
-    command: "Run: /code-fix-apply T-XXX"
+    recommended: "/code-fix-apply"
+    command: "Run: /code-fix-apply"
+    note: "Will apply all fixes from the approved plan"
     
   DO_NOT_SAY:
     - "Reply approved to continue"
     - "Say go to proceed"
     
   MUST_SAY:
-    - "Run `/code-fix-apply T-XXX` to apply the approved fixes"
+    - "Run `/code-fix-apply` to apply the approved fixes"
 ```

@@ -181,8 +181,9 @@ MANDATORY_CHECK:
 | `/impl go` | Proceed with implementation after plan approved |
 | `/impl approved` | Mark complete after manual review (skip AI review) |
 | `/code-review T-XXX` | Review task changes (AI review) |
-| `/code-fix-plan T-XXX` | Plan fixes for review issues |
-| `/code-fix-apply T-XXX` | Apply approved fixes |
+| `/code-review` | Batch review all completed tasks |
+| `/code-fix-plan` | Plan fixes for ALL review findings |
+| `/code-fix-apply` | Apply approved fixes |
 | `/phase-4-tests` | Start Phase 4: Testing |
 | `/test-verify` | Verify test coverage & quality |
 | `/phase-5-done` | Start Phase 5: Done Check |

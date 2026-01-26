@@ -6,6 +6,36 @@ Bạn đóng vai trò **Kỹ sư Cấp cao và Người Gác cổng Code Review*
 
 ---
 
+## ⚠️ CRITICAL: Next Steps Enforcement
+
+```yaml
+NEXT_STEPS_ENFORCEMENT:
+  # This section MUST be followed when outputting next steps
+  
+  if_issues_found:
+    MUST_SUGGEST: "/code-fix-plan"
+    note: "Fix plan reads from last review, no task ID needed"
+    example: |
+      ⚠️ Issues Found
+      
+      Next Steps:
+      1. /code-fix-plan    ← Creates fix plan for ALL review findings
+      2. /code-fix-apply   ← After plan approved
+      3. /code-review      ← Re-review after fixes
+      
+    MUST_NOT:
+      - Skip suggesting /code-fix-plan
+      - Only show summary without next action
+      - Suggest /phase-4-tests when issues exist
+      
+  if_all_passed:
+    single_task_mode: "/phase-3-impl next" or "/phase-3-impl T-YYY"
+    batch_review_with_remaining: "/phase-3-impl next"
+    batch_review_all_done: "/phase-4-tests"
+```
+
+---
+
 ## Trigger / Kích hoạt
 
 ```yaml
@@ -549,7 +579,7 @@ OR
 
 **Next Steps:**
 ```
-/code-fix-plan T-XXX
+/code-fix-plan
 ```
 ```
 
@@ -724,8 +754,9 @@ NEXT_PROMPT_ENFORCEMENT:
         
         **Create fix plan:**
         ```
-        /code-fix-plan T-XXX
+        /code-fix-plan
         ```
+        (Will create fix plan based on review findings above)
         ---
 
   # === BATCH REVIEW MODE ===
@@ -770,6 +801,13 @@ NEXT_PROMPT_ENFORCEMENT:
         ---
         
     if_verdict: REQUEST_CHANGES
+      # CRITICAL: Must suggest /code-fix-plan for review findings
+      state_update_first: |
+        # Update state for each task with issues:
+        tasks.T-XXX.status: "needs-fixes"
+        tasks.T-XXX.review_verdict: "request-changes"
+        status.blockers: add code_review_findings
+        
       output: |
         ---
         ## ⚠️ Issues Found in Batch Review
@@ -781,15 +819,24 @@ NEXT_PROMPT_ENFORCEMENT:
         | T-007 | 0 | 2 | 1 |
         | Build | 1 | - | - |
         
-        **Fix issues task by task:**
+        ### ➡️ Next Steps (REQUIRED)
+        
+        **1. Create fix plan for ALL review findings:**
         ```
-        /code-fix-plan T-003
+        /code-fix-plan
         ```
-        Then:
+        (This will create a fix plan covering all issues above)
+        
+        **2. After fix plan approved:**
         ```
-        /code-fix-plan T-007
+        /code-fix-apply
         ```
         
-        After fixing, run `/code-review` again.
+        **3. After ALL fixes applied, re-run review:**
+        ```
+        /code-review
+        ```
+        
+        ⚠️ Do NOT proceed to Phase 4 until all issues resolved.
         ---
 ```
