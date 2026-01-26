@@ -215,6 +215,7 @@ MANDATORY_CHECK:
 | `/impl approved` | Mark complete after manual review (skip AI review) |
 | `/code-review T-XXX` | Review task changes (AI review) |
 | `/code-review` | Batch review all completed tasks |
+| `/strict-review` | Brutal honest review (strict reviewer persona) |
 | `/code-fix-plan` | Plan fixes for ALL review findings |
 | `/code-fix-apply` | Apply approved fixes |
 | `/phase-4-tests` | Start Phase 4: Testing |
@@ -427,6 +428,7 @@ other_roots (e.g., reviews-assets):
 | `.github/prompts/task-plan-review.prompt.md` | Phase 2: Task plan quality review |
 | `.github/prompts/phase-3-impl.prompt.md` | Phase 3: Implementation (per-task) |
 | `.github/prompts/code-review.prompt.md` | Phase 3: Code review for task |
+| `.github/prompts/strict-review.prompt.md` | Brutal honest review (strict reviewer) |
 | `.github/prompts/code-fix-plan.prompt.md` | Phase 3: Fix plan for review issues |
 | `.github/prompts/code-fix-apply.prompt.md` | Phase 3: Apply approved fixes |
 | `.github/prompts/phase-4-tests.prompt.md` | Phase 4: Test implementation |

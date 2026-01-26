@@ -1,473 +1,356 @@
-# Sync Instructions Across Roots / Đồng bộ Instructions
+# Sync Instructions - Tech Stack Analysis & Generation
 
-> Sync shared `.instructions.md` files from copilot-flow to all workspace roots.
-> Đồng bộ files `.instructions.md` dùng chung từ copilot-flow sang các roots.
+> Analyze each workspace root's tech stack and generate appropriate `.instructions.md` files.
+> Phân tích tech stack của từng root và tự động tạo `.instructions.md` phù hợp.
 
 ---
 
 ## 🎯 Purpose / Mục đích
 
-Maintain shared coding standards across all workspace roots by:
-1. Storing master copies in `copilot-flow/.github/instructions/shared/`
-2. Syncing to other roots when triggered
+**OLD approach (deprecated):** Copy shared templates → All roots get same instructions
+**NEW approach:** Analyze each root → Generate tailored instructions per tech stack
 
-Duy trì coding standards chung bằng cách:
-1. Lưu bản gốc trong `copilot-flow/.github/instructions/shared/`
-2. Đồng bộ sang các roots khi được trigger
+Mỗi root có tech stack riêng, thậm chí monorepo có nhiều stack trong từng app/package.
+AI cần phân tích và tạo instructions phù hợp cho từng context.
 
 ---
 
 ## Trigger / Kích hoạt
 
-- User says: `sync instructions`, `update instructions`
-- After editing shared instructions in copilot-flow
+- User says: `sync instructions`, `generate instructions`, `/sync-instructions`
+- User says: `sync instructions to <root>` - specific root only
 
 ---
 
-## Step 1: Scan Source Files / Quét Files Nguồn
+## 🔍 Step 1: Scan & Analyze Each Root
 
 ```yaml
-source_location: <tooling_root>/.github/instructions/shared/
-
-actions:
-  1. Scan directory for all *.instructions.md files:
-     command: ls <tooling_root>/.github/instructions/shared/*.instructions.md
-     
-  2. List found files:
-     - coding-practices.instructions.md
-     - typescript.instructions.md
-     - testing.instructions.md
-     - ... (any other files user has added)
-     
-  3. If directory empty or not exists:
-     → Ask: "No shared instructions found. 
-             Would you like to create some?
-             Or specify a different source location?"
-
-dynamic_source:
-  # Whatever files exist in shared/ will be synced
-  # User can add/remove files anytime
-  # Just run `sync instructions` again to update
-  
-  files: <scan shared/ directory>
-```
-
----
-
-## Step 2: Get Target Roots from WORKSPACE_CONTEXT / Lấy Roots Đích từ WORKSPACE_CONTEXT
-
-```yaml
-source: WORKSPACE_CONTEXT.md
-
-read_roots:
-  1. Load WORKSPACE_CONTEXT.md from tooling_root
-  2. Extract all roots from Section 2 (WORKSPACE ROOTS)
-  3. Exclude tooling_root itself (copilot-flow) - it keeps source files
-  4. Use remaining roots as sync targets
-
-dynamic_targets:
-  roots: <all roots from WORKSPACE_CONTEXT except tooling_root>
-  
-  # Example: If WORKSPACE_CONTEXT has:
-  # - copilot-flow (tooling_root) → SKIP (source location)
-  # - apphub-vision → SYNC
-  # - reviews-assets → SYNC
-  # - boost-pfs-backend → SYNC
-
-target_path_in_each: .github/instructions/
-
-filter_options:
-  # User can specify which roots to sync to:
-  # "sync instructions" → all roots
-  # "sync instructions to apphub-vision" → specific root only
-  # "sync instructions except reviews-assets" → exclude specific root
-```
-
----
-
-## Step 3: Sync Process / Quá trình Đồng bộ
-
-```yaml
-for_each_source_file:      # Dynamic from Step 1
-  for_each_target_root:    # Dynamic from Step 2
-    
-    1. Ensure .github/instructions/ exists in target
-    2. Read source file content (raw, no modification)
-    3. Prepend sync header (plain markdown, NO code fences):
-       ---
-       # AUTO-SYNCED from copilot-flow/.github/instructions/shared/<filename>
-       # Synced: <YYYY-MM-DD>
-       # Do not edit directly - edit source and run `sync instructions`
-       ---
-    4. Write to target as RAW MARKDOWN file
-    5. Track what was synced
-
-⚠️ CRITICAL - FILE FORMAT:
-  - Files MUST be written as raw markdown
-  - DO NOT wrap content in code fences (```, ````, etc.)
-  - DO NOT add any wrapper/container around content
-  - The .instructions.md file IS the raw content
-  - Copilot reads these as plain markdown, not code blocks
-  
-  # ✅ CORRECT file content:
-  ---
-  applyTo: '**'
-  ---
-  ## Section
-  Content here...
-  
-  # ❌ WRONG file content (will break Copilot):
-  ````instructions
-  ---
-  applyTo: '**'
-  ---
-  ## Section
-  Content here...
-  ````
-
-output:
-  "## ✅ Instructions Synced
-  
-  ### Source Files Found
-  <list of files scanned from shared/>
-  
-  ### Target Roots (from WORKSPACE_CONTEXT)
-  <list of roots excluding tooling_root>
-  
-  ### Sync Results
-  | File | Synced To |
-  |------|-----------|
-  | coding-practices.instructions.md | apphub-vision, reviews-assets, ... |
-  | typescript.instructions.md | apphub-vision, reviews-assets, ... |
-  | <any other files> | ... |
-  
-  All roots now have updated instructions."
-```
-
----
-
-## Step 4: Verify / Xác nhận
-
-```yaml
-verification:
-  - List synced files in each root
-  - Confirm no conflicts
-  - Remind user to commit changes in each root
-```
-
----
-
-## Shared Instructions Structure / Cấu trúc
-
-```
-copilot-flow/.github/instructions/
-├── shared/                              # Master copies (sync to other roots)
-│   ├── coding-practices.instructions.md
-│   ├── typescript.instructions.md
-│   └── testing.instructions.md
-└── workflow-docs.instructions.md        # Only for copilot-flow itself
-
-<other-roots>/.github/instructions/      # Dynamically from WORKSPACE_CONTEXT
-├── coding-practices.instructions.md     # ← Synced from shared/
-├── typescript.instructions.md           # ← Synced from shared/
-├── testing.instructions.md              # ← Synced from shared/
-└── <root-specific>.instructions.md      # ← Root-specific (not synced)
-```
-
----
-
-## Root-Specific Instructions / Instructions Riêng cho Root
-
-Each root can have additional instructions that are NOT synced.
-These are detected from existing files in each root's `.github/instructions/`.
-
-```yaml
-detection:
-  1. After syncing, list files in each target root's .github/instructions/
-  2. Files NOT in shared/ are root-specific
-  3. Report what's root-specific vs synced
-
-example_output:
-  "### Root-Specific Instructions (not synced)
-  
-  | Root | Root-Specific Files |
-  |------|---------------------|
-  | apphub-vision | prisma.instructions.md, ai-api.instructions.md |
-  | reviews-assets | storybook.instructions.md |
-  | boost-pfs-backend | api-design.instructions.md |"
-```
-
----
-
-## 📌 Next Step / Bước tiếp theo
-
-After syncing:
-- Commit changes in each affected root
-- Changes will apply on next Copilot session
-
-**Related Prompts:**
-- [cross-root-guide.prompt.md](cross-root-guide.prompt.md) - Configure cross-root relationships
-
----
-
-## Step 5: Tech Stack Detection & Suggestions (Auto)
-
-After syncing, automatically detect each root's tech stack and suggest missing instructions.
-
-```yaml
-detection_rules:
-  python:
-    indicators: [requirements.txt, pyproject.toml, setup.py, Pipfile, poetry.lock]
-    suggest: python.instructions.md
-    
-  typescript:
-    indicators: [tsconfig.json, "package.json with typescript"]
-    suggest: typescript.instructions.md
-    
-  go:
-    indicators: [go.mod, go.sum]
-    suggest: go.instructions.md
-    
-  rust:
-    indicators: [Cargo.toml]
-    suggest: rust.instructions.md
-    
-  java:
-    indicators: [pom.xml, build.gradle]
-    suggest: java.instructions.md
-    
-  dotnet:
-    indicators: ["*.csproj", "*.sln"]
-    suggest: dotnet.instructions.md
-    
-  docker:
-    indicators: [Dockerfile, docker-compose.yml]
-    suggest: docker.instructions.md
-    
-  react:
-    indicators: ["package.json with react"]
-    suggest: react.instructions.md
-    
-  nextjs:
-    indicators: [next.config.js, next.config.mjs]
-    suggest: nextjs.instructions.md
-    
-  prisma:
-    indicators: [prisma/schema.prisma]
-    suggest: prisma.instructions.md
-
 process:
-  for_each_root:
-    1. Scan for indicator files
-    2. Build list of detected tech stacks
-    3. Compare with existing shared/ instructions
-    4. Identify missing instructions
-    5. Report suggestions
+  1. Read WORKSPACE_CONTEXT.md for list of roots
+  2. For each root (except tooling_root):
+     a. Scan root structure (package.json, config files, directories)
+     b. Detect tech stack per app/package if monorepo
+     c. Build tech profile
 
-output_format:
-  "## 🔍 Tech Stack Analysis
+analysis_depth:
+  # Level 1: Root level
+  - package.json (dependencies, devDependencies, scripts)
+  - Config files (tsconfig, next.config, vite.config, etc.)
+  - Build tools (turbo.json, nx.json, lerna.json)
   
-  | Root | Detected Tech | Has Instruction? | Action |
-  |------|---------------|------------------|--------|
-  | apphub-vision | typescript, nextjs, prisma | ✅ ✅ ❌ | Suggest prisma |
-  | python-service | python, docker | ❌ ✅ | Suggest python |
-  | go-api | go, docker | ❌ ✅ | Suggest go |
+  # Level 2: App/Package level (for monorepos)
+  - apps/*/package.json
+  - packages/*/package.json
+  - Each app's specific config files
   
-  ### 💡 Suggested New Instructions
-  
-  Missing instructions detected. Create:
-  
-  1. **python.instructions.md** - Python best practices, pytest, type hints
-  2. **prisma.instructions.md** - Schema design, migrations
-     
-  Reply: numbers (e.g., '1, 2'), 'all', or 'skip'"
+  # Level 3: Framework detection
+  - Next.js: next.config.* , app/ or pages/ directory
+  - React: react in dependencies, jsx/tsx files
+  - Fastify/Express: server files, routes structure
+  - Prisma: prisma/ directory, schema.prisma
+  - AWS CDK: cdk.json, bin/, lib/ with constructs
+
+output_per_root:
+  root: apphub-vision
+  type: monorepo
+  build_tool: turborepo + pnpm
+  apps:
+    - name: dashboard
+      path: apps/dashboard
+      stack: [next.js, react, typescript, tailwind]
+    - name: ai-api
+      path: apps/ai-api
+      stack: [fastify, typescript, langchain, prisma]
+    - name: shopify
+      path: apps/shopify
+      stack: [shopify-app, react, typescript]
+  packages:
+    - name: app-database
+      stack: [prisma, typescript]
+    - name: assistant
+      stack: [langchain, typescript]
+  shared_stack: [typescript, pnpm, turborepo]
 ```
 
 ---
 
-## Step 6: Create Suggested Instructions
-
-When user accepts, create from built-in templates.
+## 📋 Step 2: Present Analysis to User
 
 ```yaml
-templates:
-  python.instructions.md: |
-    ---
-    applyTo: '**/*.py'
-    ---
-    # Python Standards
-    
-    ## Style Guide
-    - Follow PEP 8
-    - Use type hints for function signatures
-    - Max line length: 88 (Black formatter)
-    
-    ## Error Handling
-    ```python
-    # ✅ Specific exceptions
-    try:
-        result = process_data(input)
-    except ValueError as e:
-        logger.error(f"Invalid input: {e}")
-        raise
-    
-    # ❌ Bare except
-    try:
-        result = process_data(input)
-    except:
-        pass
-    ```
-    
-    ## Imports
-    ```python
-    # 1. Standard library
-    import os
-    from pathlib import Path
-    
-    # 2. Third-party
-    import pandas as pd
-    from fastapi import FastAPI
-    
-    # 3. Local
-    from .models import User
-    ```
-    
-    ## Testing
-    - Use pytest
-    - Tests in `tests/` or `test_*.py`
-    - Use fixtures for setup/teardown
+format: |
+  ## 🔍 Tech Stack Analysis Results
+  
+  ### Root: `<root_name>`
+  | Aspect | Detected |
+  |--------|----------|
+  | Type | monorepo / single-app |
+  | Build Tool | pnpm + turbo / npm / yarn |
+  | Primary Language | TypeScript / JavaScript |
+  
+  #### Apps/Packages Detected
+  | Name | Path | Tech Stack |
+  |------|------|------------|
+  | dashboard | apps/dashboard | Next.js, React, Tailwind |
+  | ai-api | apps/ai-api | Fastify, Prisma, LangChain |
+  
+  #### Recommended Instructions
+  | Instruction File | Applies To | Reason |
+  |------------------|------------|--------|
+  | nextjs.instructions.md | apps/dashboard/** | Next.js app router patterns |
+  | fastify.instructions.md | apps/ai-api/** | Fastify routes, plugins |
+  | prisma.instructions.md | **/prisma/** | Schema, migrations |
+  | typescript.instructions.md | **/*.ts,**/*.tsx | Type safety |
+  
+  ---
+  
+  ### Root: `<next_root_name>`
+  ... (repeat for each root)
+  
+  ---
+  
+  ## 🎯 Summary
+  | Root | Instructions to Generate |
+  |------|-------------------------|
+  | apphub-vision | 5 files (nextjs, fastify, prisma, typescript, testing) |
+  | boost-pfs-backend | 3 files (typescript, testing, api-design) |
+  | reviews-assets | 1 file (scss) |
+  
+  Reply:
+  - `all` - Generate all recommended instructions
+  - `<root>` - Generate for specific root only  
+  - `customize` - Review and modify recommendations first
+```
 
-  go.instructions.md: |
-    ---
-    applyTo: '**/*.go'
-    ---
-    # Go Standards
-    
-    ## Style Guide
-    - Follow Effective Go
-    - Use gofmt, golint
-    
-    ## Error Handling
-    ```go
-    // ✅ Check errors explicitly
-    result, err := doSomething()
-    if err != nil {
-        return fmt.Errorf("failed: %w", err)
-    }
-    
-    // ❌ Ignoring errors
-    result, _ := doSomething()
-    ```
-    
-    ## Package Layout
-    /cmd        # Main apps
-    /internal   # Private code
-    /pkg        # Public libs
+---
 
-  prisma.instructions.md: |
-    ---
-    applyTo: '**/prisma/**,**/*.prisma'
-    ---
-    # Prisma Standards
-    
-    ## Schema Design
-    - PascalCase model names
-    - Use @map for snake_case columns
-    - Always include createdAt, updatedAt
-    
-    ```prisma
-    model User {
-      id        String   @id @default(cuid())
-      email     String   @unique
-      createdAt DateTime @default(now()) @map("created_at")
-      updatedAt DateTime @updatedAt @map("updated_at")
-      @@map("users")
-    }
-    ```
-    
-    ## Migrations
-    - Review before applying
-    - `prisma migrate dev` for development
-    - `prisma migrate deploy` for production
+## ⚙️ Step 3: Generate Instructions (AI-Driven)
 
-  java.instructions.md: |
-    ---
-    applyTo: '**/*.java'
-    ---
-    # Java Standards
-    
-    ## Style Guide
-    - Follow Google Java Style Guide
-    - Use meaningful names (camelCase methods, PascalCase classes)
-    
-    ## Error Handling
-    ```java
-    // ✅ Specific exceptions
-    try {
-        processData(input);
-    } catch (IOException e) {
-        logger.error("IO error", e);
-        throw new ServiceException("Failed to process", e);
-    }
-    
-    // ❌ Catching generic Exception
-    catch (Exception e) { }
-    ```
+**CRITICAL: AI generates content based on actual analysis, NOT from templates**
 
-  rust.instructions.md: |
-    ---
-    applyTo: '**/*.rs'
-    ---
-    # Rust Standards
-    
-    ## Style Guide
-    - Use rustfmt
-    - Follow Rust API Guidelines
-    
-    ## Error Handling
-    ```rust
-    // ✅ Use Result and ?
-    fn process() -> Result<Data, Error> {
-        let data = fetch_data()?;
-        Ok(transform(data))
-    }
-    
-    // ✅ Custom error types
-    #[derive(Debug, thiserror::Error)]
-    enum AppError {
-        #[error("IO error: {0}")]
-        Io(#[from] std::io::Error),
-    }
-    ```
+```yaml
+generation_rules:
+  1. Read actual code patterns from the root
+  2. Check existing instructions (don't duplicate)
+  3. Generate content tailored to:
+     - Framework version detected
+     - Project structure observed
+     - Patterns found in codebase
+     - Dependencies used
 
-  dotnet.instructions.md: |
-    ---
-    applyTo: '**/*.cs'
-    ---
-    # .NET Standards
-    
-    ## Style Guide
-    - Follow Microsoft C# Coding Conventions
-    - Use PascalCase for public members
-    - Use camelCase for private fields with _ prefix
-    
-    ## Async/Await
-    ```csharp
-    // ✅ Async all the way
-    public async Task<User> GetUserAsync(string id)
-    {
-        return await _repository.FindByIdAsync(id);
-    }
-    
-    // ❌ Blocking on async
-    var user = GetUserAsync(id).Result;
-    ```
+content_sources:
+  # AI should reference these when generating:
+  - Framework official docs best practices
+  - Detected patterns in existing code
+  - Package versions for compatibility
+  - Project's existing code style
 
-create_process:
-  1. User selects numbers or 'all'
-  2. Write templates to shared/
-  3. Ask user to review and customize
-  4. Auto-run sync to distribute
+example_generation:
+  # For apphub-vision/apps/dashboard (Next.js 14 detected)
+  
+  file: apps/dashboard/.github/instructions/nextjs.instructions.md
+  content_based_on:
+    - next.config.mjs settings
+    - App router structure (app/ directory)
+    - Server actions usage
+    - Existing component patterns
+  
+  generated_sections:
+    - App Router conventions (detected: using app/)
+    - Server Actions patterns (detected: use server)
+    - Data fetching (detected: fetch in server components)
+    - NOT included: Pages router (not used)
+
+location_strategy:
+  monorepo:
+    # Shared instructions at root level
+    <root>/.github/instructions/
+      typescript.instructions.md (applyTo: **/*.ts)
+      testing.instructions.md (applyTo: **/*.test.ts)
+    
+    # App-specific at app level
+    <root>/apps/<app>/.github/instructions/
+      nextjs.instructions.md (applyTo: apps/dashboard/**)
+      fastify.instructions.md (applyTo: apps/ai-api/**)
+  
+  single_app:
+    # All at root level
+    <root>/.github/instructions/
+      all-instructions-here.md
+```
+
+---
+
+## 📝 Step 4: Generate Content by Category
+
+AI generates instructions based on detected stack. Reference patterns:
+
+### TypeScript (if tsconfig.json found)
+```yaml
+analyze:
+  - tsconfig.json → strict mode? paths? target?
+  - Existing type patterns in codebase
+  
+generate_sections:
+  - Type safety rules (based on strict settings)
+  - Import patterns (based on paths config)
+  - Generic patterns (if used in codebase)
+  
+applyTo: "**/*.ts,**/*.tsx"
+```
+
+### Next.js (if next.config.* found)
+```yaml
+analyze:
+  - App router vs Pages router
+  - next.config settings
+  - Existing page/layout patterns
+  
+generate_sections:
+  - File conventions (based on detected structure)
+  - Data fetching (server components, actions)
+  - Client vs Server components
+  
+applyTo: "apps/<app-name>/**" # scoped to specific app
+```
+
+### Fastify (if fastify in dependencies)
+```yaml
+analyze:
+  - Plugin structure
+  - Route patterns
+  - Existing hooks usage
+  
+generate_sections:
+  - Route definition patterns
+  - Plugin best practices
+  - Error handling (from existing code)
+  
+applyTo: "apps/<app-name>/**"
+```
+
+### Prisma (if prisma/ directory exists)
+```yaml
+analyze:
+  - schema.prisma models
+  - Existing query patterns
+  - Client usage patterns
+  
+generate_sections:
+  - Schema conventions (from existing models)
+  - Query patterns (from existing code)
+  - Migration rules
+  
+applyTo: "**/prisma/**,**/*.prisma"
+```
+
+### React (if react in dependencies)
+```yaml
+analyze:
+  - Component patterns (functional, hooks)
+  - State management used
+  - Styling approach
+  
+generate_sections:
+  - Component structure
+  - Hooks usage (based on existing hooks)
+  - State management patterns
+  
+applyTo: "**/*.tsx,**/*.jsx"
+```
+
+### Testing (if jest/vitest/pytest found)
+```yaml
+analyze:
+  - Test framework used
+  - Existing test patterns
+  - Coverage setup
+  
+generate_sections:
+  - Test structure (from existing tests)
+  - Mocking patterns
+  - Coverage requirements
+  
+applyTo: "**/*.test.ts,**/*.spec.ts"
+```
+
+### SCSS/CSS (if scss files found)
+```yaml
+analyze:
+  - File structure
+  - Naming conventions
+  - Variable usage
+  
+generate_sections:
+  - File organization
+  - Naming conventions
+  - Responsive patterns
+  
+applyTo: "**/*.scss,**/*.css"
+```
+
+---
+
+## 📄 Step 5: Write Files
+
+```yaml
+file_format:
+  header: |
+    ---
+    applyTo: '<glob-pattern>'
+    ---
+    # <Title> - Generated from Tech Stack Analysis
+    # Generated: <YYYY-MM-DD>
+    # Based on: <what was analyzed>
+    # Regenerate: Run `/sync-instructions` to update
+    
+  body: |
+    <AI-generated content based on analysis>
+
+write_strategy:
+  - Check if file exists
+  - If exists: Show diff, ask to overwrite or merge
+  - If new: Create file
+  - After writing: List all created/updated files
+
+output: |
+  ## ✅ Instructions Generated
+  
+  ### Created/Updated Files
+  | Root | File | Status |
+  |------|------|--------|
+  | apphub-vision | .github/instructions/typescript.instructions.md | Created |
+  | apphub-vision | apps/dashboard/.github/instructions/nextjs.instructions.md | Created |
+  | apphub-vision | apps/ai-api/.github/instructions/fastify.instructions.md | Created |
+  | reviews-assets | .github/instructions/scss.instructions.md | Created |
+  
+  ### Next Steps
+  1. Review generated files and customize if needed
+  2. Commit changes to each affected root
+  3. Run `/sync-instructions` again after major dependency changes
+```
+
+---
+
+## 🔄 Incremental Updates
+
+```yaml
+update_mode:
+  trigger: "sync instructions --update" or "update instructions"
+  
+  process:
+    1. Read existing instruction files
+    2. Re-analyze current tech stack
+    3. Detect changes:
+       - New dependencies added
+       - Configs changed
+       - New apps/packages added
+    4. Show diff of what would change
+    5. Ask user to approve updates
+
+preserve:
+  - User customizations (sections marked # CUSTOM)
+  - Manual additions
+  - Only update generated sections
 ```
 
 ---
@@ -476,9 +359,35 @@ create_process:
 
 | Command | Action |
 |---------|--------|
-| `sync instructions` | Sync all + analyze tech stacks |
-| `sync instructions to <root>` | Sync to specific root only |
-| `sync instructions --skip-analysis` | Sync without tech detection |
-| `suggest instructions` | Only analyze, don't sync |
-| `suggest instructions for <root>` | Analyze specific root |
-````
+| `sync instructions` | Full analysis + generate all |
+| `sync instructions to <root>` | Analyze + generate for one root |
+| `sync instructions --update` | Update existing only |
+| `sync instructions --dry-run` | Show what would be generated |
+| `analyze tech stack` | Analysis only, no generation |
+
+---
+
+## ⚠️ Important Notes
+
+```yaml
+DO:
+  - Analyze actual code patterns before generating
+  - Scope applyTo patterns to specific apps/packages
+  - Consider monorepo structure
+  - Preserve user customizations
+  - Show what will be created before writing
+
+DO_NOT:
+  - Use generic templates for all roots
+  - Assume all roots have same stack
+  - Overwrite user customizations
+  - Generate instructions for tech not detected
+  - Apply root-level instructions to all files in monorepo
+```
+
+---
+
+## 📌 Related Prompts
+
+- [suggest-instructions.prompt.md](suggest-instructions.prompt.md) - Analysis only, no generation
+- [workspace-discovery.prompt.md](workspace-discovery.prompt.md) - Discover workspace structure

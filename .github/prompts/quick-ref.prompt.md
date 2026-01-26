@@ -282,6 +282,7 @@ Luôn dùng `/prompt-name` tường minh để đảm bảo đúng flow.
 | `/phase-3-impl T-XXX` | Implement specific task | Triển khai task cụ thể |
 | `/phase-3-impl next` | Implement next incomplete task | Triển khai task tiếp theo |
 | `/code-review T-XXX` | Review task changes | Review thay đổi của task |
+| `/strict-review` | Brutal honest review (strict persona) | Review khó tính (persona nghiêm khắc) |
 | `/code-fix-plan T-XXX` | Plan fixes for review issues | Lập kế hoạch sửa lỗi |
 | `/code-fix-apply T-XXX` | Apply approved fixes | Áp dụng fixes đã duyệt |
 | `/phase-4-tests` | Start Phase 4 Testing | Bắt đầu Phase 4 Testing |
