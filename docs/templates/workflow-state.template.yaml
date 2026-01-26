@@ -18,6 +18,11 @@ meta:
   last_updated: <ISO-8601-timestamp>   # Last state change
   updated_by: copilot                  # copilot | user
   
+  # Base branch for diff comparison / Branch gốc để so sánh diff
+  # Used by /code-review for batch review
+  # Can be: main, master, develop, feature/parent-branch, etc.
+  base_branch: main                    # Default: main. Change if needed.
+  
   # Affected roots tracking / Theo dõi các root bị ảnh hưởng
   affected_roots:
     - root: <primary-root-name>

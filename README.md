@@ -261,21 +261,28 @@ Phase 3 has **two gates** to prevent wrong implementations:
 
 After implementation completes:
 
-| Command | When to Use | Flow |
-|---------|-------------|------|
+| Command | When to Use | What It Does |
+|---------|-------------|--------------|
 | `/impl approved` | Already tested manually | Mark complete → next task |
-| `/code-review T-XXX` | Want AI review | AI reviews → approve/fix → next task |
+| `/code-review T-XXX` | Want AI review for one task | Reviews task changes only |
+| `/code-review` | Review multiple completed tasks | Batch review + lint/tsc/build |
 
 ### Recommended Workflows
 
-**Workflow A: Manual Review + Batch AI** ⭐ Recommended
+**Workflow A: Manual Review + Batch Check** ⭐ Recommended
 ```
 /phase-3-impl T-001 → /impl go → [manual test] → /impl approved
 /phase-3-impl T-002 → /impl go → [manual test] → /impl approved
+/phase-3-impl T-003 → /impl go → [manual test] → /impl approved
+/code-review         ← Batch review T-001 to T-003 + lint/tsc/build
+/phase-3-impl T-004 → /impl go → [manual test] → /impl approved
 ...
-/code-review         ← AI reviews ALL changes at once
+/code-review         ← Final batch review
 /phase-4-tests
 ```
+✅ Fast: No waiting for AI review per task
+✅ Checkpoint: Review batches as you go
+✅ Automated: Runs lint/typecheck/build to find hidden errors
 
 **Workflow B: AI Review Per Task**
 ```
@@ -287,10 +294,24 @@ After implementation completes:
 
 **Workflow C: Hybrid**
 ```
-/phase-3-impl T-001 → /impl go → /impl approved      # Simple
-/phase-3-impl T-002 → /impl go → /code-review T-002  # Complex
+/phase-3-impl T-001 → /impl go → /impl approved      # Simple task
+/phase-3-impl T-002 → /impl go → /code-review T-002  # Complex task
+/code-review         ← Batch checkpoint
 ...
 ```
+
+### `/code-review` Modes Explained
+
+| Mode | Trigger | Scope | When to Use |
+|------|---------|-------|-------------|
+| Single Task | `/code-review T-XXX` | Files from T-XXX only | Immediate feedback on one task |
+| Batch Review | `/code-review` | All completed tasks vs base branch | Checkpoint or final review |
+
+**Base Branch Configuration:**
+- Stored in `.workflow-state.yaml` → `meta.base_branch`
+- Default: `main`
+- Can be: `master`, `develop`, `feature/parent-branch`, etc.
+- Set during workflow init or update manually
 
 ---
 

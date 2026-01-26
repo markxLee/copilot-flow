@@ -78,7 +78,24 @@ steps:
   5. Identify affected roots
      action: Which workspace roots will be changed?
      
-  6. CHECK CROSS-ROOT RELATIONSHIPS (CRITICAL)
+  6. Determine base branch (IMPORTANT for code review)
+     action: |
+       Ask user: "What branch should this work be compared against?"
+       Options:
+         - main (default for most repos)
+         - master (older repos)
+         - develop (GitFlow)
+         - feature/xxx (sub-feature branch)
+       
+       This will be stored in state.meta.base_branch and used by:
+         - /code-review for diff comparison
+         - PR description generation
+       
+       If user doesn't specify, detect from:
+         1. Remote HEAD: git remote show origin | grep "HEAD branch"
+         2. Default to "main"
+     
+  7. CHECK CROSS-ROOT RELATIONSHIPS (CRITICAL)
      action: |
        IF work involves multiple roots:
          1. Read WORKSPACE_CONTEXT.md Section 9 (cross_root_workflows)
@@ -91,7 +108,7 @@ steps:
          → Note: reviews-assets must build first
          → Import pattern: import { X } from '@apphubdev/clearer-ui'
      
-  7. Output structured Work Description
+  8. Output structured Work Description
      format: Bilingual (EN then VI)
 ```
 
@@ -108,6 +125,7 @@ steps:
 | Work Type / Loại | <FEATURE/BUGFIX/...> |
 | Title / Tiêu đề | <short descriptive title> |
 | Affected Roots | <root1>, <root2> |
+| Base Branch | <main/master/develop/feature-xxx> |
 | Requestor | <user/ticket> |
 
 ---
@@ -184,6 +202,9 @@ Save Work Description to:
 
 Update state file:
 ```yaml
+meta:
+  base_branch: <detected-or-user-specified>  # IMPORTANT: Used by /code-review
+  
 phases.phase_0_analysis:
   status: in-progress
   artifacts:

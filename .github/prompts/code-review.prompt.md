@@ -10,11 +10,23 @@ Bạn đóng vai trò **Kỹ sư Cấp cao và Người Gác cổng Code Review*
 
 ```yaml
 TRIGGER_RULES:
-  # CRITICAL: Must include task ID for precise review scope
+  # Two modes: single-task review OR batch review
   
   valid_triggers:
-    - "/code-review T-XXX"  # Review specific task
-    - "/code-review"        # Review current task from state
+    single_task:
+      pattern: "/code-review T-XXX"
+      scope: Review changes for specific task only
+      use_when: After completing one task, want immediate feedback
+      
+    batch_review:
+      pattern: "/code-review"
+      scope: Review all COMPLETED tasks since last review
+      use_when: 
+        - Want to review multiple completed tasks at once
+        - Checkpoint review mid-implementation
+        - Final review before Phase 4
+        - Catch cross-task integration issues
+      note: Does NOT require all tasks to be done
     
   invalid_triggers:
     - "review"        # Too generic
@@ -23,7 +35,38 @@ TRIGGER_RULES:
   on_invalid_trigger:
     action: |
       STOP and respond:
-      "Please use: `/code-review T-XXX` to review specific task."
+      "Which review mode?
+      - `/code-review T-XXX` — Review specific task
+      - `/code-review` — Review all completed tasks (batch review)"
+```
+
+---
+
+## Review Mode Detection / Phát hiện Chế độ Review
+
+```yaml
+mode_detection:
+  if_has_task_id:
+    mode: single_task
+    scope: |
+      - Only files changed by task T-XXX
+      - Only T-XXX requirements
+      - Quick focused review
+    
+  if_no_task_id:
+    mode: batch_review
+    scope: |
+      - All files changed vs base_branch (from state)
+      - All completed tasks since last review
+      - Cross-task consistency check
+      - Full lint/type/build verification
+    note: |
+      - Can have remaining tasks not yet started
+      - After review, can continue with more tasks
+    
+  output_mode_in_summary:
+    required: true
+    format: "Review Mode: Single Task (T-XXX) | Batch Review (5 completed tasks)"
 ```
 
 ---
@@ -36,16 +79,32 @@ pre_checks:
      check: status.current_phase == 3
      if_not: WARN - "Not in Phase 3, reviewing anyway"
      
-  2. Get current task:
-     from: status.current_task
-     if_none: Ask user which task/changes to review
+  2. Determine review mode:
+     if: task_id provided → single_task mode
+     else: batch_review mode
      
-  3. Identify affected root(s):
-     from: tasks[current_task].root
+  3. Read base_branch from state:
+     path: .workflow-state.yaml → meta.base_branch
+     default: "main"
+     fallback_order:
+       - state.meta.base_branch
+       - "main"
+       - "master"
+       - ask user
      
-  4. Get diff scope:
-     - Task-specific changes
-     - Or full branch diff vs main
+  4. Get scope:
+     single_task:
+       from: impl-log.md → files changed by T-XXX
+     batch_review:
+       from: git diff origin/<base_branch>..HEAD
+       
+  5. Identify affected root(s):
+     from: changed files paths
+     
+  6. Count tasks for review:
+     batch_review:
+       completed_tasks: tasks with status "completed" or "in-progress"
+       not_reviewed: tasks without reviewed_at timestamp
 ```
 
 ---
@@ -77,20 +136,124 @@ Review code changes của task hiện tại theo standards, conventions, và tí
 
 ```yaml
 methods:
-  1. Task-scoped (Preferred):
-     - Review files listed in impl-log.md for current task
-     
-  2. Branch diff:
-     command: |
-       git fetch origin main
-       MERGE_BASE=$(git merge-base origin/main HEAD)
-       git diff $MERGE_BASE..HEAD
+  # CRITICAL: Read base_branch from state file first
+  get_base_branch:
+    1. Read state file:
+       path: .workflow-state.yaml
+       field: meta.base_branch
        
-  3. Working changes:
-     command: git diff HEAD
-     
-  4. Ask user:
-     - Request paste of relevant changes
+    2. If not set:
+       check_remote: git remote show origin | grep "HEAD branch"
+       fallback: "main" or "master"
+       
+    3. Store for this review session
+  
+  single_task_mode:
+    1. Read impl-log.md:
+       find: Files changed by task T-XXX
+       
+    2. Review those specific files:
+       command: git diff HEAD -- <file1> <file2> ...
+       
+  batch_review_mode:
+    1. Get base branch from state:
+       base_branch: state.meta.base_branch
+       
+    2. Full branch diff:
+       command: |
+         git fetch origin <base_branch>
+         MERGE_BASE=$(git merge-base origin/<base_branch> HEAD)
+         git diff $MERGE_BASE..HEAD
+         
+    3. List all changed files:
+       command: |
+         git diff --name-only $MERGE_BASE..HEAD
+         
+    4. Cross-reference with impl-log.md:
+       check: Map files to tasks
+       report: Which tasks are being reviewed
+```
+
+---
+
+## ⚡ Automated Verification (CRITICAL) / Xác minh Tự động (QUAN TRỌNG)
+
+```yaml
+AUTOMATED_CHECKS:
+  # MUST run these checks to find hidden errors
+  # Run in EACH affected root
+  
+  required_checks:
+    1_typescript_check:
+      purpose: Find type errors that IDE might miss
+      command: pnpm tsc --noEmit
+      alternative: pnpm typecheck
+      on_error:
+        severity: Critical
+        action: List all type errors as CRIT findings
+        
+    2_lint_check:
+      purpose: Find code style and potential bugs
+      command: pnpm lint
+      alternative: pnpm eslint .
+      on_error:
+        severity: Major (errors) / Minor (warnings)
+        action: List lint issues in findings
+        
+    3_build_check:
+      purpose: Verify code compiles and bundles correctly
+      command: pnpm build
+      on_error:
+        severity: Critical
+        action: Build failure = automatic REQUEST CHANGES
+        
+    4_test_check:
+      purpose: Verify tests pass (if tests exist)
+      command: pnpm test --passWithNoTests
+      on_error:
+        severity: Critical
+        action: Test failure = automatic REQUEST CHANGES
+        
+  execution_flow:
+    step_1: "Identify affected roots from changed files"
+    step_2: "For each root, run commands in terminal"
+    step_3: "Capture output for any failures"
+    step_4: "Include failures as findings with severity"
+    
+  all_tasks_mode_extra:
+    # Only in all-tasks mode, also check:
+    5_cross_root_imports:
+      purpose: Verify cross-root dependencies are correct
+      check: |
+        - No circular imports between roots
+        - Library builds before consumer
+        - API types match between backend/frontend
+```
+
+---
+
+## Verification Output Template / Template Output Xác minh
+
+```markdown
+### 🔧 Automated Verification / Xác minh Tự động
+
+| Check | Root | Status | Details |
+|-------|------|--------|---------|
+| TypeScript | apphub-vision | ✅ Pass | No errors |
+| TypeScript | boost-pfs-backend | ❌ Fail | 3 errors |
+| Lint | apphub-vision | ⚠️ Warn | 2 warnings |
+| Build | apphub-vision | ✅ Pass | - |
+| Tests | apphub-vision | ✅ Pass | 45/45 |
+
+<If any failures>
+#### TypeScript Errors (boost-pfs-backend)
+```
+src/services/user.ts:42:5 - error TS2322: Type 'string' is not assignable to type 'number'
+src/services/user.ts:55:10 - error TS2345: Argument of type 'null' is not assignable
+...
+```
+These are added to **Critical** findings below.
+</If>
 ```
 
 ---
@@ -187,25 +350,69 @@ severity_levels:
 
 | Field | Value |
 |-------|-------|
-| Task | T-XXX: <title> |
-| Root | <target_root> |
+| Review Mode | 🔹 Single Task (T-XXX) / 🔷 Batch Review (N tasks) |
+| Task(s) | T-XXX: <title> / T-001 to T-005 (5 completed) |
+| Base Branch | <base_branch from state> |
+| Root(s) | <target_root(s)> |
+| Files Changed | <count> |
 | Verdict | ✅ APPROVE / ❌ REQUEST CHANGES |
 | Risk Level | Low / Medium / High |
 
+<If batch_review>
+| Remaining Tasks | T-006 to T-008 (3 not started) |
+</If>
+
 ### What Changed / Những gì Thay đổi
+
+<If single_task>
 - <bullet 1>
 - <bullet 2>
 - <bullet 3>
+</If>
+
+<If batch_review>
+| Task | Status | Changes |
+|------|--------|---------|
+| T-001 | ✅ Reviewed | Created notification store |
+| T-002 | ✅ Reviewed | Added WebSocket hook |
+| T-003 | ✅ Reviewed | Toast component |
+| ... | ... | ... |
+| T-006 | ⬜ Not reviewed | (not started) |
+</If>
 
 ---
 
 ### Task Alignment / Căn chỉnh Task
 
+<If single_task mode>
 | Criteria | Status | Notes |
 |----------|--------|-------|
 | Matches description | ✅/❌ | ... |
 | Meets done criteria | ✅/❌ | ... |
 | No scope creep | ✅/❌ | ... |
+</If>
+
+<If all_tasks mode>
+| Task | Status | Completeness |
+|------|--------|--------------|
+| T-001 | ✅ | Fully implemented |
+| T-002 | ✅ | Fully implemented |
+| T-003 | ⚠️ | Missing error handling |
+| ... | ... | ... |
+</If>
+
+---
+
+### 🔧 Automated Verification Results / Kết quả Xác minh Tự động
+
+| Check | Root | Status | Issues |
+|-------|------|--------|--------|
+| TypeScript | <root> | ✅/❌ | <count> |
+| Lint | <root> | ✅/❌ | <count> |
+| Build | <root> | ✅/❌ | - |
+| Tests | <root> | ✅/❌ | <passed/total> |
+
+<If any failures, they are included in Findings below>
 
 ---
 
@@ -242,15 +449,17 @@ severity_levels:
 
 ---
 
-### Verification Checklist / Danh sách Xác nhận
+### Verification Commands / Lệnh Xác minh
 
-Run these commands in `<target_root>`:
+Run by AI during review (results shown above):
 
 ```bash
-pnpm build        # Should pass
-pnpm lint         # Should pass
-pnpm typecheck    # Should pass
-pnpm test         # Should pass
+# In each affected root:
+cd <root>
+pnpm tsc --noEmit         # TypeScript check
+pnpm lint                  # Lint check
+pnpm build                 # Build check
+pnpm test --passWithNoTests  # Test check
 ```
 
 <If UI changes>
@@ -356,38 +565,71 @@ STATE_UPDATE_ENFORCEMENT:
   timing: IMMEDIATELY after determining verdict
   method: Use replace_string_in_file to update .workflow-state.yaml
   
-  IF_APPROVE:
-    update_task:
-      status: "completed"         # NOT "approved", use "completed"
-      reviewed_at: "<ISO_timestamp>"
-      review_verdict: "approved"
-    
-    update_status:
-      current_task: "<next_task_id>"  # Move to next incomplete task
-      last_action: "T-XXX completed and approved"
-      next_action: "Implement <next_task_id>"
-    
-    update_impl_log:
-      action: "Add completion timestamp and ✅ status"
+  # === SINGLE TASK MODE ===
+  single_task_mode:
+    IF_APPROVE:
+      update_task:
+        status: "completed"         # NOT "approved", use "completed"
+        reviewed_at: "<ISO_timestamp>"
+        review_verdict: "approved"
       
-  IF_REQUEST_CHANGES:
-    update_task:
-      status: "needs-fixes"
-      reviewed_at: "<ISO_timestamp>"
-      review_verdict: "request-changes"
-      issues_count:
-        critical: <N>
-        major: <M>
+      update_status:
+        current_task: "<next_task_id>"  # Move to next incomplete task
+        last_action: "T-XXX completed and approved"
+        next_action: "Implement <next_task_id>"
+      
+      update_impl_log:
+        action: "Add completion timestamp and ✅ status"
+        
+    IF_REQUEST_CHANGES:
+      update_task:
+        status: "needs-fixes"
+        reviewed_at: "<ISO_timestamp>"
+        review_verdict: "request-changes"
+        issues_count:
+          critical: <N>
+          major: <M>
+      
+      update_status:
+        last_action: "Code review found issues in T-XXX"
+        next_action: "Fix <N> critical, <M> major issues"
+        blockers:
+          - type: code_review_findings
+            task: "T-XXX"
+            description: "<N> critical, <M> major issues"
+            waiting_for: fixes
+            since: "<ISO_timestamp>"
+            
+  # === BATCH REVIEW MODE ===
+  batch_review_mode:
+    # Note: Does NOT assume all tasks are done
+    # Reviews completed tasks, can continue with remaining after
     
-    update_status:
-      last_action: "Code review found issues in T-XXX"
-      next_action: "Fix <N> critical, <M> major issues"
-      blockers:
-        - type: code_review_findings
-          task: "T-XXX"
-          description: "<N> critical, <M> major issues"
-          waiting_for: fixes
-          since: "<ISO_timestamp>"
+    IF_APPROVE:
+      update_reviewed_tasks:
+        action: "Mark reviewed tasks with reviewed_at timestamp"
+        for_each: completed task in this batch
+        set:
+          reviewed_at: "<ISO_timestamp>"
+          review_verdict: "approved"
+      
+      update_status:
+        last_action: "Batch review: N tasks approved"
+        # next_action depends on remaining tasks
+        if_more_tasks: "Continue with T-YYY"
+        if_all_done: "Proceed to Phase 4 Testing"
+        
+    IF_REQUEST_CHANGES:
+      update_tasks_with_issues:
+        action: "Mark specific tasks with issues as needs-fixes"
+      
+      update_status:
+        last_action: "Batch review found issues in N tasks"
+        next_action: "Fix issues in T-XXX, T-YYY"
+        blockers:
+          - type: code_review_findings
+            tasks: ["T-XXX", "T-YYY"]
+            description: "Issues found in N tasks"
 ```
 
 ---
@@ -418,68 +660,136 @@ NEXT_PROMPT_ENFORCEMENT:
   # Sequence: 1) Update state → 2) Update impl-log → 3) Output message
   
   sequence:
-    step_1: "UPDATE .workflow-state.yaml (task status = completed)"
-    step_2: "UPDATE impl-log.md (add completion entry)"
+    step_1: "UPDATE .workflow-state.yaml"
+    step_2: "UPDATE impl-log.md"
     step_3: "OUTPUT next steps with explicit prompts"
-  
-  if_verdict: APPROVE
-    state_update_first: |
-      # MUST update state file with:
-      tasks.T-XXX.status: "completed"
-      tasks.T-XXX.reviewed_at: "<ISO_timestamp>"
-      status.current_task: "T-YYY"
-      status.last_action: "T-XXX completed"
     
-    if: more_tasks_remaining
-    output: |
-      ---
-      ## ✅ T-XXX Approved & Marked Completed
+  # === SINGLE TASK MODE ===
+  single_task_mode:
+    if_verdict: APPROVE
+      state_update_first: |
+        # MUST update state file with:
+        tasks.T-XXX.status: "completed"
+        tasks.T-XXX.reviewed_at: "<ISO_timestamp>"
+        status.current_task: "T-YYY"
+        status.last_action: "T-XXX completed"
       
-      State updated:
-      - T-XXX status: completed ✅
-      - Next task: T-YYY
+      if: more_tasks_remaining
+      output: |
+        ---
+        ## ✅ T-XXX Approved & Marked Completed
+        
+        State updated:
+        - T-XXX status: completed ✅
+        - Next task: T-YYY
+        
+        **Continue implementation:**
+        ```
+        /phase-3-impl T-YYY
+        ```
+        OR
+        ```
+        /phase-3-impl next
+        ```
+        ---
       
-      **Continue implementation:**
-      ```
-      /phase-3-impl T-YYY
-      ```
-      OR
-      ```
-      /phase-3-impl next
-      ```
-      ---
-    
-    if: all_tasks_complete
-    output: |
-      ---
-      ## ✅ All Tasks Complete
-      
-      State updated:
-      - T-XXX status: completed ✅
-      - All 12/12 tasks done
-      
-      **Proceed to testing:**
-      ```
-      /phase-4-tests
-      ```
-      ---
+      if: all_tasks_complete
+      output: |
+        ---
+        ## ✅ T-XXX Complete — All Tasks Done!
+        
+        State updated:
+        - T-XXX status: completed ✅
+        - All N/N tasks done
+        
+        **Recommended: Run batch review before Phase 4:**
+        ```
+        /code-review
+        ```
+        (This will check lint/types/build across all changes)
+        
+        **OR proceed directly to testing:**
+        ```
+        /phase-4-tests
+        ```
+        ---
 
-  if_verdict: REQUEST_CHANGES
-    state_update_first: |
-      # MUST update state file with:
-      tasks.T-XXX.status: "needs-fixes"
-      status.next_action: "Fix issues in T-XXX"
-    
-    output: |
-      ---
-      ## ⚠️ Changes Requested for T-XXX
-      
-      State updated:
-      - T-XXX status: needs-fixes
-      
-      **Create fix plan:**
-      ```
-      /code-fix-plan T-XXX
-      ```
-      ---
+    if_verdict: REQUEST_CHANGES
+      output: |
+        ---
+        ## ⚠️ Changes Requested for T-XXX
+        
+        State updated:
+        - T-XXX status: needs-fixes
+        
+        **Create fix plan:**
+        ```
+        /code-fix-plan T-XXX
+        ```
+        ---
+
+  # === BATCH REVIEW MODE ===
+  batch_review_mode:
+    if_verdict: APPROVE
+      if: more_tasks_remaining
+      output: |
+        ---
+        ## ✅ Batch Review Passed
+        
+        ### Summary
+        - Tasks reviewed: 5 (T-001 to T-005)
+        - Remaining tasks: 3 (T-006 to T-008)
+        - Base branch: <base_branch>
+        - TypeScript: ✅ Pass
+        - Lint: ✅ Pass  
+        - Build: ✅ Pass
+        
+        **Continue with remaining tasks:**
+        ```
+        /phase-3-impl next
+        ```
+        ---
+        
+      if: all_tasks_complete
+      output: |
+        ---
+        ## ✅ Batch Review Passed — All Tasks Done!
+        
+        ### Summary
+        - Tasks reviewed: N/N
+        - Base branch: <base_branch>
+        - TypeScript: ✅ Pass
+        - Lint: ✅ Pass
+        - Build: ✅ Pass
+        - Tests: ✅ Pass
+        
+        **Proceed to testing:**
+        ```
+        /phase-4-tests
+        ```
+        ---
+        
+    if_verdict: REQUEST_CHANGES
+      output: |
+        ---
+        ## ⚠️ Issues Found in Batch Review
+        
+        ### Issues by Task
+        | Task | Critical | Major | Minor |
+        |------|----------|-------|-------|
+        | T-003 | 1 | 0 | 2 |
+        | T-007 | 0 | 2 | 1 |
+        | Build | 1 | - | - |
+        
+        **Fix issues task by task:**
+        ```
+        /code-fix-plan T-003
+        ```
+        Then:
+        ```
+        /code-fix-plan T-007
+        ```
+        
+        After fixing, run `/code-review` again.
+        ---
 ```

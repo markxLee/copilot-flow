@@ -115,12 +115,64 @@ workflow_detection:
      
   3. If state file EXISTS:
      - Read meta.docs_root from it
+     - Read meta.base_branch from it
      - Load and show resume prompt
      - goto: Step 5A (Resume Mode)
      
   4. If state file NOT EXISTS:
      action: Ask what user wants to do
      goto: Step 5B (New Session Mode)
+```
+
+### Step 4B: Detect Base Branch (ALWAYS CONFIRM) / Xác định Branch Gốc
+
+```yaml
+base_branch_detection:
+  # Base branch is used by /code-review for diff comparison
+  # ALWAYS confirm with user - never auto-decide
+  # User may use feature branches as base for sub-features
+  # Example: feature/big-feature → feature/big-feature-part-1
+  
+  1. If RESUMING existing workflow:
+     source: .workflow-state.yaml → meta.base_branch
+     action: Use saved value (already confirmed previously)
+     
+  2. If NEW workflow:
+     a. Detect likely default branch (as SUGGESTION only):
+        commands:
+          # Try to get default branch from remote
+          - git remote show origin 2>/dev/null | grep "HEAD branch" | cut -d: -f2 | tr -d ' '
+          # Fallback: check if main exists
+          - git rev-parse --verify origin/main 2>/dev/null && echo "main"
+          # Fallback: check if master exists  
+          - git rev-parse --verify origin/master 2>/dev/null && echo "master"
+          # Fallback: check if develop exists
+          - git rev-parse --verify origin/develop 2>/dev/null && echo "develop"
+     
+     b. ALWAYS ask user to confirm (không tự quyết định):
+        "### 🎯 Base Branch / Branch Gốc
+        
+        Branch này sẽ merge vào đâu? / Where will this branch merge into?
+        
+        | Info | Value |
+        |------|-------|
+        | Current branch | `<current_branch>` |
+        | Suggested | `<detected_branch>` |
+        
+        **Common patterns / Các mẫu thường gặp:**
+        - `main` / `master` - Direct to main branch
+        - `develop` - Feature → develop → main  
+        - `feature/xxx` - Sub-feature → parent feature branch
+        
+        This affects `/code-review` diff comparison.
+        
+        **Enter base branch (or press Enter for `<detected_branch>`):**"
+     
+  3. Store in session context:
+     base_branch: <user_confirmed_value>
+     
+  4. Save to state file when workflow starts:
+     meta.base_branch: <user_confirmed_value>
 ```
 
 ### Step 5A: Resume Mode / Chế độ Tiếp tục
@@ -135,6 +187,7 @@ resume_actions:
      | Aspect | Value |
      |--------|-------|
      | Branch | `<branch-slug>` |
+     | Base Branch | `<base_branch>` |
      | Feature | <feature-name> |
      | Phase | <current_phase>: <phase_name> |
      | Status | <phase_status> |
@@ -168,6 +221,7 @@ new_session_actions:
      **Tooling Root:** `<tooling_root>`
      **Docs Root:** `<docs_root>` (or ask user)
      **Branch:** `<branch-slug>`
+     **Base Branch:** `<base_branch>` (for PR comparison)
      
      No active workflow found for this branch.
      Không tìm thấy workflow đang hoạt động cho branch này.
