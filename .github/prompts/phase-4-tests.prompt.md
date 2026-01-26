@@ -261,9 +261,95 @@ pnpm test --coverage --collectCoverageFrom='path/to/file.ts'
 
 ---
 
-### Test Documentation Update / Cập nhật Tài liệu Test
+### 📋 Test Log / Nhật ký Test
 
-Add to `04_tests/tests.md`:
+> After user runs tests, document the results here
+> Sau khi người dùng chạy tests, ghi lại kết quả ở đây
+
+```markdown
+## Test Execution Log — Batch <N>
+
+### Run Info
+| Field | Value |
+|-------|-------|
+| Executed At | <timestamp> |
+| Command | `pnpm test --coverage` |
+| Duration | <X>s |
+
+### Results Summary
+| Metric | Value |
+|--------|-------|
+| Total Tests | <N> |
+| Passed | <N> ✅ |
+| Failed | <N> ❌ |
+| Skipped | <N> ⏭️ |
+
+### Coverage Report
+| File | Statements | Branches | Functions | Lines |
+|------|------------|----------|-----------|-------|
+| file.ts | 85% | 80% | 100% | 85% |
+| other.ts | 72% | 70% | 90% | 75% |
+| **Total** | **78%** | **75%** | **95%** | **80%** |
+
+### Test Output (if failures)
+```
+FAIL  path/to/__tests__/file.test.ts
+  ● Test suite description › test name
+    Expected: X
+    Received: Y
+    
+    at Object.<anonymous> (file.test.ts:42:5)
+```
+
+### Failure Analysis (if any)
+| Test | Error | Root Cause | Action |
+|------|-------|------------|--------|
+| `test name` | Expected X got Y | Bug in test mock | Fix mock setup |
+
+### Verdict
+- [ ] ✅ All tests pass
+- [ ] ✅ Coverage ≥ 70%
+- [ ] Ready for next batch / test-verify
+```
+
+---
+
+## ⚠️ MANDATORY: Test Documentation Update / BẮT BUỘC: Cập nhật Tài liệu Test
+
+```yaml
+##############################################################
+#  🚨 CRITICAL: MUST UPDATE tests.md AFTER EACH BATCH
+#  🚨 QUAN TRỌNG: PHẢI CẬP NHẬT tests.md SAU MỖI BATCH
+##############################################################
+
+documentation_rule:
+  file: "<docs_root>/docs/runs/<branch-slug>/04_tests/tests.md"
+  timing: IMMEDIATELY after writing test batch (before STOP)
+  enforced: ALWAYS - no exceptions
+  
+  MUST_DO:
+    - Create tests.md if not exists
+    - Append batch results to tests.md
+    - Include coverage numbers
+    - Update status after user runs tests
+    
+  MUST_NOT:
+    - Skip documentation update
+    - Only show in chat without saving to file
+    - Forget to create/update the file
+    
+  verification:
+    after_each_batch: |
+      ✅ Check: Does 04_tests/tests.md exist?
+      ✅ Check: Is batch <N> documented in file?
+      ✅ Check: Are coverage numbers recorded?
+```
+
+### 📝 ACTION: Create/Update `04_tests/tests.md`
+
+**File path:** `<docs_root>/docs/runs/<branch-slug>/04_tests/tests.md`
+
+**Template to ADD (append each batch):**
 
 ```markdown
 ## Test Batch <N>
