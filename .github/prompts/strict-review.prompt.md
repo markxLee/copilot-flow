@@ -18,6 +18,40 @@ accepted_triggers:
 
 ---
 
+## 🔧 Context & Diff Source
+
+```yaml
+# CRITICAL: Read base_branch from workflow state, NOT hardcoded "main"
+
+get_base_branch:
+  1. Read .workflow-state.yaml → meta.base_branch
+  2. If not found → fallback to "main" or "master"
+  3. Store for diff commands
+
+diff_commands:
+  single_file:
+    command: git diff HEAD -- <file>
+    
+  all_changes:
+    # Use base_branch from state
+    base_branch: state.meta.base_branch
+    commands: |
+      git fetch origin <base_branch>
+      MERGE_BASE=$(git merge-base origin/<base_branch> HEAD)
+      git diff $MERGE_BASE..HEAD
+    
+  file_list:
+    command: git diff --name-only $MERGE_BASE..HEAD
+
+multi_root_awareness:
+  # Check which root contains the file(s) to review
+  1. If specific file: detect root from path
+  2. If --pr mode: get affected_roots from state
+  3. Run git commands in correct root directory
+```
+
+---
+
 ## 🎭 Reviewer Persona
 
 ```yaml
