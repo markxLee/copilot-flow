@@ -1,0 +1,488 @@
+# Workflow State File / File Trạng thái Workflow
+# This file tracks progress and enables resuming work at any point
+# File này theo dõi tiến độ và cho phép tiếp tục công việc bất cứ lúc nào
+#
+# Location: copilot-flow/docs/runs/BP-24-application-installation-to-billing/.workflow-state.yaml
+# Updated: Automatically by Copilot after each action
+# Format: YAML (AI-optimized for fast parsing)
+
+# ============================================================
+# META - Workflow identification / Định danh workflow
+# ============================================================
+meta:
+  branch_slug: BP-24-application-installation-to-billing
+  docs_root: copilot-flow
+  tooling_root: copilot-flow
+  feature_name: "BP-24: Billing App Installation Synchronization"
+  created_at: "2026-01-23T00:00:00Z"
+  last_updated: "2026-01-27T00:00:00Z"
+  updated_by: copilot
+  
+  # Base branch for diff comparison
+  base_branch: main
+  
+  # Affected roots tracking
+  affected_roots:
+    - root: apphub-vision
+      role: primary
+      changes:
+        - apps/billing/**
+        - apps/dashboard/**
+        - packages/billing-database/**
+
+# ============================================================
+# CURRENT STATUS - Quick resume point / Điểm tiếp tục nhanh
+# ============================================================
+status:
+  current_phase: 4
+  phase_name: tests
+  phase_status: approved
+  
+  # Task-level tracking
+  current_task: null
+  current_root: apphub-vision
+  
+  # Quick context for immediate resume
+  last_action: "Phase 4 Tests Complete - 265 tests passed, all v2 components ≥94% coverage"
+  next_action: "Ready for Phase 5: Done Check and PR preparation"
+  
+  # Blockers
+  blockers: []
+
+# ============================================================
+# PHASE PROGRESS - Detailed per-phase tracking / Theo dõi từng phase
+# ============================================================
+phases:
+  phase_0_analysis:
+    status: approved
+    started_at: "2026-01-23T00:00:00Z"
+    completed_at: "2026-01-23T12:00:00Z"
+    approved_at: "2026-01-23T12:00:00Z"
+    approved_by: user
+    
+    artifacts:
+      - path: 00_analysis/technical-feasibility.md
+        status: complete
+    
+    decisions:
+      - id: D-001
+        decision: "Use Service-Based Billing Model (v2) instead of StoreAccountLink"
+        rationale: "Account should be abstract billing group, support billing beyond app usage (support, custom work, consulting)"
+      - id: D-002
+        decision: "Store belongs directly to Organisation (organisationId FK)"
+        rationale: "Simpler relationship model, store is organizational asset"
+      - id: D-003
+        decision: "ServiceUsage replaces AppAccount concept"
+        rationale: "More flexible - can bill for apps, support packages, custom work, consulting"
+        
+    open_questions: []
+
+  phase_1_spec:
+    status: approved
+    started_at: "2026-01-23T12:00:00Z"
+    completed_at: "2026-01-23T14:00:00Z"
+    approved_at: "2026-01-23T14:00:00Z"
+    
+    artifacts:
+      - path: 01_spec/spec.md
+        status: complete
+      - path: 01_spec/spec-update-1.md
+        status: complete
+    
+    requirements_count:
+      functional: 12
+      non_functional: 3
+    
+    open_questions: []
+
+  phase_2_tasks:
+    status: approved
+    started_at: "2026-01-23T14:00:00Z"
+    completed_at: "2026-01-23T16:00:00Z"
+    approved_at: "2026-01-23T16:00:00Z"
+    
+    artifacts:
+      - path: 02_tasks/tasks.md
+        status: complete
+      - path: 02_tasks/tasks-update-1.md
+        status: complete
+    
+    tasks_summary:
+      total: 17
+      by_root:
+        apphub-vision: 17
+    
+    open_questions: []
+
+  phase_3_impl:
+    status: approved
+    started_at: "2026-01-23T16:00:00Z"
+    completed_at: "2026-01-26T18:00:00Z"
+    approved_at: "2026-01-26T18:00:00Z"
+    
+    artifacts:
+      - path: 03_impl/impl-log.md
+        status: complete
+    
+    # Task tracking - v1 Original Tasks
+    tasks:
+      # === v1 Original Tasks ===
+      - id: T-001
+        title: "Create Zod validation schema for provision request"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-23T17:00:00Z"
+        checkpoint:
+          files_created:
+            - apps/billing/app/api/internal/organisation/provision/schema.ts
+            
+      - id: T-002
+        title: "Create ProvisionService + StoreRepository"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-23T19:00:00Z"
+        depends_on: [T-001]
+        checkpoint:
+          files_created:
+            - apps/billing/services/provision.service.ts
+            - apps/billing/lib/repository/prisma/store.repository.ts
+            
+      - id: T-003
+        title: "Create provision API endpoint"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-23T20:00:00Z"
+        depends_on: [T-002]
+        checkpoint:
+          files_created:
+            - apps/billing/app/api/internal/organisation/provision/route.ts
+            
+      - id: T-004
+        title: "Create Dashboard billing helper"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-24T10:00:00Z"
+        depends_on: [T-003]
+        checkpoint:
+          files_created:
+            - apps/dashboard/helper/billing/provision.ts
+            
+      - id: T-005
+        title: "Integrate into get-started onboarding"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-24T12:00:00Z"
+        depends_on: [T-004]
+        checkpoint:
+          files_modified:
+            - apps/dashboard/app/(frameless-layout)/get-started/actions.ts
+            
+      - id: T-006
+        title: "Unit tests for v1 ProvisionService"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-24T15:00:00Z"
+        depends_on: [T-005]
+        checkpoint:
+          files_created:
+            - apps/billing/__tests__/services/provision.service.test.ts
+            
+      - id: T-007
+        title: "Integration tests for provision endpoint"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-24T16:00:00Z"
+        depends_on: [T-006]
+        checkpoint:
+          files_created:
+            - apps/billing/__tests__/app/api/internal/organisation/provision/route.test.ts
+            
+      # === v2 Spec Update 1 Tasks ===
+      - id: T-008
+        title: "Add Prisma Schema Models (Service, ServiceUsage, ServiceUsageStore)"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-25T10:00:00Z"
+        checkpoint:
+          files_modified:
+            - packages/billing-database/prisma/schema.prisma
+            
+      - id: T-009
+        title: "Generate Prisma Migration"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-25T11:00:00Z"
+        depends_on: [T-008]
+        checkpoint:
+          files_created:
+            - packages/billing-database/prisma/migrations/20260123074436_add_service_models/migration.sql
+            
+      - id: T-010
+        title: "Update Seed Script for Service Table"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-25T12:00:00Z"
+        depends_on: [T-009]
+        checkpoint:
+          files_modified:
+            - packages/billing-database/prisma/seed/services.ts
+            
+      - id: T-011
+        title: "Create ServiceRepository"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-25T14:00:00Z"
+        depends_on: [T-010]
+        checkpoint:
+          files_created:
+            - apps/billing/lib/repository/prisma/service.repository.ts
+          files_modified:
+            - apps/billing/lib/repository/prisma/index.ts
+            
+      - id: T-012
+        title: "Create ServiceUsageRepository"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-25T16:00:00Z"
+        depends_on: [T-011]
+        checkpoint:
+          files_created:
+            - apps/billing/lib/repository/prisma/service-usage.repository.ts
+          files_modified:
+            - apps/billing/lib/repository/prisma/index.ts
+            
+      - id: T-013
+        title: "Update StoreRepository for v2"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-25T18:00:00Z"
+        depends_on: [T-012]
+        checkpoint:
+          files_modified:
+            - apps/billing/lib/repository/prisma/store.repository.ts
+            
+      - id: T-014
+        title: "Update ProvisionService for v2 Model"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-26T10:00:00Z"
+        depends_on: [T-013]
+        checkpoint:
+          files_modified:
+            - apps/billing/services/provision.service.ts
+            - apps/billing/app/api/internal/organisation/provision/schema.ts
+            
+      - id: T-015
+        title: "Update Unit Tests for v2"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-26T14:00:00Z"
+        depends_on: [T-014]
+        checkpoint:
+          files_modified:
+            - apps/billing/__tests__/services/provision.service.test.ts
+            
+      - id: T-016
+        title: "v2 Repository Tests - ServiceRepository"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-26T16:00:00Z"
+        depends_on: [T-015]
+        checkpoint:
+          files_created:
+            - apps/billing/__tests__/lib/repository/prisma/service.repository.test.ts
+            
+      - id: T-017
+        title: "v2 Repository Tests - ServiceUsageRepository + StoreRepository"
+        root: apphub-vision
+        status: done
+        completed_at: "2026-01-26T18:00:00Z"
+        depends_on: [T-016]
+        checkpoint:
+          files_created:
+            - apps/billing/__tests__/lib/repository/prisma/service-usage.repository.test.ts
+            - apps/billing/__tests__/lib/repository/prisma/store.repository.test.ts
+    
+    sync_status: []
+    open_questions: []
+
+  phase_4_tests:
+    status: approved
+    started_at: "2026-01-24T15:00:00Z"
+    completed_at: "2026-01-26T18:00:00Z"
+    approved_at: "2026-01-26T18:00:00Z"
+    
+    artifacts:
+      - path: 04_tests/unit-tests.md
+        status: complete
+    
+    test_summary:
+      total: 265
+      passed: 265
+      failed: 0
+      skipped: 0
+      coverage: "97.72%"
+    
+    failures: []
+    open_questions: []
+
+  phase_5_done:
+    status: not-started
+    started_at: null
+    completed_at: null
+    approved_at: null
+    
+    artifacts:
+      - path: 05_done/done-check.md
+        status: pending
+      - path: 05_done/release-notes.md
+        status: pending
+    
+    checklist:
+      docs_complete: false
+      code_reviewed: false
+      tests_pass: true
+      ready_to_merge: false
+    
+    open_questions: []
+
+# ============================================================
+# AFFECTED ROOTS - Track changes per root / Theo dõi thay đổi theo root
+# ============================================================
+affected_roots:
+  - root: apphub-vision
+    path: /Users/trucle/Desktop/boostcommerce/apphub-vision
+    branch: feature/BP-24-application-installation-to-billing
+    
+    # Change tracking
+    files:
+      created:
+        - apps/billing/app/api/internal/organisation/provision/schema.ts
+        - apps/billing/app/api/internal/organisation/provision/route.ts
+        - apps/billing/services/provision.service.ts
+        - apps/billing/lib/repository/prisma/store.repository.ts
+        - apps/billing/lib/repository/prisma/service.repository.ts
+        - apps/billing/lib/repository/prisma/service-usage.repository.ts
+        - apps/dashboard/helper/billing/provision.ts
+        - packages/billing-database/prisma/migrations/20260123074436_add_service_models/migration.sql
+        - apps/billing/__tests__/services/provision.service.test.ts
+        - apps/billing/__tests__/app/api/internal/organisation/provision/route.test.ts
+        - apps/billing/__tests__/lib/repository/prisma/service.repository.test.ts
+        - apps/billing/__tests__/lib/repository/prisma/service-usage.repository.test.ts
+        - apps/billing/__tests__/lib/repository/prisma/store.repository.test.ts
+      modified:
+        - apps/dashboard/app/(frameless-layout)/get-started/actions.ts
+        - apps/billing/lib/repository/prisma/index.ts
+        - packages/billing-database/prisma/schema.prisma
+        - packages/billing-database/prisma/seed/services.ts
+      deleted: []
+    
+    # Git status
+    git:
+      has_uncommitted: false
+      commits_ahead: 0
+      last_commit: null
+      last_commit_msg: null
+    
+    # PR tracking
+    pr:
+      number: null
+      url: null
+      status: null
+
+# ============================================================
+# CONVERSATION CONTEXT - For AI continuity / Ngữ cảnh cho AI
+# ============================================================
+context:
+  # Key decisions made during this session
+  session_decisions:
+    - "v2 Model: Service-Based Billing replaces StoreAccountLink"
+    - "ServiceUsage = Account → Service relationship"
+    - "ServiceUsageStore = which Stores use the service"
+    - "Store.organisationId FK (belongs to org directly)"
+    - "Service table seeded with: clearer, boost, support, custom-theme"
+  
+  # Important context that shouldn't be lost
+  important_notes:
+    - "ServiceUsage replaces AppAccount concept for flexibility"
+    - "Billing supports: apps, support packages, custom work, consulting"
+    - "Fire-and-forget pattern for Dashboard → Billing provisioning"
+    - "All 265 tests passed with ≥94% coverage on v2 components"
+  
+  # User preferences observed
+  user_preferences:
+    language: both
+    detail_level: detailed
+    auto_commit: false
+  
+  # Errors encountered and how they were resolved
+  error_log: []
+
+# ============================================================
+# HISTORY - Timeline of actions / Lịch sử hành động
+# ============================================================
+history:
+  - timestamp: "2026-01-23T00:00:00Z"
+    phase: 0
+    action: phase_start
+    description: "Started Phase 0: Analysis & Design"
+    
+  - timestamp: "2026-01-23T12:00:00Z"
+    phase: 0
+    action: approval
+    description: "Phase 0 approved - Technical feasibility analysis complete"
+    
+  - timestamp: "2026-01-23T12:00:00Z"
+    phase: 1
+    action: phase_start
+    description: "Started Phase 1: Specification"
+    
+  - timestamp: "2026-01-23T14:00:00Z"
+    phase: 1
+    action: approval
+    description: "Phase 1 approved - Spec v1 complete"
+    
+  - timestamp: "2026-01-23T14:00:00Z"
+    phase: 2
+    action: phase_start
+    description: "Started Phase 2: Task Planning"
+    
+  - timestamp: "2026-01-23T16:00:00Z"
+    phase: 2
+    action: approval
+    description: "Phase 2 approved - 7 tasks planned for v1"
+    
+  - timestamp: "2026-01-23T16:00:00Z"
+    phase: 3
+    action: phase_start
+    description: "Started Phase 3: Implementation"
+    
+  - timestamp: "2026-01-24T16:00:00Z"
+    phase: 3
+    action: task_complete
+    description: "v1 Tasks T-001 to T-007 complete - 41 tests, 97.72% coverage"
+    
+  - timestamp: "2026-01-25T00:00:00Z"
+    phase: 1
+    action: spec_update
+    description: "Spec Update 1: v2 Service-Based Billing Model"
+    
+  - timestamp: "2026-01-25T00:00:00Z"
+    phase: 2
+    action: task_update
+    description: "Tasks Update 1: Added T-008 to T-017 for v2 model"
+    
+  - timestamp: "2026-01-26T18:00:00Z"
+    phase: 3
+    action: task_complete
+    description: "v2 Tasks T-008 to T-017 complete - All implementation done"
+    
+  - timestamp: "2026-01-26T18:00:00Z"
+    phase: 4
+    action: phase_complete
+    description: "Phase 4 Tests complete - 265 tests passed, all v2 components ≥94% coverage"
+    
+  - timestamp: "2026-01-27T00:00:00Z"
+    phase: 4
+    action: state_migration
+    description: "Migrated from old flow to new workflow-state.yaml format"
