@@ -40,7 +40,7 @@ ON_EVERY_NEW_SESSION:
 ## 🚀 Session Start - Run Init First
 
 **On EVERY new conversation**, Copilot SHOULD:
-1. Run [init-context.prompt.md](.github/prompts/init-context.prompt.md)
+1. Run [init-context.prompt.md](prompts/init-context.prompt.md)
 2. Or wait for user to say `init` / `start` / `resume`
 
 This ensures:
@@ -57,7 +57,7 @@ This ensures:
 This repository (`copilot-flow`) implements a **multi-phase governed workflow** for complex development tasks.
 
 **Copilot MUST:**
-1. Follow the workflow contract at [docs/workflow/contract.md](docs/workflow/contract.md)
+1. Follow the workflow contract at [docs/workflow/contract.md](../docs/workflow/contract.md)
 2. Check for existing workflow state before starting new work
 3. Use bilingual templates for all documentation
 4. STOP for user approval at phase gates
@@ -213,6 +213,7 @@ MANDATORY_CHECK:
 | `/phase-3-impl next` | Plan next task (shows approach first) |
 | `/impl go` | Proceed with implementation after plan approved |
 | `/impl approved` | Mark complete after manual review (skip AI review) |
+| `/verify-checks` | Run automated checks (type/lint/build/test) |
 | `/code-review T-XXX` | Review task changes (AI review) |
 | `/code-review` | Batch review all completed tasks |
 | `/strict-review` | Brutal honest review (strict reviewer persona) |
@@ -226,11 +227,13 @@ MANDATORY_CHECK:
 | `/workflow-resume` | Resume from saved state |
 | `/rollback` | Undo implementation changes |
 | `/lite-mode` | Start lite mode for simple tasks |
+| `/solo-orchestrator` | One-command solo flow (Lite vs Governed) |
 
 ### Session Commands (Explicit Prompts)
 | Prompt | Action |
 |--------|--------|
 | `/init` | Initialize session, load context |
+| `/solo-orchestrator` | One-command solo flow (Lite vs Governed) |
 | `/workflow-resume` | Continue from saved state |
 | `/workflow-status` | Show current workflow status |
 | `/quick-ref` | Show quick reference card |
@@ -427,6 +430,8 @@ other_roots (e.g., reviews-assets):
 | `.github/prompts/phase-2-tasks.prompt.md` | Phase 2: Task Planning |
 | `.github/prompts/task-plan-review.prompt.md` | Phase 2: Task plan quality review |
 | `.github/prompts/phase-3-impl.prompt.md` | Phase 3: Implementation (per-task) |
+| `.github/prompts/solo-orchestrator.prompt.md` | One-command solo flow (Lite vs Governed) |
+| `.github/prompts/verify-checks.prompt.md` | Run automated checks (type/lint/build/test) |
 | `.github/prompts/code-review.prompt.md` | Phase 3: Code review for task |
 | `.github/prompts/strict-review.prompt.md` | Brutal honest review (strict reviewer) |
 | `.github/prompts/code-fix-plan.prompt.md` | Phase 3: Fix plan for review issues |
@@ -437,6 +442,7 @@ other_roots (e.g., reviews-assets):
 | `.github/prompts/pr-description.prompt.md` | Generate PR description file |
 | `.github/prompts/pr-notify-reviewers.prompt.md` | Friendly message to notify reviewers |
 | `.github/prompts/workflow-resume.prompt.md` | Resume from saved state |
+| `.github/prompts/workflow-status.prompt.md` | Show current workflow status (read-only) |
 | `.github/prompts/memory-context-hygiene.prompt.md` | Reset context when confused |
 | `.github/prompts/workspace-update-root.prompt.md` | Update workspace context |
 | `.github/prompts/cross-root-guide.prompt.md` | **Auto-config & SAVE cross-root relationships** |

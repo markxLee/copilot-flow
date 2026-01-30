@@ -25,7 +25,7 @@ Before any work, Copilot MUST reference `WORKSPACE_CONTEXT.md` to understand:
 - Cross-root dependencies
 
 If `WORKSPACE_CONTEXT.md` does not exist or is stale:
-→ STOP and run `setup workspace` (or `workspace-discovery.prompt.md`)
+→ STOP and run `/setup-workspace` (or `/workspace-discovery` for partial setup)
 
 **Setup Workspace** runs 4 steps:
 1. Discovery → WORKSPACE_CONTEXT.md

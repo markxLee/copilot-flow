@@ -142,4 +142,4 @@ Edit this file to change default Copilot settings for all roots.
 ## Related Prompts
 
 - [sync-instructions.prompt.md](sync-instructions.prompt.md) - Sync instruction files
-- [workspace-discovery.prompt.md](workspace-discovery.prompt.md) - Setup workspace
+- [workspace-discovery.prompt.md](workspace-discovery.prompt.md) - Discovery step (part of /setup-workspace)

@@ -160,7 +160,7 @@ Quy trình 6 phase có cấu trúc cho các task phức tạp, có cổng duyệ
 
 | Phase | What Happens | Output | Gate |
 |-------|--------------|--------|------|
-| **0 - Analysis** | Understand problem, research codebase, design approach | `analysis.md` with diagrams | ⏸️ Approval |
+| **0 - Analysis** | Understand problem, research codebase, design approach | `solution-design.md` with diagrams | ⏸️ Approval |
 | **1 - Specification** | Define requirements, acceptance criteria, edge cases | `spec.md` with clear criteria | ⏸️ Approval |
 | **2 - Task Planning** | Break into tasks, estimate, identify dependencies | `tasks.md` with ordered list | ⏸️ Approval |
 | **3 - Implementation** | Code each task, run reviews per task | `impl-log.md` + code changes | ⏸️ Per-task |
@@ -202,7 +202,7 @@ Quy trình 6 phase có cấu trúc cho các task phức tạp, có cổng duyệ
 
 **Step 2: Run Copilot setup / Chạy cài đặt Copilot:**
 ```
-setup workspace
+`/setup-workspace`
 │
 ├── Step 1: workspace-discovery
 │   ├── Scan all roots
@@ -235,7 +235,7 @@ setup workspace
 4. **Sync instructions:** Say `sync instructions`
 5. **Generate docs:** Say `generate architecture`
 
-Or run all at once: `setup workspace`
+Or run all at once: `/setup-workspace`
 
 ---
 
@@ -281,6 +281,7 @@ Luôn dùng `/prompt-name` tường minh để đảm bảo đúng flow.
 | `/task-plan-review` | Review task plan (before Phase 3) | Review task plan (trước Phase 3) |
 | `/phase-3-impl T-XXX` | Implement specific task | Triển khai task cụ thể |
 | `/phase-3-impl next` | Implement next incomplete task | Triển khai task tiếp theo |
+| `/verify-checks` | Run automated checks (type/lint/build/test) | Chạy kiểm tra tự động (type/lint/build/test) |
 | `/code-review T-XXX` | Review task changes | Review thay đổi của task |
 | `/strict-review` | Brutal honest review (strict persona) | Review khó tính (persona nghiêm khắc) |
 | `/code-fix-plan T-XXX` | Plan fixes for review issues | Lập kế hoạch sửa lỗi |
@@ -293,6 +294,7 @@ Luôn dùng `/prompt-name` tường minh để đảm bảo đúng flow.
 | `/workflow-resume` | Resume from saved state | Tiếp tục từ trạng thái đã lưu |
 | `/rollback` | Undo implementation changes | Hoàn tác thay đổi |
 | `/lite-mode` | Start lite mode for simple tasks | Chế độ nhanh cho task đơn giản |
+| `/solo-orchestrator` | One-command solo flow (Lite vs Governed) | Điều phối 1 lệnh cho solo (Lite vs Governed) |
 
 ---
 
@@ -323,6 +325,7 @@ approved
 /phase-2-tasks   # After spec review passes
 /task-plan-review # After Phase 2, review task plan first
 /phase-3-impl T-001  # After task plan review passes
+/verify-checks       # Run automated checks first
 /code-review T-001   # After task implementation
 ```
 
@@ -342,13 +345,14 @@ approved
 ### 🛠️ Setup Commands / Lệnh Cài đặt
 | Command | Action | Lệnh VN |
 |---------|--------|---------|
-| `setup workspace` | Full setup (4 steps) | `cài đặt workspace` |
-| `sync instructions` | Sync coding standards | `đồng bộ instructions` |
-| `suggest instructions` | Analyze tech + suggest | `gợi ý instructions` |
-| `sync vscode settings` | Sync VS Code settings | `đồng bộ settings` |
-| `generate workspace file` | Create .code-workspace | `tạo workspace file` |
-| `generate architecture` | Create ARCHITECTURE.md | `tạo architecture` |
-| `cross-root` | Configure cross-root | `cấu hình đa root` |
+| `/setup-workspace` | Full setup (discovery → cross-root → sync → generate) | `cài đặt workspace` |
+| `/workspace-discovery` | Scan workspace and create WORKSPACE_CONTEXT.md | `quét workspace` |
+| `/cross-root-guide` | Configure and save cross-root patterns | `cấu hình đa root` |
+| `/sync-instructions` | Sync coding standards | `đồng bộ instructions` |
+| `/suggest-instructions` | Analyze tech + suggest | `gợi ý instructions` |
+| `/sync-vscode-settings` | Sync VS Code settings | `đồng bộ settings` |
+| `/generate-workspace-file` | Create .code-workspace | `tạo workspace file` |
+| `/generate-architecture` | Create ARCHITECTURE.md | `tạo architecture` |
 
 ---
 
@@ -357,6 +361,11 @@ approved
 ---
 
 ### 🔄 Common Flows with Explicit Prompts / Các Luồng với Prompt Tường minh
+
+**Solo (Recommended Entry Point):**
+```
+/solo-orchestrator start: <describe work>
+```
 
 **New Feature (Full Workflow):**
 ```
@@ -367,6 +376,7 @@ init
   → /phase-1-spec 
   → /phase-2-tasks 
   → /phase-3-impl T-001 
+  → /verify-checks
   → /code-review T-001
   → /phase-3-impl T-002
   → ... (repeat for all tasks)
@@ -490,7 +500,7 @@ rollback → (choose what to undo) → continue
 #### 5. "Phase outputs don't save" / Output phase không lưu
 
 **Symptoms / Triệu chứng:**
-- analysis.md, spec.md etc. not created
+- solution-design.md, spec.md etc. not created
 - State file missing entries
 
 **Fix / Cách sửa:**

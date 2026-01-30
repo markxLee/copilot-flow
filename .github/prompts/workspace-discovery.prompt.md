@@ -7,7 +7,7 @@ description: Scan and document multi-root workspace with machine-readable YAML f
 
 ## Trigger / Kích hoạt
 
-- User says: `setup workspace`, `discover workspace`, `scan workspace`
+- User says: `discover workspace`, `scan workspace`
 - First time setting up copilot-flow in a workspace
 - Adding a new root to existing workspace
 
@@ -17,46 +17,11 @@ Generate a **machine-optimized** `WORKSPACE_CONTEXT.md` file that AI agents can 
 
 ---
 
-## Full Setup Mode (`setup workspace`)
+## Full Setup / Setup đầy đủ
 
-When user says `setup workspace`, run ALL setup steps in sequence:
+If user asks for a full setup pipeline, use `/setup-workspace` (or the prompt file `.github/prompts/setup-workspace.prompt.md`).
 
-```yaml
-setup_sequence:
-  1. workspace-discovery (this prompt):
-     - Scan all roots
-     - Generate WORKSPACE_CONTEXT.md
-     
-  2. cross-root-guide:
-     - Auto-detect cross-root patterns
-     - Save to Section 9
-     
-  3. sync-instructions:
-     - Sync shared instructions
-     - Detect tech stacks
-     - Suggest missing instructions
-     
-  4. generate-workspace-files:
-     - Generate .code-workspace file
-     - Generate ARCHITECTURE.md
-
-output_after_all:
-  "## ✅ Workspace Setup Complete!
-  
-  | Step | Status |
-  |------|--------|
-  | 1. Discovery | ✅ WORKSPACE_CONTEXT.md created |
-  | 2. Cross-root | ✅ Patterns saved to Section 9 |
-  | 3. Sync Instructions | ✅ Synced + tech stacks analyzed |
-  | 4. Workspace Files | ✅ .code-workspace + ARCHITECTURE.md |
-  
-  To open workspace:
-  \`\`\`bash
-  code <workspace_name>.code-workspace
-  \`\`\`
-  
-  Ready to start working. Say \`init\` to begin."
-```
+This prompt is discovery-only: it generates/updates `WORKSPACE_CONTEXT.md`.
 
 ---
 

@@ -37,7 +37,8 @@ pre_checks:
      if_not: STOP - "No spec found. Run phase-1-spec first."
      
   2. Load related artifacts:
-     - 00_analysis/analysis.md (approved design)
+      - 00_analysis/solution-design.md (approved design, preferred)
+      - 00_analysis/analysis.md (legacy alias)
      - 00_analysis/work-description.md (original requirements)
      - 01_spec/spec.md (current spec)
      

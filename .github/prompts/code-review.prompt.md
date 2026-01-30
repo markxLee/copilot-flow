@@ -135,6 +135,17 @@ pre_checks:
      batch_review:
        completed_tasks: tasks with status "completed" or "in-progress"
        not_reviewed: tasks without reviewed_at timestamp
+
+  7. Load work contract (requirement traceability):
+     required:
+       - 00_analysis/work-description.md
+     optional:
+       - 00_analysis/work-updates.md
+       - 00_analysis/work-description-update-<N>.md (if requirement changes were registered)
+     rule: |
+       - Treat work-description.md as the original intent.
+       - If work-updates.md exists, the latest approved REQUIREMENT_CHANGE/SCOPE_EXPANSION entry defines the current intent.
+       - Review must ensure implementation matches the current intent and does not exceed it.
 ```
 
 ---
@@ -149,15 +160,33 @@ Review code changes của task hiện tại theo standards, conventions, và tí
 
 ## Scope Rules (NON-NEGOTIABLE) / Quy tắc Phạm vi (KHÔNG THƯƠNG LƯỢNG)
 
+**CRITICAL / QUAN TRỌNG:** Scope depends on review mode.
+
+### Mode A: Single Task Review (T-XXX) / Review 1 Task (T-XXX)
+
 **MUST / PHẢI:**
-- Review ONLY changes for current task
-- Focus on modified files listed in task
-- Check against done criteria from task plan
+- Review ONLY changes attributable to task T-XXX
+- Focus on files listed for T-XXX (from tasks.md) and/or recorded in impl-log.md
+- Validate against T-XXX done criteria + related spec acceptance criteria
+- Flag any scope creep beyond T-XXX
 
 **MUST NOT / KHÔNG ĐƯỢC:**
-- Review code outside the task scope
-- Propose broad refactors unrelated to task
-- Add new dependencies unless required
+- Review unrelated tasks or unrelated files
+- Propose broad refactors not required to satisfy T-XXX
+- Add new dependencies unless explicitly required by T-XXX
+- Implement fixes (only identify issues)
+
+### Mode B: Batch Review (no task ID) / Review Tổng (không có task ID)
+
+**MUST / PHẢI:**
+- Review ALL changes in the branch diff vs `base_branch` (from state)
+- Map changed files back to completed tasks since last review (via impl-log.md)
+- Check cross-task integration consistency (types/contracts/import boundaries)
+- Keep feedback scoped to the diff (don’t dig into untouched code)
+
+**MUST NOT / KHÔNG ĐƯỢC:**
+- Request refactors outside the diff or outside completed tasks
+- Expand scope into new features not planned in Phase 2
 - Implement fixes (only identify issues)
 
 ---
@@ -208,56 +237,22 @@ methods:
 
 ## ⚡ Automated Verification (CRITICAL) / Xác minh Tự động (QUAN TRỌNG)
 
+**Run `/verify-checks` first** (preferred).
+
 ```yaml
-AUTOMATED_CHECKS:
-  # MUST run these checks to find hidden errors
-  # Run in EACH affected root
-  
-  required_checks:
-    1_typescript_check:
-      purpose: Find type errors that IDE might miss
-      command: pnpm tsc --noEmit
-      alternative: pnpm typecheck
-      on_error:
-        severity: Critical
-        action: List all type errors as CRIT findings
-        
-    2_lint_check:
-      purpose: Find code style and potential bugs
-      command: pnpm lint
-      alternative: pnpm eslint .
-      on_error:
-        severity: Major (errors) / Minor (warnings)
-        action: List lint issues in findings
-        
-    3_build_check:
-      purpose: Verify code compiles and bundles correctly
-      command: pnpm build
-      on_error:
-        severity: Critical
-        action: Build failure = automatic REQUEST CHANGES
-        
-    4_test_check:
-      purpose: Verify tests pass (if tests exist)
-      command: pnpm test --passWithNoTests
-      on_error:
-        severity: Critical
-        action: Test failure = automatic REQUEST CHANGES
-        
-  execution_flow:
-    step_1: "Identify affected roots from changed files"
-    step_2: "For each root, run commands in terminal"
-    step_3: "Capture output for any failures"
-    step_4: "Include failures as findings with severity"
-    
-  all_tasks_mode_extra:
-    # Only in all-tasks mode, also check:
-    5_cross_root_imports:
-      purpose: Verify cross-root dependencies are correct
-      check: |
-        - No circular imports between roots
-        - Library builds before consumer
-        - API types match between backend/frontend
+AUTOMATED_VERIFICATION_POLICY:
+  preferred: "/verify-checks"
+  rationale: |
+    Keeps /code-review focused on correctness + requirement alignment.
+    /verify-checks handles package-manager detection and scripts-first commands.
+
+  if_user_did_not_run_verify_checks:
+    action: WARN
+    risk: "Review may miss type/build/test failures."
+
+  if_verify_checks_failed:
+    action: REQUEST_CHANGES
+    severity: Critical
 ```
 
 ---
@@ -265,7 +260,7 @@ AUTOMATED_CHECKS:
 ## Verification Output Template / Template Output Xác minh
 
 ```markdown
-### 🔧 Automated Verification / Xác minh Tự động
+### 🔧 Verify Checks Summary / Tóm tắt Verify Checks
 
 | Check | Root | Status | Details |
 |-------|------|--------|---------|
@@ -292,41 +287,48 @@ These are added to **Critical** findings below.
 
 ```yaml
 categories:
-  1. Correctness:
+  1. Work Alignment:
+    - Matches current work intent (work-description.md + latest work update)
+    - No scope creep beyond in-scope / out-of-scope
+    - Requirements changes are documented (work-update)
+    - User-visible behavior matches requested behavior
+
+  2. Correctness:
      - Logic errors
      - Off-by-one errors
      - Null/undefined handling
      - Edge cases
      
-  2. Task Alignment:
-     - Matches task description
-     - Meets done criteria
-     - No scope creep
+  3. Task & Spec Alignment:
+    - Matches task description (tasks.md)
+    - Meets done criteria
+    - Meets spec acceptance criteria (spec.md)
+    - No scope creep beyond planned tasks
      
-  3. Code Quality:
+  4. Code Quality:
      - Readability
      - Maintainability
      - DRY principles
      - Naming conventions
      
-  4. Project Conventions:
+  5. Project Conventions:
      - Follow existing patterns
      - Use project utilities (tryCatch, etc.)
      - Import organization
      - TypeScript strictness
      
-  5. Security:
+  6. Security:
      - No secrets hardcoded
      - Input validation
      - SQL injection prevention
      - SSRF protection
      
-  6. Performance:
+  7. Performance:
      - No obvious inefficiencies
      - Appropriate data structures
      - Avoid unnecessary re-renders (React)
      
-  7. Multi-Root Consistency:
+  8. Multi-Root Consistency:
      - Changes respect root boundaries
      - Cross-root imports correct
      - Build dependencies maintained
@@ -486,10 +488,26 @@ Run by AI during review (results shown above):
 ```bash
 # In each affected root:
 cd <root>
-pnpm tsc --noEmit         # TypeScript check
-pnpm lint                  # Lint check
-pnpm build                 # Build check
-pnpm test --passWithNoTests  # Test check
+
+# 0) Detect package manager from lockfile:
+# - pnpm-lock.yaml  -> pnpm
+# - yarn.lock       -> yarn
+# - package-lock.json -> npm
+
+# 1) Prefer repo scripts from package.json (examples):
+# TypeScript check:
+<pm> typecheck            # or: npm run typecheck
+
+# Lint check:
+<pm> lint                 # or: npm run lint
+
+# Build check:
+<pm> build                # or: npm run build
+
+# Test check:
+<pm> test                 # or: npm test
+
+# 2) If scripts are missing, fallback to reasonable defaults for that repo.
 ```
 
 <If UI changes>

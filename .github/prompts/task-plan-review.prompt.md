@@ -38,7 +38,8 @@ pre_checks:
      
   2. Load related artifacts:
      - 01_spec/spec.md (requirements to cover)
-     - 00_analysis/analysis.md (solution design)
+      - 00_analysis/solution-design.md (solution design, preferred)
+      - 00_analysis/analysis.md (legacy alias)
      - 02_tasks/tasks.md (current task plan)
      
   3. Update state:

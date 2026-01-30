@@ -9,7 +9,7 @@
 
 - User says: `generate workspace file`, `create workspace file`
 - User says: `generate architecture`, `create architecture`
-- Part of `setup workspace` flow
+- Part of `/setup-workspace` flow
 
 ---
 
@@ -235,7 +235,7 @@ when_to_regenerate:
   - User says `regenerate workspace files`
 
 auto_regenerate:
-  # Part of setup workspace flow
+  # Part of /setup-workspace flow
   # After discovery completes, auto-generate these files
 ```
 

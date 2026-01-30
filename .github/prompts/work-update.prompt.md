@@ -191,12 +191,16 @@ steps:
 
 | Phase | Original | Update <N> |
 |-------|----------|------------|
-| 0 | analysis.md | analysis-update-<N>.md |
+| 0 | solution-design.md | solution-design-update-<N>.md |
 | 1 | spec.md | spec-update-<N>.md |
 | 2 | tasks.md | tasks-update-<N>.md |
 | 3 | impl-log.md | impl-log-update-<N>.md |
 | 4 | tests.md | tests-update-<N>.md |
 | 5 | done.md | done-update-<N>.md |
+
+Additional traceability docs (recommended):
+- If requirements/scope changed: create `00_analysis/work-description-update-<N>.md`
+- Always append a short entry to `00_analysis/work-updates.md`
 
 ---
 
@@ -339,6 +343,9 @@ phase_execution:
      - Use suffix "-update-<N>" for new docs
      - Reference previous version for context
      - Note what changed from previous
+     - If update type is REQUIREMENT_CHANGE or SCOPE_EXPANSION:
+       - Create `00_analysis/work-description-update-<N>.md`
+       - Append an entry to `00_analysis/work-updates.md` linking to the update
   3. Update artifacts reference in state:
      artifacts:
        - path: spec-update-<N>.md

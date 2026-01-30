@@ -45,7 +45,8 @@ pre_checks:
      
   2. Load spec artifacts:
      - 01_spec/spec.md
-     - 00_analysis/analysis.md
+      - 00_analysis/solution-design.md  # preferred (canonical)
+      - 00_analysis/analysis.md         # legacy alias (accept if present)
      
   3. Update state:
      status.current_phase: 2

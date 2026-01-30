@@ -200,6 +200,21 @@ Save Work Description to:
 <docs_root>/docs/runs/<branch-slug>/00_analysis/work-description.md
 ```
 
+Initialize Work Updates log (if not exists):
+```
+<docs_root>/docs/runs/<branch-slug>/00_analysis/work-updates.md
+```
+
+Suggested initial content:
+```markdown
+# Work Updates / Cập nhật Công việc
+
+## Update #0 — Initial Intake / Lần #0 — Ghi nhận ban đầu
+- Timestamp: <now>
+- Type: INITIAL
+- Description: Created initial work-description.md
+```
+
 Update state file:
 ```yaml
 meta:
@@ -210,6 +225,8 @@ phases.phase_0_analysis:
   artifacts:
     - path: 00_analysis/work-description.md
       status: draft
+         - path: 00_analysis/work-updates.md
+            status: initialized
       
 status:
   last_action: "Created work description"
@@ -238,6 +255,14 @@ action:
      - "What specifically should be improved? Performance, UI, functionality?"
      - "Which 'thing' needs updating? Please provide file/component name."
   3. Wait for answers before proceeding
+```
+
+### Case 0: Missing workspace context / Thiếu ngữ cảnh workspace
+```yaml
+trigger: "No WORKSPACE_CONTEXT.md" / "Unknown docs_root" / "Not set up"
+action:
+   1. STOP
+   2. Suggest running: "/setup-workspace"
 ```
 
 ### Case 2: User describes solution not problem / Mô tả giải pháp không phải vấn đề
@@ -296,7 +321,7 @@ trigger: WORKSPACE_CONTEXT.md not found or tooling_root not set
 action:
   1. STOP immediately
   2. Inform user:
-     - "Workspace not configured. Run `setup workspace` first."
+       - "Workspace not configured. Run `/setup-workspace` first."
   3. Do NOT proceed with work intake
 ```
 

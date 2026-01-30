@@ -404,7 +404,8 @@ sequenceDiagram
 ```yaml
 artifacts:
   main_doc:
-    path: <docs_root>/docs/runs/<branch-slug>/00_analysis/analysis.md
+    # Canonical Phase 0 artifact name (matches workflow contract + state template)
+    path: <docs_root>/docs/runs/<branch-slug>/00_analysis/solution-design.md
     content: Combines 0.1, 0.2, 0.3 outputs
     
   diagrams:
@@ -436,7 +437,7 @@ status:
 phases.phase_0_analysis:
   status: in-progress
   artifacts:
-    - path: 00_analysis/analysis.md
+    - path: 00_analysis/solution-design.md
       status: draft
     - path: 00_analysis/diagrams/flow-overview.md
       status: pending
@@ -451,7 +452,7 @@ phases.phase_0_analysis:
   status: awaiting-review
   completed_at: <now>
   artifacts:
-    - path: 00_analysis/analysis.md
+    - path: 00_analysis/solution-design.md
       status: complete
   decisions:
     - id: D-001
@@ -479,7 +480,8 @@ After completing all sub-phases:
 | Diagrams | <N> diagrams created |
 
 ### Artifacts Created / Artifact Đã tạo
-- [Analysis Document](./00_analysis/analysis.md)
+- [Solution Design](./00_analysis/solution-design.md) (preferred)
+- Legacy alias (if resuming older runs): `./00_analysis/analysis.md`
 - [Flow Overview](./00_analysis/diagrams/flow-overview.md)
 - [Decision Log](./00_analysis/decision-log.md)
 

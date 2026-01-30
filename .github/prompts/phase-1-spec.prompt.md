@@ -43,7 +43,8 @@ pre_checks:
      if_not: STOP and ask user to approve Phase 0 first
      
   2. Load analysis artifacts:
-     - 00_analysis/analysis.md
+      - 00_analysis/solution-design.md  # preferred (canonical)
+      - 00_analysis/analysis.md         # legacy alias (accept if present)
      - 00_analysis/work-description.md
      - 00_analysis/decision-log.md
      
@@ -160,7 +161,7 @@ Use the template at `docs/templates/01_spec.template.md` with the following stru
 | Aspect | Value |
 |--------|-------|
 | Feature | <name> |
-| Phase 0 Analysis | [Link](../00_analysis/analysis.md) |
+| Phase 0 Analysis | [Link](../00_analysis/solution-design.md) (or legacy: `analysis.md`) |
 | Functional Reqs | <N> |
 | Non-Functional Reqs | <M> |
 | Affected Roots | <root1>, <root2> |

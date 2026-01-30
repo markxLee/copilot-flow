@@ -42,7 +42,8 @@ pre_checks:
      if_any_incomplete: STOP - "Phase <X> not complete"
      
   2. Load all artifacts:
-     - 00_analysis/analysis.md
+      - 00_analysis/solution-design.md  # preferred (canonical)
+      - 00_analysis/analysis.md         # legacy alias (accept if present)
      - 01_spec/spec.md
      - 02_tasks/tasks.md
      - 03_impl/impl-log.md

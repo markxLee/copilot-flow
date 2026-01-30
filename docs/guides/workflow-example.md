@@ -326,7 +326,7 @@ Copilot: ## 🔬 Phase 0: Analysis & Design
          | State | Zustand + persist | Already used, easy persistence |
          | WebSocket | Reuse existing | Avoid duplicate connections |
          
-         📄 Created: `apphub-vision/docs/runs/feature-notification-system/00_analysis/analysis.md`
+         📄 Created: `apphub-vision/docs/runs/feature-notification-system/00_analysis/solution-design.md`
          
          ⏸️ STOP: Review analysis and approve.
          
