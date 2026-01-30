@@ -15,11 +15,12 @@ meta:
   tooling_root: copilot-flow
   feature_name: "BP-24: Billing App Installation Synchronization"
   created_at: "2026-01-23T00:00:00Z"
-  last_updated: "2026-01-27T00:00:00Z"
+  last_updated: "2026-01-28T00:00:00Z"
   updated_by: copilot
+  update_count: 1
   
   # Base branch for diff comparison
-  base_branch: main
+  base_branch: feature/BP-11-main-billing-platform
   
   # Affected roots tracking
   affected_roots:
@@ -34,20 +35,57 @@ meta:
 # CURRENT STATUS - Quick resume point / Điểm tiếp tục nhanh
 # ============================================================
 status:
-  current_phase: 4
-  phase_name: tests
-  phase_status: approved
+  current_phase: 3
+  phase_name: impl
+  phase_status: in-progress
+  current_update: 1
   
   # Task-level tracking
-  current_task: null
+  current_task: T-017
+  current_task_status: not-started
   current_root: apphub-vision
   
   # Quick context for immediate resume
-  last_action: "Phase 4 Tests Complete - 265 tests passed, all v2 components ≥94% coverage"
-  next_action: "Ready for Phase 5: Done Check and PR preparation"
+  last_action: "T-016 approved - Integration tests for Update #1 response structure"
+  next_action: "Start T-017 Manual E2E verification with /phase-3-impl T-017"
+  
+  # Strategy decision
+  strategy_decisions:
+    T-007_T-009_refactoring:
+      decision: "Option A - Keep both repos temporarily"
+      rationale: "Maintains working intermediate state between T-007 and T-009"
+      details:
+        T-007: "Create NEW ServiceAccountStoreRepository, KEEP old ServiceUsageRepository"
+        T-009: "Update provision.service.ts + CLEANUP (delete old repo, update imports)"
   
   # Blockers
   blockers: []
+
+# ============================================================
+# UPDATES - Iteration tracking / Theo dõi Iterations
+# ============================================================
+updates:
+  - number: 1
+    timestamp: "2026-01-28T00:00:00Z"
+    type: PR_REVIEW
+    source: "PR Review Feedback"
+    description: "Data model refinement: Remove Product/ServiceUsageStore, rename ServiceUsage→ServiceAccountStore, add accountId storage in Dashboard"
+    restart_from: 1
+    affected_phases: [1, 2, 3, 4, 5]
+    status: approved
+    started_at: "2026-01-28T00:00:00Z"
+    affected_requirements:
+      added:
+        - FR-005: "Service Seed Data"
+        - FR-007: "ServiceAccountStore Linking"
+        - FR-010: "Dashboard accountId Storage Schema"
+      modified:
+        - FR-001: "Model changes in provisioning endpoint"
+        - FR-006: "Store now belongs to Organisation"
+        - FR-008: "Response includes accountId"
+        - FR-009: "Dashboard persists accountId"
+        - FR-013: "New constraints for Service and ServiceAccountStore"
+      removed: []
 
 # ============================================================
 # PHASE PROGRESS - Detailed per-phase tracking / Theo dõi từng phase
@@ -78,32 +116,78 @@ phases:
     open_questions: []
 
   phase_1_spec:
-    status: approved
+    status: complete
     started_at: "2026-01-23T12:00:00Z"
-    completed_at: "2026-01-23T14:00:00Z"
-    approved_at: "2026-01-23T14:00:00Z"
+    completed_at: "2026-01-28T00:00:00Z"
+    approved_at: "2026-01-28T00:00:00Z"
     
     artifacts:
       - path: 01_spec/spec.md
         status: complete
+        version: v1
       - path: 01_spec/spec-update-1.md
         status: complete
+        version: update-1
+      - path: 01_spec/spec-review.md
+        status: complete
+        verdict: PASS
     
     requirements_count:
-      functional: 12
+      functional: 13
       non_functional: 3
     
-    open_questions: []
+    review_results:
+      verdict: PASS
+      critical_issues: 0
+      major_issues: 0
+      minor_issues: 2
+      suggestions: 3
+      quality_score: 98
+    
+    open_questions:
+      - Q3: "Migration strategy for existing data"
+      - Q5: "Store transfer between Organisations"
 
   phase_2_tasks:
-    status: approved
-    started_at: "2026-01-23T14:00:00Z"
-    completed_at: "2026-01-23T16:00:00Z"
-    approved_at: "2026-01-23T16:00:00Z"
+    status: complete
+    previous_status: awaiting-review
+    started_at: "2026-01-28T00:00:00Z"
+    completed_at: "2026-01-28T01:00:00Z"
+    approved_at: "2026-01-28T01:00:00Z"
     
     artifacts:
       - path: 02_tasks/tasks.md
         status: complete
+        version: v1
+      - path: 02_tasks/tasks-update-1.md
+        status: complete
+        version: update-1
+      - path: 02_tasks/task-plan-review.md
+        status: complete
+        version: review
+    
+    review_results:
+      verdict: PASS
+      quality_score: 95
+      critical_issues: 0
+      major_issues: 0
+      minor_issues: 1
+      suggestions: 0
+    
+    tasks_summary:
+      total: 17
+      by_root:
+        apphub-vision: 17
+      by_phase:
+        database_schema: 5
+        repository_layer: 3
+        service_layer: 1
+        api_layer: 2
+        dashboard: 3
+        testing: 3
+      estimated_effort: "18-22 hours"
+    
+    open_questions: []
       - path: 02_tasks/tasks-update-1.md
         status: complete
     
@@ -291,7 +375,8 @@ phases:
         checkpoint:
           files_created:
             - apps/billing/__tests__/lib/repository/prisma/service.repository.test.ts
-            
+            pending-update-1
+    previous_status: 
       - id: T-017
         title: "v2 Repository Tests - ServiceUsageRepository + StoreRepository"
         root: apphub-vision
@@ -311,7 +396,8 @@ phases:
     started_at: "2026-01-24T15:00:00Z"
     completed_at: "2026-01-26T18:00:00Z"
     approved_at: "2026-01-26T18:00:00Z"
-    
+    pending-update-1
+    previous_status: 
     artifacts:
       - path: 04_tests/unit-tests.md
         status: complete
@@ -469,6 +555,16 @@ history:
     
   - timestamp: "2026-01-25T00:00:00Z"
     phase: 2
+    
+  - timestamp: "2026-01-28T00:00:00Z"
+    phase: 1
+    action: update_registered
+    description: "Update #1 registered - PR review: Remove Product/ServiceUsageStore, rename ServiceUsage→ServiceAccountStore, add accountId storage"
+    
+  - timestamp: "2026-01-28T00:00:00Z"
+    phase: 1
+    action: spec_update
+    description: "Spec Update #1 complete - spec-update-1.md created with PR review changes"
     action: task_update
     description: "Tasks Update 1: Added T-008 to T-017 for v2 model"
     
@@ -486,3 +582,13 @@ history:
     phase: 4
     action: state_migration
     description: "Migrated from old flow to new workflow-state.yaml format"
+
+  - timestamp: "2026-01-28T15:30:00Z"
+    phase: 3
+    action: strategy_decision
+    description: "Option A chosen for T-007/T-009 refactoring - T-007 creates new repo keeping old, T-009 handles cleanup"
+
+  - timestamp: "2026-01-28T15:30:00Z"
+    phase: 2
+    action: task_plan_update
+    description: "Updated tasks-update-1.md to document Option A strategy explicitly in T-007 and T-009"

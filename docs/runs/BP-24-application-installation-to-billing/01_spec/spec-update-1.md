@@ -1,411 +1,942 @@
-# BP-24 Spec Update 1: Service-Based Billing Model (v2)
+# Specification Update #1 — BP-24: Billing App Installation Synchronization
+<!-- Specification Update #1 based on PR Review Feedback -->
+<!-- Data Model Refinement: Service-Based Architecture -->
 
 ---
 
-# English
+## 📋 Update Context
 
-## Overview
+| Aspect | Value |
+|--------|-------|
+| Update Number | **#1** |
+| Update Type | **PR_REVIEW** |
+| Update Date | 2026-01-28 |
+| Previous Spec | [spec.md](./spec.md) |
+| Restart Phase | Phase 1 (Specification) |
 
-**Problem:**
-- Original spec (v1) linked Store directly to Account via `StoreAccountLink`
-- PR review feedback: Account should be an **abstract billing group**, not directly tied to Store
-- Need to support billing for items beyond app usage: support packages, custom work, consulting
-- Current model cannot answer "what service is being billed?" only "which store is linked?"
+### Changes Overview / Tổng quan Thay đổi
 
-**Goals:**
-- Introduce `Service` entity to define **what can be billed** (apps, support, custom work, consulting)
-- Track service usage via `ServiceUsage` (Account → Service relationship) — *replaces the concept of "AppAccount"*
-- Track which stores use a service via `ServiceUsageStore` (ServiceUsage → Store)
-- Store belongs directly to Organisation (not linked through Account)
-- Service table should be **seeded** with master data
+🇻🇳 **Các thay đổi chính từ PR review:**
+1. Loại bỏ model `Product` → chỉ giữ model `Service` (khái niệm rộng hơn, phù hợp hơn)
+2. Loại bỏ model `ServiceUsageStore` → gộp vào model mới
+3. Đổi tên `ServiceUsage` → `ServiceAccountStore` (ngữ nghĩa rõ ràng hơn)
+4. Thêm logic lưu `accountId` trong Dashboard để sử dụng khi gọi Billing API
 
-> **Terminology Note:** We use **"Service"** instead of "App" to have a broader meaning. Billing is not just for app usage (Clearer, Boost) but also for other billable items such as:
-> - **Support packages** (premium support, SLA)
-> - **Custom development** (theme customization, app customization)
-> - **Consulting** (setup assistance, training)
-> - **One-time services** (data migration, integration setup)
->
-> Therefore, **`ServiceUsage`** replaces the earlier concept of "AppAccount" to provide this flexibility.
-
-**Non-goals:**
-- Changing Organisation or Account core structure
-- Multi-account per organisation (future enhancement)
-- Service pricing or plan assignment (separate feature)
+🇬🇧 **Key changes from PR review:**
+1. Remove `Product` model → keep only `Service` model (broader concept, better fit)
+2. Remove `ServiceUsageStore` model → consolidate into renamed model
+3. Rename `ServiceUsage` → `ServiceAccountStore` (clearer semantics)
+4. Add logic to store `accountId` in Dashboard for use when calling Billing API
 
 ---
 
-## User Stories
+## TL;DR
 
-- As a **billing system**, I want to track which services an account uses, so that I can bill for apps, support, and custom work separately
-- As a **system**, when provisioning a merchant, I want to create the appropriate service usage record, so that billing attribution is correct
-- As a **developer**, I want a seeded Service table, so that I don't need to manually create services in each environment
-
----
-
-## Scope
-
-**In scope:**
-- New `Service` model (seeded lookup table)
-- New `ServiceUsage` model (Account uses Service)
-- New `ServiceUsageStore` model (which Stores are associated with usage)
-- Update `Store` model to belong to Organisation directly (`organisationId` FK)
-- Deprecate `StoreAccountLink` model
-- Create seed script for Service table
-- Update `ProvisionService` for v2 model logic
-- Update API response to include `serviceUsage` instead of `storeAccountLink`
-
-**Out of scope:**
-- Service pricing configuration
-- ServiceUsage billing cycle management
-- Retroactive migration of existing StoreAccountLinks
-- Multi-service provisioning in single request
+| Aspect | Value |
+|--------|-------|
+| Feature | BP-24: Billing App Installation Synchronization |
+| Status | **Update #1** - Draft |
+| Previous Version | [spec.md](./spec.md) (v1 baseline) |
+| Functional Requirements | 13 (Updated) |
+| Non-Functional Requirements | 3 |
+| Affected Roots | apphub-vision |
+| Breaking Changes | ✅ Yes (Schema changes) |
 
 ---
 
-## UX / Flow
+## 1. Overview / Tổng quan
 
-### Updated Provisioning Flow (v2)
+### 1.1 Problem Statement / Phát biểu Vấn đề
 
-1) Dashboard calls `POST /api/internal/organisation/provision`
-2) Billing validates internal API token
-3) Billing checks if Organisation exists by `primaryContactEmail`
-   - **If not exists:**
-     a. Create Stripe Customer
-     b. Create Organisation with `stripeCustomerId`
-     c. Create Account with name "Default"
-4) Billing creates/finds Store by `shopDomain`:
-   - Store now has `organisationId` FK (belongs to org directly)
-5) Billing creates ServiceUsage for "clearer" service:
-   a. Lookup Service by code `'clearer'`
-   b. Find or create ServiceUsage (accountId + serviceId)
-   c. Create ServiceUsageStore linking Store to ServiceUsage
-6) Return `{ organisation, account, store, serviceUsage }` to Dashboard
+🇻🇳 **Vấn đề:**
+- Khi merchant cài đặt Shopify app qua Dashboard, không có record tương ứng trong hệ thống Billing
+- Organisation và ServiceAccountStore (quan hệ Account → Service → Store) phải tồn tại trong Billing database trước khi merchant có thể được tính phí
+- Hiện tại cần can thiệp thủ công để tạo billing records
+- Chưa có luồng provisioning tự động giữa Dashboard và Billing
 
-### Model Relationship Diagram
+🇬🇧 **Problem:**
+- When a merchant installs the Shopify app via Dashboard, there is no corresponding record in the Billing system
+- Organisation and ServiceAccountStore (Account → Service → Store relationship) must exist in Billing database before merchants can be charged
+- Currently requires manual intervention to create billing records
+- No automated provisioning flow exists between Dashboard and Billing
+
+### 1.2 Goals / Mục tiêu
+
+🇻🇳 **Mục tiêu:**
+1. Tự động tạo billing records (Organisation + ServiceAccountStore) khi Shopify app được cài đặt
+2. Tạo Stripe Customer trong hệ thống Stripe cho các thao tác billing sau này
+3. Theo dõi quan hệ Account → Service → Store qua model ServiceAccountStore
+4. Tận dụng internal API authentication từ BP-25 cho giao tiếp internal an toàn
+5. Đảm bảo operations idempotent để xử lý retry an toàn
+6. **[NEW]** Dashboard lưu accountId để sử dụng khi gọi Billing API
+
+🇬🇧 **Goals:**
+1. Automatically provision billing records (Organisation + ServiceAccountStore) when Shopify app is installed
+2. Create Stripe Customer in Stripe's system for future billing operations
+3. Track Account → Service → Store relationships via ServiceAccountStore model
+4. Leverage internal API authentication from BP-25 for secure internal communication
+5. Ensure idempotent operations to handle retries safely
+6. **[NEW]** Dashboard persists accountId for use when calling Billing API
+
+### 1.3 Non-Goals / Ngoài Phạm vi
+
+🇻🇳 **Không thuộc phạm vi:**
+- Tạo Subscription (flow riêng sau provisioning)
+- Setup payment method trên Stripe (xử lý trong Billing UI)
+- Hỗ trợ multi-region (mặc định `uk` region)
+- Xóa hoặc cập nhật Organisation/Account sau khi tạo
+- Multi-service provisioning (chỉ "clearer" service trong MVP)
+
+🇬🇧 **Out of scope:**
+- Subscription creation (separate flow after provisioning)
+- Stripe payment method setup (handled in Billing UI)
+- Multi-region support (default to `uk` region)
+- Organisation/Account deletion or updates after creation
+- Multi-service provisioning (only "clearer" service in MVP)
+
+---
+
+## 2. Data Model Changes / Thay đổi Data Model
+
+### 2.1 Model Removals / Models bị Loại bỏ
+
+#### ❌ Product (REMOVED)
+
+🇻🇳 **Lý do loại bỏ:**
+- Khái niệm `Product` và `Service` trùng lặp về mặt ngữ nghĩa
+- `Service` là khái niệm rộng hơn, phù hợp với business model (billing cho apps, support packages, custom work, consulting)
+- Tất cả relationships của `Product` được migrate vào `Service`:
+  - Product → ServiceAccountStore relationships → Service → ServiceAccountStore
+  - Product metadata (name, description) → Service metadata
+
+🇬🇧 **Reason for removal:**
+- `Product` and `Service` concepts overlap semantically
+- `Service` is broader and better fits the business model (billing for apps, support packages, custom work, consulting)
+- All `Product` relationships migrated to `Service`:
+  - Product → ServiceAccountStore relationships → Service → ServiceAccountStore
+  - Product metadata (name, description) → Service metadata
+
+#### ❌ ServiceUsageStore (REMOVED)
+
+🇻🇳 **Lý do loại bỏ:**
+- Tạo indirection không cần thiết
+- Logic được gộp vào model `ServiceAccountStore` (renamed từ `ServiceUsage`)
+- Đơn giản hóa quan hệ: Account → Service → Store thành một model duy nhất
+
+🇬🇧 **Reason for removal:**
+- Creates unnecessary indirection
+- Logic consolidated into `ServiceAccountStore` model (renamed from `ServiceUsage`)
+- Simplifies Account → Service → Store relationship into single model
+
+### 2.2 Model Renames / Đổi tên Models
+
+#### 🔄 ServiceUsage → ServiceAccountStore
+
+🇻🇳 **Lý do đổi tên:**
+- Ngữ nghĩa rõ ràng hơn: model này đại diện cho việc Store nào (thuộc Account nào) đang sử dụng Service nào
+- Tránh nhầm lẫn với "usage" (sử dụng thực tế) vs "account" (đăng ký sử dụng)
+- Tên mới phản ánh đầy đủ 3 thực thể: Service + Account + Store
+
+🇬🇧 **Reason for rename:**
+- Clearer semantics: this model represents which Store (under which Account) uses which Service
+- Avoids confusion between "usage" (actual usage) vs "account" (subscription)
+- New name fully reflects all 3 entities: Service + Account + Store
+
+---
+
+## 3. Updated Data Model / Data Model Cập nhật
+
+### 3.1 Prisma Schema
+
+```prisma
+// ============================================================
+// Billing Core Models
+// ============================================================
+
+model Organisation {
+  id                   String    @id @default(uuid())
+  organisationName     String
+  primaryContactEmail  String    // Lookup key
+  primaryContactPhone  String?
+  stripeCustomerId     String
+  stripeRegion         String    @default("uk")
+  testMode             Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  accounts             Account[]
+
+  @@map("organisations")
+}
+
+model Account {
+  id             String              @id @default(uuid())
+  organisationId String
+  accountName    String              @default("Clearer")
+  notes          String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  organisation   Organisation        @relation(fields: [organisationId], references: [id])
+  serviceAccounts ServiceAccountStore[]
+
+  @@map("accounts")
+}
+
+// ============================================================
+// Service Models (UPDATED)
+// ============================================================
+
+model Service {
+  id          String                @id @default(uuid())
+  name        String                @unique  // "clearer", "boost", "support", "custom-theme"
+  displayName String
+  description String?
+  isActive    Boolean               @default(true)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  serviceAccounts ServiceAccountStore[]
+
+  @@map("services")
+}
+
+// ============================================================
+// Store & Linking Models (UPDATED)
+// ============================================================
+
+model Store {
+  id         String                @id @default(uuid())
+  shopDomain String                @unique  // e.g., "myshop.myshopify.com"
+  shopName   String?
+  platform   String                @default("shopify")
+  organisationId String
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  organisation Organisation          @relation(fields: [organisationId], references: [id])
+  serviceAccounts ServiceAccountStore[]
+
+  @@map("stores")
+}
+
+// NEW: Consolidated model replacing ServiceUsage + ServiceUsageStore
+model ServiceAccountStore {
+  id          String   @id @default(uuid())
+  accountId   String
+  serviceId   String
+  storeId     String
+  linkedAt    DateTime @default(now())
+  isActive    Boolean  @default(true)
+  
+  account     Account  @relation(fields: [accountId], references: [id])
+  service     Service  @relation(fields: [serviceId], references: [id])
+  store       Store    @relation(fields: [storeId], references: [id])
+
+  // Constraint: One service per store per account
+  @@unique([accountId, serviceId, storeId])
+  @@map("service_account_stores")
+}
+```
+
+### 3.2 Data Model Diagram / Sơ đồ Data Model
 
 ```
-Organisation (merchant company)
-    │
-    ├──── (1:N) ──── Account (abstract billing group)
-    │                   │
-    │                   └──── (1:N) ──── ServiceUsage
-    │                                        │
-    │                                        ├── serviceId → Service
-    │                                        │
-    │                                        └── (1:N) ──── ServiceUsageStore
-    │                                                           │
-    └──── (1:N) ──── Store ◄────────────────────────────────────┘
+Organisation (1) ──────< (N) Account
+      │                      │
+      │ (1)                  │ (1)
+      │                      │
+      ▼                      ▼
+    Store (N)          ServiceAccountStore (N) ──> (1) Service
+
+Relationships / Quan hệ:
+- One Organisation has many Accounts (1:N)
+- One Organisation has many Stores (1:N) - Store belongs directly to Organisation
+- One Account can use multiple Services across multiple Stores (1:N ServiceAccountStore)
+- One Service can be used by multiple Accounts (1:N ServiceAccountStore)
+- One Store can be linked to multiple Service-Account combinations (1:N ServiceAccountStore)
+- Unique constraint: (accountId, serviceId, storeId) - one service per store per account
 ```
+
+### 3.3 Key Constraints / Ràng buộc Quan trọng
+
+🇻🇳 **Ràng buộc:**
+1. `Service.name` phải unique (e.g., "clearer", "boost")
+2. `Store.shopDomain` phải unique (e.g., "shop.myshopify.com")
+3. `Store.organisationId` FK to Organisation - Store belongs directly to Organisation
+4. `ServiceAccountStore` có unique constraint: `(accountId, serviceId, storeId)`
+   - Một Store chỉ có thể link với một Account cho mỗi Service
+   - Store có thể sử dụng nhiều Services (clearer + boost)
+   - Account có thể có nhiều Stores sử dụng cùng một Service
+
+🇬🇧 **Constraints:**
+1. `Service.name` must be unique (e.g., "clearer", "boost")
+2. `Store.shopDomain` must be unique (e.g., "shop.myshopify.com")
+3. `Store.organisationId` FK to Organisation - Store belongs directly to Organisation
+4. `ServiceAccountStore` has unique constraint: `(accountId, serviceId, storeId)`
+   - One Store can only link to one Account per Service
+   - Store can use multiple Services (clearer + boost)
+   - Account can have multiple Stores using the same Service
 
 ---
 
-## Data & Contracts
+## 4. Functional Requirements / Yêu cầu Chức năng
 
-**Entities / Schemas:**
+### FR-001: Internal Provisioning API Endpoint
 
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | **Updated** (model changes) |
+
+#### Description / Mô tả
+
+🇻🇳 Cập nhật internal API endpoint `POST /api/internal/provision` (đã tồn tại) trong Billing app để trả về `accountId` trong response. Endpoint tạo Organisation, Account, Service (nếu chưa có), ServiceAccountStore, và Store records.
+
+🇬🇧 Update existing internal API endpoint `POST /api/internal/provision` in Billing app to return `accountId` in response. Endpoint creates Organisation, Account, Service (if not exists), ServiceAccountStore, and Store records.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC1-1: Endpoint path is `POST /api/internal/provision` (existing endpoint)
+- [ ] AC1-2: Validates internal API token using BP-25 `getAuthContext()`
+- [ ] AC1-3: Returns 401 if token is invalid or missing
+- [ ] AC1-4: Returns 400 if request body validation fails
+- [ ] AC1-5: Returns 500 if Stripe or database errors occur
+
+---
+
+### FR-002: Stripe Customer Creation
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | No change from v1 |
+
+#### Description / Mô tả
+
+🇻🇳 Tạo Stripe Customer khi Organisation chưa tồn tại. Sử dụng region `uk` và `testMode` dựa trên environment.
+
+🇬🇧 Create Stripe Customer when Organisation does not exist. Use region `uk` and `testMode` based on environment.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC2-1: Stripe Customer created with region `uk`
+- [ ] AC2-2: `testMode` set to `true` if environment is not `production`
+- [ ] AC2-3: Stripe Customer ID stored in `Organisation.stripeCustomerId`
+- [ ] AC2-4: If Stripe API fails, log error and return 500
+
+---
+
+### FR-003: Organisation Idempotent Creation
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | No change from v1 |
+
+#### Description / Mô tả
+
+🇻🇳 Kiểm tra Organisation tồn tại bằng `primaryContactEmail`. Nếu chưa tồn tại, tạo mới với Stripe Customer ID. Nếu đã tồn tại, trả về existing.
+
+🇬🇧 Check if Organisation exists by `primaryContactEmail`. If not, create new with Stripe Customer ID. If exists, return existing.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC3-1: Lookup Organisation by `primaryContactEmail`
+- [ ] AC3-2: If not found, create Organisation with mapped fields from request
+- [ ] AC3-3: If found, skip creation and use existing Organisation
+- [ ] AC3-4: Map request fields: `email` → `primaryContactEmail`, `name` → `organisationName`, `phone` → `primaryContactPhone`
+
+---
+
+### FR-004: Account Creation
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | No change from v1 |
+
+#### Description / Mô tả
+
+🇻🇳 Tạo Account với tên mặc định "Clearer" cho Organisation. Nếu Account đã tồn tại, bỏ qua.
+
+🇬🇧 Create Account with default name "Clearer" for Organisation. If Account exists, skip.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC4-1: Check if Account exists with `organisationId` + `accountName="Clearer"`
+- [ ] AC4-2: If not found, create Account
+- [ ] AC4-3: If found, skip and use existing Account
+
+---
+
+### FR-005: Service Seed Data
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | **New** (replaces Product) |
+
+#### Description / Mô tả
+
+🇻🇳 Seed Service table với các services mặc định: "clearer", "boost", "support", "custom-theme". Provisioning endpoint luôn sử dụng service "clearer".
+
+🇬🇧 Seed Service table with default services: "clearer", "boost", "support", "custom-theme". Provisioning endpoint always uses "clearer" service.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC5-1: Seed script creates Service records with names: "clearer", "boost", "support", "custom-theme"
+- [ ] AC5-2: Each Service has `displayName` and `description`
+- [ ] AC5-3: All Services default to `isActive: true`
+- [ ] AC5-4: Provisioning endpoint references service by name "clearer"
+
+---
+
+### FR-006: Store Creation with Organisation Link
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | **Updated** (Store now belongs to Organisation) |
+
+#### Description / Mô tả
+
+🇻🇳 Tìm hoặc tạo Store record bằng `shopDomain`. Store thuộc về Organisation (organisationId FK). Store là unique per `shopDomain`.
+
+🇬🇧 Find or create Store record by `shopDomain`. Store belongs to Organisation (organisationId FK). Store is unique per `shopDomain`.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC6-1: Lookup Store by `shopDomain`
+- [ ] AC6-2: If not found, create Store with `shopDomain`, `platform: "shopify"`, and `organisationId`
+- [ ] AC6-3: If found, verify `organisationId` matches (or update if transfer scenario)
+- [ ] AC6-4: Unique constraint on `shopDomain` prevents duplicates
+
+---
+
+### FR-007: ServiceAccountStore Linking
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | **New** (replaces ServiceUsage + ServiceUsageStore) |
+
+#### Description / Mô tả
+
+🇻🇳 Tạo ServiceAccountStore record để link Account + Service "clearer" + Store. Đảm bảo unique constraint `(accountId, serviceId, storeId)` được tôn trọng.
+
+🇬🇧 Create ServiceAccountStore record to link Account + Service "clearer" + Store. Ensure unique constraint `(accountId, serviceId, storeId)` is respected.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC7-1: Lookup Service by name "clearer"
+- [ ] AC7-2: Check if ServiceAccountStore exists for `(accountId, serviceId="clearer", storeId)`
+- [ ] AC7-3: If not found, create ServiceAccountStore with `isActive: true`
+- [ ] AC7-4: If found, skip and use existing
+- [ ] AC7-5: Unique constraint prevents duplicate links
+
+---
+
+### FR-008: Response Structure
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | **Updated** (include accountId) |
+
+#### Description / Mô tả
+
+🇻🇳 API trả về cấu trúc `{ organisation, account, service, store, serviceAccountStore, accountId, created }`. Field `accountId` là Account.id để Dashboard lưu trữ.
+
+🇬🇧 API returns structure `{ organisation, account, service, store, serviceAccountStore, accountId, created }`. Field `accountId` is Account.id for Dashboard to persist.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC8-1: Response includes `organisation` object
+- [ ] AC8-2: Response includes `account` object
+- [ ] AC8-3: Response includes `service` object (name: "clearer")
+- [ ] AC8-4: Response includes `store` object
+- [ ] AC8-5: Response includes `serviceAccountStore` object
+- [ ] AC8-6: **[NEW]** Response includes `accountId` (string, Account.id)
+- [ ] AC8-7: Response includes `created` boolean (true if newly created)
+
+---
+
+### FR-009: Dashboard Integration (Onboarding Flow)
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Dashboard app) |
+| Status | **Updated** (persist accountId) |
+
+#### Description / Mô tả
+
+🇻🇳 Dashboard onboarding flow (`/get-started`) gọi provisioning endpoint sau khi merchant hoàn thành profile. Sau khi nhận response, Dashboard lưu `accountId` vào database để sử dụng khi gọi Billing API sau này.
+
+🇬🇧 Dashboard onboarding flow (`/get-started`) calls provisioning endpoint after merchant completes profile. After receiving response, Dashboard persists `accountId` to database for use when calling Billing API later.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC9-1: `registerCompany()` action calls `provisionBillingOrganisationAsync()` after saving merchant data
+- [ ] AC9-2: Provisioning call is fire-and-forget (failures logged, do not block onboarding)
+- [ ] AC9-3: Request includes: `{ email, name, phone, domain, shopDomain }`
+- [ ] AC9-4: **[NEW]** Dashboard receives `accountId` from response
+- [ ] AC9-5: **[NEW]** Dashboard persists `accountId` to merchant/organisation record
+- [ ] AC9-6: **[NEW]** `accountId` is available for subsequent Billing API calls
+
+---
+
+### FR-010: Dashboard accountId Storage Schema
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Dashboard app, app-database) |
+| Status | **New** |
+
+#### Description / Mô tả
+
+🇻🇳 Thêm field `billingAccountId` vào table `Merchant` trong app-database để lưu Account ID từ Billing app. Field này được sử dụng khi Dashboard cần gọi Billing API.
+
+🇬🇧 Add field `billingAccountId` to `Merchant` table in app-database to store Account ID from Billing app. This field is used when Dashboard needs to call Billing API.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC10-1: Add `billingAccountId` field to `Merchant` table in app-database schema
+- [ ] AC10-2: Prisma migration created for `Merchant.billingAccountId` field
+- [ ] AC10-3: Field type is `String?` (nullable UUID from Billing)
+- [ ] AC10-4: Field is nullable for backward compatibility with existing merchants
+- [ ] AC10-5: Update `registerCompany()` to save accountId after receiving provision response
+- [ ] AC10-6: Update `getStartedProgress()` fallback to save accountId if missing
+
+---
+
+### FR-011: Fallback Provisioning
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Should** |
+| Affected Roots | apphub-vision (Dashboard app) |
+| Status | No change from v1 |
+
+#### Description / Mô tả
+
+🇻🇳 Existing merchants (đã cài đặt trước billing feature) cần fallback provisioning khi họ truy cập dashboard. Logic trong `getStartedProgress()` kiểm tra nếu profile đã complete nhưng chưa provision, trigger provisioning.
+
+🇬🇧 Existing merchants (installed before billing feature) need fallback provisioning when accessing dashboard. Logic in `getStartedProgress()` checks if profile is complete but not provisioned, triggers provisioning.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC11-1: `getStartedProgress()` checks if provisioning needed
+- [ ] AC11-2: If merchant profile complete but no billing records, trigger provisioning
+- [ ] AC11-3: Idempotent - safe to call multiple times
+- [ ] AC11-4: **[NEW]** Persist accountId after fallback provisioning
+
+---
+
+### FR-012: Error Handling & Logging
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app, Dashboard app) |
+| Status | No change from v1 |
+
+#### Description / Mô tả
+
+🇻🇳 Provisioning failures không block onboarding flow. Tất cả errors được log để review sau. Dashboard tiếp tục onboarding nếu provisioning fail.
+
+🇬🇧 Provisioning failures do not block onboarding flow. All errors are logged for later review. Dashboard continues onboarding if provisioning fails.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC12-1: Billing endpoint logs all errors to console
+- [ ] AC12-2: Dashboard logs provisioning failures
+- [ ] AC12-3: Onboarding flow continues even if provisioning fails
+- [ ] AC12-4: Stripe Customer ID logged if Organisation creation fails (for cleanup)
+
+---
+
+### FR-013: Idempotency & Concurrency
+
+| Aspect | Detail |
+|--------|--------|
+| Priority | **Must** |
+| Affected Roots | apphub-vision (Billing app) |
+| Status | **Updated** (new constraints) |
+
+#### Description / Mô tả
+
+🇻🇳 Provisioning endpoint phải idempotent - gọi nhiều lần với cùng input trả về cùng kết quả. Xử lý concurrent requests an toàn với database constraints.
+
+🇬🇧 Provisioning endpoint must be idempotent - calling multiple times with same input returns same result. Handle concurrent requests safely with database constraints.
+
+#### Acceptance Criteria / Tiêu chí Nghiệm thu
+
+- [ ] AC13-1: `Service.name` unique constraint prevents duplicate services
+- [ ] AC13-2: `Store.shopDomain` unique constraint prevents duplicate stores
+- [ ] AC13-3: `ServiceAccountStore` unique constraint `(accountId, serviceId, storeId)` prevents duplicate links
+- [ ] AC13-4: Concurrent requests for same email return existing Organisation
+- [ ] AC13-5: Concurrent requests for same shopDomain return existing Store
+- [ ] AC13-6: Calling endpoint multiple times returns `created: false` after first call
+
+---
+
+## 5. Non-Functional Requirements / Yêu cầu Phi Chức năng
+
+### NFR-001: Performance
+
+| Aspect | Detail |
+|--------|--------|
+| Category | Performance |
+| Metric | < 2s end-to-end for provisioning |
+
+🇻🇳 **Mô tả:** Provisioning endpoint phải hoàn thành trong vòng 2 giây (bao gồm Stripe API call + database operations).
+
+🇬🇧 **Description:** Provisioning endpoint must complete within 2 seconds (including Stripe API call + database operations).
+
+---
+
+### NFR-002: Security
+
+| Aspect | Detail |
+|--------|--------|
+| Category | Security |
+| Metric | Internal API token validation required |
+
+🇻🇳 **Mô tả:** Endpoint chỉ chấp nhận requests với valid internal API token (BP-25). Token phải có prefix `bil_*`.
+
+🇬🇧 **Description:** Endpoint only accepts requests with valid internal API token (BP-25). Token must have prefix `bil_*`.
+
+---
+
+### NFR-003: Reliability
+
+| Aspect | Detail |
+|--------|--------|
+| Category | Reliability |
+| Metric | 99% success rate (excluding Stripe failures) |
+
+🇻🇳 **Mô tả:** Provisioning phải thành công 99% trường hợp (không tính Stripe API failures ngoài tầm kiểm soát).
+
+🇬🇧 **Description:** Provisioning must succeed 99% of the time (excluding Stripe API failures beyond our control).
+
+---
+
+## 6. API Contracts / Hợp đồng API
+
+### 6.1 Request Schema
+
+```typescript
+// POST /api/internal/provision
+// Header: Authorization: Bearer bil_<jwt>
+
+interface ProvisionRequest {
+  email: string;        // Required, lookup key
+  name: string;         // Required, organisation name
+  phone?: string;       // Optional
+  domain?: string;      // Optional (for future use)
+  shopDomain: string;   // Required, e.g., "myshop.myshopify.com"
+}
 ```
-Service (NEW - seeded lookup table)
-├── id: UUID
-├── code: string          ← unique, e.g. "clearer", "boost", "support"
-├── name: string          ← display name, e.g. "Clearer App"
-├── type: string          ← "app" | "support" | "custom"
-├── description?: string  ← optional description
-├── createdAt: DateTime
-└── updatedAt: DateTime
 
-ServiceUsage (NEW - Account uses Service)
-├── id: UUID
-├── accountId: FK → Account
-├── serviceId: FK → Service
-├── createdAt: DateTime
-├── updatedAt: DateTime
-└── unique constraint: (accountId, serviceId)
+### 6.2 Response Schema (Updated)
 
-ServiceUsageStore (NEW - which Stores use the service)
-├── id: UUID
-├── serviceUsageId: FK → ServiceUsage
-├── storeId: FK → Store
-├── createdAt: DateTime
-└── unique constraint: (serviceUsageId, storeId)
-
-Store (UPDATED)
-├── id: UUID
-├── organisationId: FK → Organisation  ← NEW (belongs to org directly)
-├── shopDomain: string                 ← unique
-├── shopName?: string
-├── platform: 'shopify'
-├── createdAt: DateTime
-└── updatedAt: DateTime
-
-StoreAccountLink (DEPRECATED)
-└── To be removed in future migration
+```typescript
+interface ProvisionResponse {
+  organisation: {
+    id: string;
+    organisationName: string;
+    primaryContactEmail: string;
+    primaryContactPhone: string | null;
+    stripeCustomerId: string;
+    stripeRegion: string;
+    testMode: boolean;
+  };
+  account: {
+    id: string;
+    organisationId: string;
+    accountName: string;
+    notes: string | null;
+  };
+  service: {
+    id: string;
+    name: string;         // "clearer"
+    displayName: string;
+    description: string | null;
+    isActive: boolean;
+  };
+  store: {
+    id: string;
+    shopDomain: string;
+    shopName: string | null;
+    platform: string;     // "shopify"
+    organisationId: string;
+  };
+  serviceAccountStore: {
+    id: string;
+    accountId: string;
+    serviceId: string;
+    storeId: string;
+    linkedAt: string;
+    isActive: boolean;
+  };
+  accountId: string;      // NEW: Account.id for Dashboard to persist
+  created: boolean;       // true if newly created, false if existing
+}
 ```
 
-**Seed Data (Service table):**
+### 6.3 Error Responses
 
-| code | name | type | description |
-|------|------|------|-------------|
-| clearer | Clearer App | app | AI-powered analytics platform |
-| boost | Boost App | app | Product filter & search app |
-| support | Support Package | support | Premium customer support |
-| custom-theme | Theme Customization | custom | Custom theme development |
-
-**API Response (Updated):**
-
-```json
+```typescript
+// 400 Bad Request
 {
-  "organisation": { "id": "...", "organisationName": "..." },
-  "account": { "id": "...", "accountName": "Default" },
-  "store": { "id": "...", "shopDomain": "...", "organisationId": "..." },
-  "serviceUsage": {
-    "id": "...",
-    "accountId": "...",
-    "serviceId": "...",
-    "service": { "code": "clearer", "name": "Clearer App", "type": "app" },
-    "stores": [{ "id": "...", "shopDomain": "..." }]
-  },
-  "created": true
+  error: "Validation error",
+  details: {
+    email: "Invalid email format",
+    shopDomain: "Required field"
+  }
+}
+
+// 401 Unauthorized
+{
+  error: "Invalid or missing internal API token"
+}
+
+// 500 Internal Server Error
+{
+  error: "Provisioning failed",
+  details: "Stripe API error: ..."
 }
 ```
 
 ---
 
-## Acceptance Criteria
+## 7. Migration Impact / Ảnh hưởng Migration
 
-- [ ] AC1: `Service` model exists with fields: id, code, name, type, description
-- [ ] AC2: `ServiceUsage` model exists with unique constraint on (accountId, serviceId)
-- [ ] AC3: `ServiceUsageStore` model exists with unique constraint on (serviceUsageId, storeId)
-- [ ] AC4: `Store` model has `organisationId` FK
-- [ ] AC5: Seed script creates 4 services: clearer, boost, support, custom-theme
-- [ ] AC6: `db:seed` command runs successfully and is idempotent
-- [ ] AC7: Provisioning creates ServiceUsage for "clearer" service
-- [ ] AC8: Provisioning creates ServiceUsageStore linking Store to ServiceUsage
-- [ ] AC9: API response includes `serviceUsage` with service details
-- [ ] AC10: README documents seed requirement for deployments
+### 7.1 Database Migration
 
----
+🇻🇳 **Các bước Migration:**
 
-## Edge Cases
+1. **Tạo migration mới:**
+   - Drop table `ServiceUsageStore` (nếu đã tồn tại)
+   - Drop table `Product` (nếu đã tồn tại)
+   - Rename table `ServiceUsage` → `service_account_stores`
+   - Add `organisationId` column to Store table
+   - Add Service reference to ServiceAccountStore
 
-- **Service 'clearer' not found**: Error 500 - seed required before provisioning
-- **ServiceUsage already exists for account+service**: Return existing, skip creation
-- **ServiceUsageStore already exists**: Return existing, skip creation
-- **Store already exists for different org**: Error - shopDomain must be unique
-- **No shopDomain provided**: Skip store and service usage creation
-- **Concurrent provision requests**: Database unique constraints prevent duplicates
+2. **Seed Service table:**
+   - Insert services: "clearer", "boost", "support", "custom-theme"
 
----
+3. **Data migration (nếu có data cũ):**
+   - For existing Store records: set `organisationId` (may need manual mapping)
+   - Migrate existing `ServiceUsage` records to new schema
+   - Map `accountId`, add `serviceId` (default "clearer"), add `storeId`
 
-## Risks & Mitigations
+🇬🇧 **Migration Steps:**
 
-- **Risk:** Service table not seeded before deployment
-  - **Mitigation:** Document in README, add to CI/CD pipeline, log clear error if service not found
+1. **Create new migration:**
+   - Drop table `ServiceUsageStore` (if exists)
+   - Drop table `Product` (if exists)
+   - Rename table `ServiceUsage` → `service_account_stores`
+   - Add `organisationId` column to Store table
+   - Add Service reference to ServiceAccountStore
 
-- **Risk:** Breaking change for existing StoreAccountLink data
-  - **Mitigation:** Keep StoreAccountLink for now (deprecated), migrate data in separate task
+2. **Seed Service table:**
+   - Insert services: "clearer", "boost", "support", "custom-theme"
 
-- **Risk:** Service code typo causes lookup failure
-  - **Mitigation:** Use constants/enum for service codes, validate at compile time
+3. **Data migration (if old data exists):**
+   - For existing Store records: set `organisationId` (may need manual mapping)
+   - Migrate existing `ServiceUsage` records to new schema
+   - Map `accountId`, add `serviceId` (default "clearer"), add `storeId`
 
----
+### 7.2 Code Migration
 
-## Assumptions
+🇻🇳 **Các file cần update:**
 
-- Service table will be seeded before any provisioning calls
-- One service usage per account+service combination
-- Store can only belong to one organisation
-- "Default" account name replaces "Clearer" account name
+**Billing App:**
+- `packages/billing-database/prisma/schema.prisma` - Schema changes (Service, ServiceAccountStore, Store.organisationId)
+- `packages/billing-database/prisma/seed/services.ts` - Seed Service data
+- `apps/billing/lib/repository/prisma/service.repository.ts` - New repository
+- `apps/billing/lib/repository/prisma/service-usage.repository.ts` → rename to `service-account-store.repository.ts`
+- `apps/billing/lib/repository/prisma/store.repository.ts` - Update for organisationId FK
+- `apps/billing/services/provision.service.ts` - Update logic for new models
+- `apps/billing/app/api/internal/provision/route.ts` - Update to return accountId in response
+- `apps/billing/app/api/internal/provision/schema.ts` - Update response schema with accountId
 
----
+**Dashboard App:**
+- `packages/app-database/prisma/schema.prisma` - Add `billingAccountId: String?` to Merchant model
+- `apps/dashboard/helper/billing/provision.ts` - Handle accountId in response, return to caller
+- `apps/dashboard/app/(frameless-layout)/get-started/actions.ts` - Persist accountId to Merchant table in both `registerCompany()` and `getStartedProgress()` fallback
 
-## Open Questions
+**Tests:**
+- Update all affected test files for new model names
+- Add tests for accountId persistence
 
-- Q1: Should we migrate existing StoreAccountLink data? → **Defer to separate migration task**
-- Q2: Can an account have multiple stores for same service? → **Yes, via multiple ServiceUsageStore records**
-- Q3: How to handle service deactivation? → **Out of scope for MVP**
-
----
-
-# Tiếng Việt
-
-## Tổng quan
-
-**Vấn đề:**
-- Spec gốc (v1) link Store trực tiếp với Account qua `StoreAccountLink`
-- Feedback từ PR review: Account nên là **billing group trừu tượng**, không link trực tiếp với Store
-- Cần hỗ trợ billing cho các item ngoài app usage: support packages, custom work, consulting
-- Model hiện tại không thể trả lời "service nào đang được billing?" chỉ có "store nào đang link?"
-
-**Mục tiêu:**
-- Giới thiệu entity `Service` để định nghĩa **cái gì có thể billing** (apps, support, custom work, consulting)
-- Theo dõi service usage qua `ServiceUsage` (quan hệ Account → Service) — *thay thế khái niệm "AppAccount"*
-- Theo dõi stores nào sử dụng service qua `ServiceUsageStore` (ServiceUsage → Store)
-- Store thuộc trực tiếp Organisation (không link qua Account)
-- Bảng Service cần được **seed** với master data
-
-> **Ghi chú thuật ngữ:** Chúng tôi sử dụng **"Service"** thay vì "App" để có ý nghĩa rộng hơn. Billing không chỉ dành cho việc sử dụng app (Clearer, Boost) mà còn cho các dịch vụ phát sinh khác như:
-> - **Support packages** (hỗ trợ premium, SLA)
-> - **Custom development** (tùy chỉnh theme, tùy chỉnh app)
-> - **Consulting** (hỗ trợ setup, training)
-> - **One-time services** (data migration, integration setup)
->
-> Do đó, **`ServiceUsage`** thay thế cho khái niệm "AppAccount" để cung cấp sự linh hoạt này.
-
-**Không thuộc phạm vi:**
-- Thay đổi cấu trúc core của Organisation hoặc Account
-- Multi-account per organisation (cải tiến tương lai)
-- Cấu hình giá Service hoặc gán plan (feature riêng)
+🇬🇧 **Files to update:** (Same as above)
 
 ---
 
-## User Stories
+## 8. Cross-Root Impact / Ảnh hưởng Đa Root
 
-- Là **billing system**, tôi muốn theo dõi account sử dụng services nào, để có thể billing riêng cho apps, support, và custom work
-- Là **system**, khi provisioning merchant, tôi muốn tạo service usage record phù hợp, để billing attribution chính xác
-- Là **developer**, tôi muốn bảng Service được seed sẵn, để không cần tạo services thủ công ở mỗi environment
+### Root: apphub-vision
 
----
+| Aspect | Detail |
+|--------|--------|
+| Changes | Schema changes, API updates, Dashboard persistence |
+| Sync Type | Immediate (single monorepo) |
 
-## Phạm vi
+🇻🇳 **Điểm Tích hợp:**
+- Billing app exposes internal API
+- Dashboard consumes internal API
+- Shared internal API token (BP-25)
+- Dashboard persists accountId to app-database
 
-**Trong phạm vi:**
-- Model `Service` mới (bảng lookup được seed)
-- Model `ServiceUsage` mới (Account sử dụng Service)
-- Model `ServiceUsageStore` mới (Stores nào liên kết với usage)
-- Cập nhật model `Store` thuộc trực tiếp Organisation (`organisationId` FK)
-- Deprecate model `StoreAccountLink`
-- Tạo seed script cho bảng Service
-- Cập nhật `ProvisionService` cho logic v2
-- Cập nhật API response bao gồm `serviceUsage` thay vì `storeAccountLink`
+🇬🇧 **Integration Points:**
+- Billing app exposes internal API
+- Dashboard consumes internal API
+- Shared internal API token (BP-25)
+- Dashboard persists accountId to app-database
 
-**Ngoài phạm vi:**
-- Cấu hình giá Service
-- Quản lý billing cycle của ServiceUsage
-- Migration dữ liệu StoreAccountLink hiện có
-- Provisioning nhiều services trong một request
+🇻🇳 **Dependencies Affected:**
+- `@clearer/billing-database` - Schema changes affect all Billing app imports
+- `@clearer/app-database` - New field for accountId storage
 
----
-
-## UX / Luồng xử lý
-
-### Luồng Provisioning cập nhật (v2)
-
-1) Dashboard gọi `POST /api/internal/organisation/provision`
-2) Billing validate internal API token
-3) Billing kiểm tra Organisation tồn tại bằng `primaryContactEmail`
-   - **Nếu không tồn tại:**
-     a. Tạo Stripe Customer
-     b. Tạo Organisation với `stripeCustomerId`
-     c. Tạo Account với tên "Default"
-4) Billing tạo/tìm Store bằng `shopDomain`:
-   - Store bây giờ có `organisationId` FK (thuộc trực tiếp org)
-5) Billing tạo ServiceUsage cho service "clearer":
-   a. Lookup Service bằng code `'clearer'`
-   b. Tìm hoặc tạo ServiceUsage (accountId + serviceId)
-   c. Tạo ServiceUsageStore link Store với ServiceUsage
-6) Trả về `{ organisation, account, store, serviceUsage }` cho Dashboard
+🇬🇧 **Dependencies Affected:**
+- `@clearer/billing-database` - Schema changes affect all Billing app imports
+- `@clearer/app-database` - New field for accountId storage
 
 ---
 
-## Dữ liệu & Hợp đồng
+## 9. Edge Cases / Trường hợp Biên
 
-**Thực thể / Schema:**
+| ID | Scenario | Expected Behavior |
+|----|----------|-------------------|
+| EC-001 | Duplicate email with different Stripe customer | Should not happen (email is lookup key) |
+| EC-002 | Stripe API failure | Log error, return 500, Dashboard continues |
+| EC-003 | DB transaction failure after Stripe customer created | Log Stripe customer ID for manual cleanup |
+| EC-004 | Internal API token expired/invalid | Return 401, Dashboard logs and continues |
+| EC-005 | Missing required fields | Return 400 with validation errors |
+| EC-006 | Account "Clearer" already exists for org | Skip creation, return existing |
+| EC-007 | Concurrent requests for same email | DB constraint prevents duplicates |
+| EC-008 | Service "clearer" not found | Ensure Service is seeded properly |
+| EC-009 | ServiceAccountStore already exists | Skip creation, return existing |
+| EC-010 | **[NEW]** Dashboard receives accountId but fails to persist | Log error, continue (can retry fallback provisioning later) |
+| EC-011 | Store exists but belongs to different Organisation | Update organisationId (store transfer scenario) |
 
+---
+
+## 10. Risks & Mitigations / Rủi ro & Giảm thiểu
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| **Stripe Customer orphaned** (created but Org creation fails) | Medium | Log Stripe customer ID for manual cleanup |
+| **No unique constraint on primaryContactEmail** | Low | Application-level check first; consider DB constraint later |
+| **Internal API token leakage** | Medium | Tokens short-lived (BP-25), endpoint only creates records |
+| **Billing app unavailable** | Low | Fire-and-forget pattern; Dashboard continues, logs failure |
+| **Service seed data missing** | High | Add validation in provisioning endpoint; fail fast if service not found |
+| **ServiceAccountStore constraint violation** | Low | Unique constraint handles, return existing |
+| **Dashboard fails to persist accountId** | Low | Log error, fallback provisioning can retry later |
+| **Store organisationId mismatch** | Medium | Handle store transfer scenario; update organisationId if needed |
+
+---
+
+## 11. Dependencies / Phụ thuộc
+
+| Dependency | Type | Status |
+|------------|------|--------|
+| BP-25 Internal API Auth | Feature | ✅ Merged & Active |
+| Stripe API (region: uk) | External Service | ✅ Available |
+| `@clearer/billing-database` | Internal Package | 🔄 Schema update required |
+| `@clearer/app-database` | Internal Package | 🔄 Schema update required (accountId field) |
+| Prisma ORM | Tool | ✅ Available |
+
+---
+
+## 12. Open Questions / Câu hỏi Mở
+
+| ID | Question | Status | Resolution |
+|----|----------|--------|------------|
+| Q1 | Which Dashboard table should store `billingAccountId`? | **� Resolved** | **Merchant table** - Add `billingAccountId: String?` field to `Merchant` model in app-database |
+| Q2 | Should we add unique constraint on `Service.name` at DB level? | **🟢 Resolved** | Yes, added in schema |
+| Q3 | Migration strategy for existing data (if any)? | **🟡 Pending** | Need to check if any existing ServiceUsage data |
+| Q4 | Should fallback provisioning retry if accountId persistence fails? | **🟢 Resolved** | No retry - idempotent fallback in `getStartedProgress()` handles it |
+| Q5 | How to handle Store transfer between Organisations? | **🟡 Pending** | Defer to implementation - likely return error for security |
+
+---
+
+## 13. Approval / Phê duyệt
+
+| Role | Status | Date |
+|------|--------|------|
+| Spec Author (Copilot) | ✅ Done | 2026-01-28 |
+| Reviewer | ⏳ Pending | |
+| Stakeholder | ⏳ Pending | |
+
+---
+
+## ⏸️ STOP: Spec Update #1 Complete / Hoàn thành Spec Update #1
+
+### Summary / Tóm tắt
+
+| Aspect | Value |
+|--------|-------|
+| Update Type | PR_REVIEW |
+| Breaking Changes | ✅ Yes (Schema changes) |
+| Functional Requirements | 13 (3 new: FR-005, FR-007, FR-010) |
+| Non-Functional Requirements | 3 |
+| Open Questions | 5 |
+| Models Removed | 2 (Product, ServiceUsageStore) |
+| Models Renamed | 1 (ServiceUsage → ServiceAccountStore) |
+| New Fields | 2 (Store.organisationId, Dashboard.billingAccountId - table TBD) |
+
+### Key Changes from v1 / Thay đổi Chính so với v1
+
+🇻🇳
+1. ❌ Loại bỏ: `Product`, `ServiceUsageStore`
+2. 🔄 Đổi tên: `ServiceUsage` → `ServiceAccountStore`
+3. ➕ Thêm: `Service` model với seed data
+4. ➕ Thêm: `Store.organisationId` FK - Store thuộc trực tiếp Organisation
+5. ➕ Thêm: `accountId` return value + Dashboard persistence logic
+6. 🔄 Cập nhật: API response schema
+7. 🔄 Cập nhật: Constraints và relationships
+
+🇬🇧
+1. ❌ Removed: `Product`, `ServiceUsageStore`
+2. 🔄 Renamed: `ServiceUsage` → `ServiceAccountStore`
+3. ➕ Added: `Service` model with seed data
+4. ➕ Added: `Store.organisationId` FK - Store belongs directly to Organisation
+5. ➕ Added: `accountId` return value + Dashboard persistence logic
+6. 🔄 Updated: API response schema
+7. 🔄 Updated: Constraints and relationships
+
+---
+
+### 📋 Next Steps (EXPLICIT PROMPTS REQUIRED)
+
+**Step 1: Run spec review (RECOMMENDED)**
 ```
-Service (MỚI - bảng lookup được seed)
-├── id: UUID
-├── code: string          ← unique, vd: "clearer", "boost", "support"
-├── name: string          ← tên hiển thị, vd: "Clearer App"
-├── type: string          ← "app" | "support" | "custom"
-├── description?: string  ← mô tả tùy chọn
-├── createdAt: DateTime
-└── updatedAt: DateTime
-
-ServiceUsage (MỚI - Account sử dụng Service)
-├── id: UUID
-├── accountId: FK → Account
-├── serviceId: FK → Service
-├── createdAt: DateTime
-├── updatedAt: DateTime
-└── unique constraint: (accountId, serviceId)
-
-ServiceUsageStore (MỚI - Stores nào sử dụng service)
-├── id: UUID
-├── serviceUsageId: FK → ServiceUsage
-├── storeId: FK → Store
-├── createdAt: DateTime
-└── unique constraint: (serviceUsageId, storeId)
-
-Store (CẬP NHẬT)
-├── id: UUID
-├── organisationId: FK → Organisation  ← MỚI (thuộc trực tiếp org)
-├── shopDomain: string                 ← unique
-├── shopName?: string
-├── platform: 'shopify'
-├── createdAt: DateTime
-└── updatedAt: DateTime
+/spec-review
 ```
 
-**Seed Data (bảng Service):**
-
-| code | name | type | description |
-|------|------|------|-------------|
-| clearer | Clearer App | app | Nền tảng analytics AI |
-| boost | Boost App | app | App filter & search sản phẩm |
-| support | Support Package | support | Hỗ trợ khách hàng premium |
-| custom-theme | Theme Customization | custom | Phát triển theme tùy chỉnh |
+**Step 2: After review passes, proceed to Phase 2**
+```
+/phase-2-tasks
+```
 
 ---
 
-## Tiêu chí nghiệm thu
+**⚠️ Skip review (manual approval):**
+If you reviewed manually and want to proceed directly:
+Say `approved` then run `/phase-2-tasks`
 
-- [ ] AC1: Model `Service` tồn tại với các fields: id, code, name, type, description
-- [ ] AC2: Model `ServiceUsage` tồn tại với unique constraint trên (accountId, serviceId)
-- [ ] AC3: Model `ServiceUsageStore` tồn tại với unique constraint trên (serviceUsageId, storeId)
-- [ ] AC4: Model `Store` có `organisationId` FK
-- [ ] AC5: Seed script tạo 4 services: clearer, boost, support, custom-theme
-- [ ] AC6: Command `db:seed` chạy thành công và idempotent
-- [ ] AC7: Provisioning tạo ServiceUsage cho service "clearer"
-- [ ] AC8: Provisioning tạo ServiceUsageStore link Store với ServiceUsage
-- [ ] AC9: API response bao gồm `serviceUsage` với chi tiết service
-- [ ] AC10: README document yêu cầu seed cho deployments
-
----
-
-## Trường hợp biên
-
-- **Service 'clearer' không tìm thấy**: Error 500 - cần seed trước provisioning
-- **ServiceUsage đã tồn tại cho account+service**: Trả về existing, bỏ qua creation
-- **ServiceUsageStore đã tồn tại**: Trả về existing, bỏ qua creation
-- **Store đã tồn tại cho org khác**: Error - shopDomain phải unique
-- **Không có shopDomain**: Bỏ qua store và service usage creation
-- **Concurrent provision requests**: Database unique constraints ngăn duplicates
-
----
-
-## Rủi ro & Giảm thiểu
-
-- **Rủi ro:** Bảng Service chưa seed trước deployment
-  - **Giảm thiểu:** Document trong README, thêm vào CI/CD pipeline, log error rõ ràng nếu service không tìm thấy
-
-- **Rủi ro:** Breaking change cho dữ liệu StoreAccountLink hiện có
-  - **Giảm thiểu:** Giữ StoreAccountLink (deprecated), migrate data trong task riêng
-
-- **Rủi ro:** Typo service code gây lookup failure
-  - **Giảm thiểu:** Dùng constants/enum cho service codes, validate tại compile time
-
----
-
-## Giả định
-
-- Bảng Service sẽ được seed trước bất kỳ provisioning calls nào
-- Một service usage per account+service combination
-- Store chỉ có thể thuộc một organisation
-- Tên account "Default" thay thế tên account "Clearer"
-
----
-
-## Câu hỏi mở
-
-- Q2: Account có thể có nhiều stores cho cùng service? → **Có, qua nhiều ServiceUsageStore records**
-- Q3: Xử lý deactivation service như thế nào? → **Ngoài phạm vi MVP**
+⚠️ DO NOT use generic commands like `go`, `approved` alone.
