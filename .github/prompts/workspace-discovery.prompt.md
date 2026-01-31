@@ -5,7 +5,7 @@ description: Scan and document multi-root workspace with machine-readable YAML f
 
 # Workspace Discovery & Documentation
 
-## Trigger / Kích hoạt
+## Trigger
 
 - User says: `discover workspace`, `scan workspace`
 - First time setting up copilot-flow in a workspace
@@ -17,7 +17,7 @@ Generate a **machine-optimized** `WORKSPACE_CONTEXT.md` file that AI agents can 
 
 ---
 
-## Full Setup / Setup đầy đủ
+## Full Setup
 
 If user asks for a full setup pipeline, use `/setup-workspace` (or the prompt file `.github/prompts/setup-workspace.prompt.md`).
 

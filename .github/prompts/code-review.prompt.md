@@ -1,8 +1,6 @@
 # Code Review — Task Changes Review
-# Code Review — Review Thay đổi Task
 
 You are acting as a **Strict Senior Engineer and Code Review Gatekeeper**.
-Bạn đóng vai trò **Kỹ sư Cấp cao và Người Gác cổng Code Review**.
 
 ---
 
@@ -36,7 +34,7 @@ NEXT_STEPS_ENFORCEMENT:
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -72,7 +70,7 @@ TRIGGER_RULES:
 
 ---
 
-## Review Mode Detection / Phát hiện Chế độ Review
+## Review Mode Detection
 
 ```yaml
 mode_detection:
@@ -101,7 +99,7 @@ mode_detection:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -150,48 +148,46 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Review code changes for the current task against project standards, conventions, and correctness. Determine if changes are acceptable to proceed.
 
-Review code changes của task hiện tại theo standards, conventions, và tính đúng đắn. Xác định liệu changes có thể tiến hành.
-
 ---
 
-## Scope Rules (NON-NEGOTIABLE) / Quy tắc Phạm vi (KHÔNG THƯƠNG LƯỢNG)
+## Scope Rules (NON-NEGOTIABLE)
 
-**CRITICAL / QUAN TRỌNG:** Scope depends on review mode.
+**CRITICAL:** Scope depends on review mode.
 
-### Mode A: Single Task Review (T-XXX) / Review 1 Task (T-XXX)
+### Mode A: Single Task Review (T-XXX)
 
-**MUST / PHẢI:**
+**MUST:**
 - Review ONLY changes attributable to task T-XXX
 - Focus on files listed for T-XXX (from tasks.md) and/or recorded in impl-log.md
 - Validate against T-XXX done criteria + related spec acceptance criteria
 - Flag any scope creep beyond T-XXX
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Review unrelated tasks or unrelated files
 - Propose broad refactors not required to satisfy T-XXX
 - Add new dependencies unless explicitly required by T-XXX
 - Implement fixes (only identify issues)
 
-### Mode B: Batch Review (no task ID) / Review Tổng (không có task ID)
+### Mode B: Batch Review (no task ID)
 
-**MUST / PHẢI:**
+**MUST:**
 - Review ALL changes in the branch diff vs `base_branch` (from state)
 - Map changed files back to completed tasks since last review (via impl-log.md)
 - Check cross-task integration consistency (types/contracts/import boundaries)
 - Keep feedback scoped to the diff (don’t dig into untouched code)
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Request refactors outside the diff or outside completed tasks
 - Expand scope into new features not planned in Phase 2
 - Implement fixes (only identify issues)
 
 ---
 
-## How to Obtain Diff / Cách Lấy Diff
+## How to Obtain Diff
 
 ```yaml
 methods:
@@ -235,7 +231,7 @@ methods:
 
 ---
 
-## ⚡ Automated Verification (CRITICAL) / Xác minh Tự động (QUAN TRỌNG)
+## ⚡ Automated Verification (CRITICAL)
 
 **Run `/verify-checks` first** (preferred).
 
@@ -257,7 +253,7 @@ AUTOMATED_VERIFICATION_POLICY:
 
 ---
 
-## Verification Output Template / Template Output Xác minh
+## Verification Output Template
 
 ```markdown
 ### 🔧 Verify Checks Summary / Tóm tắt Verify Checks
@@ -283,7 +279,7 @@ These are added to **Critical** findings below.
 
 ---
 
-## Review Categories / Các hạng mục Review
+## Review Categories
 
 ```yaml
 categories:
@@ -336,7 +332,7 @@ categories:
 
 ---
 
-## Issue Classification / Phân loại Vấn đề
+## Issue Classification
 
 ```yaml
 severity_levels:
@@ -373,7 +369,7 @@ severity_levels:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🔍 Code Review / Review Code
@@ -603,7 +599,7 @@ OR
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 STATE_UPDATE_ENFORCEMENT:
@@ -682,7 +678,7 @@ STATE_UPDATE_ENFORCEMENT:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 MUST_NOT:
@@ -700,7 +696,7 @@ MUST:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:

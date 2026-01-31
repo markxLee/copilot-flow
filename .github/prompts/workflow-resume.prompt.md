@@ -1,18 +1,17 @@
 # Workflow Resume Prompt
 # Use this prompt to continue work from a saved state
-# Dùng prompt này để tiếp tục công việc từ trạng thái đã lưu
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
   accepted_triggers:
     - "/workflow-resume"         # Explicit prompt reference (RECOMMENDED)
-    - "resume", "tiếp tục"       # Also accepted - clear intent
-    - "status", "trạng thái"     # Also accepted - status check
-    - "where were we", "đang làm gì"  # Also accepted
+    - "resume"                   # Also accepted
+    - "status"                   # Also accepted
+    - "where were we"            # Also accepted
     
   why: |
     Resume is safe because it loads state and suggests explicit next prompt.
@@ -21,24 +20,24 @@ TRIGGER_RULES:
 
 ---
 
-## Instructions / Hướng dẫn
+## Instructions
 
-### Step 1: Locate State File / Tìm file trạng thái
+### Step 1: Locate State File
 
 ```yaml
 CRITICAL_WORKFLOW_DETECTION:
-  # AI không có memory giữa sessions
-  # PHẢI detect workflow từ WORKSPACE_CONTEXT.md + git branch
+  # IMPORTANT: The assistant has no memory across sessions.
+  # Workflow detection MUST be derived from WORKSPACE_CONTEXT.md + git branch.
   
   step_1_read_workspace_context_first:
-    # ĐỌC WORKSPACE_CONTEXT.md TRƯỚC để biết default_docs_root
+    # Read WORKSPACE_CONTEXT.md first to get default_docs_root
     file: copilot-flow/WORKSPACE_CONTEXT.md
     extract: meta.default_docs_root
     example: "apphub-vision"
     
   step_2_get_branch_from_docs_root:
-    # QUAN TRỌNG: Chạy git TẠI default_docs_root, không phải tại tooling_root!
-    # Vì mỗi root có thể có branch khác nhau
+    # IMPORTANT: Run git in default_docs_root (not tooling_root),
+    # because each root may be on a different branch.
     command: git -C <default_docs_root> rev-parse --abbrev-ref HEAD
     example: git -C apphub-vision rev-parse --abbrev-ref HEAD
     result: "feature/bp-32-add-payment-detail"
@@ -71,14 +70,21 @@ CRITICAL_WORKFLOW_DETECTION:
     if_not_exists:
       action: ASK user
       message: |
-        "Không tìm thấy workflow cho branch `<branch>` (slug: `<slug>`)
-        
-        Bạn muốn:
-        1. Bắt đầu workflow mới? → `/work-intake`
-        2. Tìm workflow khác? → Cho tôi biết branch name"
+        "No workflow found for branch `<branch>` (slug: `<slug>`)
+
+        Options:
+        1. Start a new workflow → `/work-intake`
+        2. Look for a different workflow → tell me the branch name
+
+        (VI)
+        Không tìm thấy workflow cho branch `<branch>` (slug: `<slug>`)
+
+        Lựa chọn:
+        1. Bắt đầu workflow mới → `/work-intake`
+        2. Tìm workflow khác → cho tôi biết branch name"
 ```
 
-### Step 2: Parse State / Đọc trạng thái
+### Step 2: Parse State
 
 Read `.workflow-state.yaml` and extract:
 
@@ -95,7 +101,7 @@ quick_status:
   blockers: <any blockers>
 ```
 
-### Step 3: Report Status / Báo cáo trạng thái
+### Step 3: Report Status
 
 Output format (bilingual):
 
@@ -154,7 +160,7 @@ Based on current phase, run one of:
 **⚠️ DO NOT say "Reply `go` to proceed"** - Use explicit prompt references above.
 ```
 
-### Step 4: Handle Different States / Xử lý các trạng thái
+### Step 4: Handle Different States
 
 #### State: awaiting-review
 ```yaml
@@ -205,7 +211,7 @@ action: |
   Proceeding..."
 ```
 
-### Step 5: Update State After Each Action / Cập nhật trạng thái
+### Step 5: Update State After Each Action
 
 After EVERY significant action, update `.workflow-state.yaml`:
 
@@ -232,7 +238,7 @@ updates_required:
 
 ---
 
-## State Transitions / Chuyển trạng thái
+## State Transitions
 
 ```
 not-started ──▶ in-progress ──▶ awaiting-review ──▶ approved ──▶ (next phase)
@@ -246,22 +252,22 @@ not-started ──▶ in-progress ──▶ awaiting-review ──▶ approved �
 
 ---
 
-## Quick Commands / Lệnh nhanh
+## Quick Commands
 
 | Command | Action | Risk |
 |---------|--------|------|
-| `resume` / `tiếp tục` | Continue from last state | ✅ Safe |
-| `status` / `trạng thái` | Show current status only | ✅ Safe |
+| `resume` | Continue from last state | ✅ Safe |
+| `status` | Show current status only | ✅ Safe |
 | `/phase-X-...` | Run specific phase prompt | ✅ Safe |
-| `skip` / `bỏ qua` | Skip current task/blocker | ⚠️ Caution |
-| `back` / `quay lại` | Go to previous phase | ⚠️ Caution |
-| `restart` / `làm lại` | Restart current phase | ⚠️ Caution |
-| `abort` / `hủy` | Cancel workflow | ⚠️ Caution |
-| ~~`go`~~ / ~~`tiếp`~~ | ~~Execute next_action~~ | ❌ RISKY - may skip phases |
+| `skip` | Skip current task/blocker | ⚠️ Caution |
+| `back` | Go to previous phase | ⚠️ Caution |
+| `restart` | Restart current phase | ⚠️ Caution |
+| `abort` | Cancel workflow | ⚠️ Caution |
+| ~~`go`~~ | ~~Execute next_action~~ | ❌ RISKY - may skip phases |
 
 ---
 
-## Error Recovery / Khôi phục lỗi
+## Error Recovery
 
 ### State file corrupted or missing
 ```yaml
@@ -293,7 +299,7 @@ recovery:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 Always use bilingual format for status reports:
 - Headers: English / Vietnamese
@@ -302,7 +308,7 @@ Always use bilingual format for status reports:
 
 ---
 
-## Example Resume Session / Ví dụ phiên tiếp tục
+## Example Resume Session
 
 ```
 User: resume

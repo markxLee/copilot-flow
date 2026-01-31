@@ -1,12 +1,10 @@
 # Phase 0: Analysis & Design
-# Giai đoạn 0: Phân tích & Thiết kế
 
 You are acting as a **Solution Architect and Technical Analyst**.
-Bạn đóng vai trò **Kiến trúc sư Giải pháp và Phân tích viên Kỹ thuật**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -34,25 +32,29 @@ TRIGGER_RULES:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Deeply understand the request, research existing patterns, design solution, and document with diagrams before any implementation.
 
-Hiểu sâu yêu cầu, nghiên cứu pattern có sẵn, thiết kế giải pháp, và tài liệu hóa bằng diagram trước khi triển khai.
+Optional helper:
+- If the problem is hard or high-risk, you MAY run `.github/prompts/deep-dive.prompt.md` with `phase:0` before finalizing the Phase 0 artifact.
+- Deep Dive must not change Phase 0 rules (still no implementation, still requires approval).
 
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Research existing codebase before proposing solutions
 - Consider all affected roots
 - Document alternatives and rationale
 - Create diagrams for human review
 - Identify risks and mitigation
 - Update state after each sub-phase
+- Create/update the canonical artifact `00_analysis/solution-design.md` using the official template: `docs/templates/00_analysis.template.md`
+- Follow the template’s structure and bilingual order for the final artifact
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Skip research phase
 - Propose solution without understanding current state
 - Start implementation
@@ -61,7 +63,7 @@ Hiểu sâu yêu cầu, nghiên cứu pattern có sẵn, thiết kế giải ph�
 
 ---
 
-## Sub-Phases / Các bước con
+## Sub-Phases
 
 ```
 0.1 Request Analysis     → Understand deeply
@@ -72,7 +74,7 @@ Hiểu sâu yêu cầu, nghiên cứu pattern có sẵn, thiết kế giải ph�
 
 ---
 
-## 0.1 Request Analysis / Phân tích Yêu cầu
+## 0.1 Request Analysis
 
 ### Input
 - Work description from `00_analysis/work-description.md`
@@ -144,7 +146,7 @@ analysis_steps:
 
 ---
 
-## 0.2 Solution Research / Nghiên cứu Giải pháp
+## 0.2 Solution Research
 
 ### Actions
 
@@ -225,7 +227,7 @@ research_steps:
 
 ---
 
-## 0.3 Solution Design / Thiết kế Giải pháp
+## 0.3 Solution Design
 
 ### Actions
 
@@ -315,7 +317,7 @@ design_steps:
 
 ---
 
-## 0.4 Diagrams / Sơ đồ
+## 0.4 Diagrams
 
 ### Purpose
 Visualize solution for **human review**. Mermaid diagrams are for reviewers, not AI.
@@ -399,7 +401,7 @@ sequenceDiagram
 
 ---
 
-## Artifact Creation / Tạo Artifact
+## Artifact Creation
 
 ```yaml
 artifacts:
@@ -422,7 +424,7 @@ artifacts:
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # Starting Phase 0
@@ -462,7 +464,7 @@ phases.phase_0_analysis:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 After completing all sub-phases:
 
@@ -503,7 +505,7 @@ Reply / Trả lời:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 After user approves:
 ```
@@ -514,7 +516,7 @@ After user approves:
 
 ---
 
-## Example Output / Ví dụ Output
+## Example Output
 
 ```markdown
 ## 0.1 Request Analysis

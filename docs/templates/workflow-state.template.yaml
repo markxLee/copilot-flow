@@ -238,6 +238,33 @@ affected_roots:
     # ... same structure
 
 # ============================================================
+# DEEP DIVE SESSION - Multi-perspective analysis state
+# ============================================================
+deep_dive_session:
+  active: <true | false>             # Is there an active session?
+  phase: <0 | 5>                     # Which phase this session is for
+  log_file: <path-to-log>            # e.g., docs/runs/my-feature/deep-dive-2024-01-15.md
+  started_at: <ISO-8601-timestamp>
+  
+  # Track all turns in the session
+  turns:
+    - turn: 1
+      role: <architect | critic | security | strict | user | custom:name>
+      model: <copilot | gpt-4o | claude-sonnet | null>  # null for user turns
+      timestamp: <ISO-8601-timestamp>
+    - turn: 2
+      role: <role-name>
+      model: <model-name>
+      timestamp: <ISO-8601-timestamp>
+  
+  # Synthesis status
+  synthesis_done: <true | false>
+  synthesis_timestamp: <ISO-8601-timestamp>
+  
+  # For Option B parallel execution tracking
+  pending_roles: [<role1>, <role2>]  # Roles queued for parallel execution
+  
+# ============================================================
 # CONVERSATION CONTEXT - For AI continuity / Ngữ cảnh cho AI
 # ============================================================
 context:
@@ -269,10 +296,11 @@ context:
 history:
   - timestamp: <ISO-8601>
     phase: <phase-number>
-    action: <action-type>  # phase_start | task_start | task_complete | approval | error | resume
+    action: <action-type>  # phase_start | task_start | task_complete | approval | error | resume | deep_dive_start | deep_dive_turn | deep_dive_synthesize | deep_dive_end
     description: <what happened>
     
   - timestamp: <ISO-8601>
     phase: 3
     action: task_complete
     description: "Completed T-001: Created helper utilities"
+

@@ -1,12 +1,10 @@
 # Code Fix Plan — Address Review Findings
-# Kế hoạch Sửa Code — Xử lý Phát hiện từ Review
 
 You are acting as a **Senior Engineer and Remediation Planner**.
-Bạn đóng vai trò **Kỹ sư Cấp cao và Người Lập kế hoạch Khắc phục**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -30,7 +28,7 @@ TRIGGER_RULES:
 
 ---
 
-## Mode Detection / Phát hiện Chế độ
+## Mode Detection
 
 ```yaml
 mode_detection:
@@ -63,7 +61,7 @@ mode_detection:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -95,24 +93,22 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Produce a minimal, task-scoped fix plan to address issues from Code Review. Map each finding to a concrete fix without implementing.
 
-Tạo kế hoạch sửa tối thiểu, theo phạm vi task để xử lý issues từ Code Review. Map mỗi finding thành fix cụ thể mà không triển khai.
-
 ---
 
-## Rules (NON-NEGOTIABLE) / Quy tắc (KHÔNG THƯƠNG LƯỢNG)
+## Rules (NON-NEGOTIABLE)
 
-**MUST / PHẢI:**
+**MUST:**
 - Propose fixes ONLY for issues in the review
 - Keep fixes minimal and focused
 - Map each finding to specific fix
 - Stay within task scope
 - Include verification steps
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Implement code changes in this response
 - Propose broad refactors
 - Add new features
@@ -121,7 +117,7 @@ Tạo kế hoạch sửa tối thiểu, theo phạm vi task để xử lý issue
 
 ---
 
-## Fix Prioritization / Ưu tiên Sửa
+## Fix Prioritization
 
 ```yaml
 priority_order:
@@ -139,7 +135,7 @@ batch_strategy:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 📋 Code Fix Plan / Kế hoạch Sửa Code
@@ -331,7 +327,7 @@ Reply `adjust <finding>` to modify a fix approach.
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # After fix plan created
@@ -357,7 +353,7 @@ tasks:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 MUST_NOT:
@@ -375,7 +371,7 @@ MUST:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | User Response | Next Action |
 |---------------|-------------|
@@ -386,7 +382,7 @@ MUST:
 
 ---
 
-## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+## 📋 CHECKPOINT — Next Prompt
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:

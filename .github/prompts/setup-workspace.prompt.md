@@ -1,15 +1,11 @@
 # Setup Workspace — Full Initialization Pipeline
-# Thiết lập Workspace — Quy trình Khởi tạo Đầy đủ
 
 > Runs the full workspace setup pipeline:
 > discovery → cross-root → sync instructions → generate workspace files
-> 
-> Chạy toàn bộ pipeline setup workspace:
-> discovery → cross-root → sync instructions → tạo file workspace
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -25,7 +21,7 @@ TRIGGER_RULES:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 - Ensure `WORKSPACE_CONTEXT.md` exists and is up-to-date
 - Ensure cross-root workflows (Section 9) are configured
@@ -34,22 +30,22 @@ TRIGGER_RULES:
 
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Prefer explicit sub-prompts to avoid phase confusion
 - Ask user before overwriting any existing important files
 - Keep setup non-destructive by default (append/merge rather than delete)
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Create/switch git branches
 - Modify application code (setup only)
 
 ---
 
-## Execution Plan / Kế hoạch Thực thi
+## Execution Plan
 
-### Step 1: Workspace Discovery / Khám phá Workspace
+### Step 1: Workspace Discovery
 
 - Run:
 
@@ -60,7 +56,7 @@ TRIGGER_RULES:
 Expected outcome:
 - `WORKSPACE_CONTEXT.md` exists/updated
 
-### Step 2: Cross-Root Configuration / Cấu hình Cross-Root
+### Step 2: Cross-Root Configuration
 
 - Run:
 
@@ -71,7 +67,7 @@ Expected outcome:
 Expected outcome:
 - `WORKSPACE_CONTEXT.md` Section 9 is created/updated
 
-### Step 3: Sync Instructions / Đồng bộ Instructions
+### Step 3: Sync Instructions
 
 - Run:
 
@@ -82,7 +78,7 @@ Expected outcome:
 Expected outcome:
 - Per-root `.github/instructions/*.md` are generated/updated (where applicable)
 
-### Step 4: Generate Workspace Files / Tạo file Workspace
+### Step 4: Generate Workspace Files
 
 - Run:
 
@@ -96,7 +92,13 @@ Expected outcome:
 
 ---
 
-## Output Format / Định dạng Output
+## Incremental Updates
+
+After initial setup, use `/workspace-update-root` to incrementally update a single root without re-running full discovery.
+
+---
+
+## Output Format
 
 ```markdown
 ## 🧰 Setup Workspace / Thiết lập Workspace
@@ -118,7 +120,7 @@ Expected outcome:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 - If user rejects overwriting files → STOP and propose a safe alternative
 - If multiple roots exist but cross-root info is ambiguous → STOP and ask clarifying questions

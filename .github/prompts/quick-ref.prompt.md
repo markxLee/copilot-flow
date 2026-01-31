@@ -1,18 +1,16 @@
-# Quick Reference Card / Thẻ Tham chiếu Nhanh
+# Quick Reference Card
 
 > Cheat sheet for Copilot Workflow commands and phases.
-> Thẻ tóm tắt các lệnh và phase của Copilot Workflow.
 
 ---
 
-## 🎯 Purpose / Mục đích
+## 🎯 Purpose
 
 Display a concise reference card with all commands, phases, and navigation.
-Hiển thị thẻ tham chiếu ngắn gọn với tất cả lệnh, phases, và navigation.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 - User says: `help`, `commands`, `cheat sheet`, `quick ref`, `?`
 - User seems confused about what to do next
@@ -20,7 +18,7 @@ Hiển thị thẻ tham chiếu ngắn gọn với tất cả lệnh, phases, v�
 
 ---
 
-## ⚠️ CRITICAL: Display Rules / Quy tắc Hiển thị
+## ⚠️ CRITICAL: Display Rules
 
 ```yaml
 display_rules:
@@ -49,7 +47,7 @@ display_rules:
 
 ---
 
-## Output Template / Kết quả
+## Output Template
 
 **IMPORTANT: Display the following markdown EXACTLY as-is, do not summarize:**
 
@@ -295,6 +293,7 @@ Luôn dùng `/prompt-name` tường minh để đảm bảo đúng flow.
 | `/rollback` | Undo implementation changes | Hoàn tác thay đổi |
 | `/lite-mode` | Start lite mode for simple tasks | Chế độ nhanh cho task đơn giản |
 | `/solo-orchestrator` | One-command solo flow (Lite vs Governed) | Điều phối 1 lệnh cho solo (Lite vs Governed) |
+| `/deep-dive option:A|B phase:<0\|1\|5>` | Optional deep dive (A: Copilot-only; B: external LLM API runner) | Deep dive tuỳ chọn (A: chỉ Copilot; B: runner gọi external LLM API) |
 
 ---
 
@@ -365,6 +364,12 @@ approved
 **Solo (Recommended Entry Point):**
 ```
 /solo-orchestrator start: <describe work>
+```
+
+**Hard Problems (Optional Turbo):**
+```
+/deep-dive option:A phase:0   # Copilot-only deep dive (no external API)
+/deep-dive option:B phase:0   # External multi-worker consensus (LLM API)
 ```
 
 **New Feature (Full Workflow):**
@@ -574,7 +579,7 @@ If nothing works / Nếu không gì hoạt động:
 
 ---
 
-## Context-Aware Display / Hiển thị Theo Ngữ cảnh
+## Context-Aware Display
 
 When showing quick ref, also include:
 
@@ -593,7 +598,7 @@ context_footer:
 
 ---
 
-## Compact Version / Phiên bản Ngắn
+## Compact Version
 
 When user says `help short` or `? short`:
 
@@ -610,7 +615,7 @@ When user says `help short` or `? short`:
 
 ---
 
-## Integration / Tích hợp
+## Integration
 
 This prompt can be called from any other prompt when:
 - User seems lost

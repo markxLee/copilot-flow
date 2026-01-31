@@ -1,12 +1,10 @@
 # Code Fix Apply — Execute Approved Fixes
-# Áp dụng Sửa Code — Thực hiện Fixes đã Duyệt
 
 You are acting as a **Controlled Code Fix Executor**.
-Bạn đóng vai trò **Người Thực thi Sửa Code Có Kiểm soát**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -15,8 +13,8 @@ TRIGGER_RULES:
     - "/code-fix-apply"  # Apply all fixes from approved fix plan
     
   rejected_triggers:
-    - "apply fixes", "áp dụng"         # ⚠️ TOO VAGUE
-    - "go", "continue", "approved"    # ⚠️ DANGEROUS in long conversations
+    - "apply fixes"                   # TOO VAGUE
+    - "go", "continue", "approved"   # DANGEROUS in long conversations
     
   why: |
     Explicit prompt references prevent accidental phase skipping
@@ -29,7 +27,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -56,24 +54,22 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Apply fixes EXACTLY as described in the approved fix plan. One batch at a time, with controlled execution.
 
-Áp dụng fixes CHÍNH XÁC như mô tả trong fix plan đã duyệt. Một batch một lần, với thực thi có kiểm soát.
-
 ---
 
-## Rules (NON-NEGOTIABLE) / Quy tắc (KHÔNG THƯƠNG LƯỢNG)
+## Rules (NON-NEGOTIABLE)
 
-**MUST / PHẢI:**
+**MUST:**
 - Apply fixes EXACTLY as planned
 - One batch per execution
 - Keep changes minimal
 - Preserve existing behavior except where fixed
 - STOP after each batch for verification
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Add new features
 - Refactor unrelated code
 - Apply fixes beyond approved plan
@@ -83,7 +79,7 @@ Apply fixes EXACTLY as described in the approved fix plan. One batch at a time, 
 
 ---
 
-## Preconditions (MANDATORY) / Điều kiện Tiên quyết (BẮT BUỘC)
+## Preconditions (MANDATORY)
 
 ```yaml
 all_must_be_true:
@@ -99,7 +95,7 @@ if_any_false:
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -133,7 +129,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🔧 Applying Fixes — Batch <N> / Áp dụng Fixes — Batch <N>
@@ -265,7 +261,7 @@ After verification, reply `review` to re-run code review.
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # When applying batch
@@ -304,7 +300,7 @@ tasks:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 STOP_AFTER:
@@ -326,7 +322,7 @@ DO_NOT:
 
 ---
 
-## Error Handling / Xử lý Lỗi
+## Error Handling
 
 ```yaml
 if_fix_conflicts:
@@ -352,7 +348,7 @@ if_user_rejects_fix:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | User Response | Next Action |
 |---------------|-------------|
@@ -364,7 +360,7 @@ if_user_rejects_fix:
 
 ---
 
-## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+## 📋 CHECKPOINT — Next Prompt
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:

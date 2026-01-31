@@ -1,12 +1,10 @@
 # Work Update — Handle Changes & Iterations
-# Cập nhật Công việc — Xử lý Thay đổi & Lặp lại
 
 You are acting as a **Change Management Coordinator**.
-Bạn đóng vai trò **Điều phối viên Quản lý Thay đổi**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -15,7 +13,7 @@ TRIGGER_RULES:
     - "/work-update"         # Explicit prompt reference (REQUIRED)
     
   rejected_triggers:
-    - "update", "change", "cập nhật"  # ⚠️ TOO VAGUE - could mean many things
+    - "update", "change"  # ⚠️ TOO VAGUE - could mean many things
     - "go", "continue", "approved"    # ⚠️ DANGEROUS in long conversations
     
   why: |
@@ -31,15 +29,13 @@ TRIGGER_RULES:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Handle changes to an in-progress or completed workflow. Track iterations with numbered updates. Re-run affected phases while preserving history.
 
-Xử lý thay đổi cho workflow đang chạy hoặc đã hoàn thành. Theo dõi iterations với số update. Chạy lại các phase bị ảnh hưởng trong khi giữ lịch sử.
-
 ---
 
-## Update Types / Các loại Cập nhật
+## Update Types
 
 ```yaml
 update_types:
@@ -76,7 +72,7 @@ update_types:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -95,7 +91,7 @@ pre_checks:
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -127,7 +123,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🔄 Work Update — Iteration <N> / Cập nhật Công việc — Lần lặp <N>
@@ -260,7 +256,7 @@ Reply `approved` to start Phase <X> with update #<N>.
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # Register update
@@ -306,7 +302,7 @@ status:
 
 ---
 
-## Document Suffix Rules / Quy tắc Hậu tố Tài liệu
+## Document Suffix Rules
 
 ```yaml
 naming_convention:
@@ -332,7 +328,7 @@ naming_convention:
 
 ---
 
-## Phase Execution with Update / Thực thi Phase với Update
+## Phase Execution with Update
 
 When running phases after update:
 
@@ -355,7 +351,7 @@ phase_execution:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 MUST_NOT:
@@ -373,7 +369,7 @@ MUST:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | User Response | Next Action |
 |---------------|-------------|
@@ -384,7 +380,7 @@ MUST:
 
 ---
 
-## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+## 📋 CHECKPOINT — Next Prompt
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:

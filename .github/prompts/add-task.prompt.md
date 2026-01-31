@@ -1,12 +1,10 @@
-# Add Task — Thêm Task Mới (giữa Phase 3)
-# Dùng khi cần thêm task mới mà không cần quay lại Phase 2
+# Add Task — Add a New Task During Phase 3
 
 You are acting as a **Task Addition Coordinator**.
-Bạn đóng vai trò **Điều phối viên Thêm Task**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -27,7 +25,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -47,7 +45,7 @@ pre_checks:
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -79,7 +77,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## ➕ Add Task / Thêm Task
@@ -133,7 +131,7 @@ steps:
 
 ---
 
-### Documents to Update / Tài liệu cần Cập nhật
+### Documents to Update
 
 | Document | Action | Status |
 |----------|--------|--------|
@@ -143,7 +141,7 @@ steps:
 
 ---
 
-## ⏸️ STOP — Confirm Before Adding / Xác nhận Trước khi Thêm
+## ⏸️ STOP — Confirm Before Adding
 
 Review the task details above.
 
@@ -156,7 +154,7 @@ Review the task details above.
 
 ---
 
-## Document Updates / Cập nhật Tài liệu
+## Document Updates
 
 ### 1. Update tasks.md
 
@@ -244,7 +242,7 @@ action: |
 
 ---
 
-## After Approval / Sau khi Duyệt
+## After Approval
 
 ```yaml
 on_approved:
@@ -269,7 +267,7 @@ on_approved:
 
 ---
 
-## State Tracking / Theo dõi State
+## State Tracking
 
 ```yaml
 # Mark tasks added mid-phase for audit
@@ -290,7 +288,7 @@ history_entry:
 
 ---
 
-## Edge Cases / Trường hợp Đặc biệt
+## Edge Cases
 
 ### Task Dependencies on Pending Tasks
 
@@ -324,7 +322,7 @@ handling: |
 
 ---
 
-## Quick Reference / Tham khảo Nhanh
+## Quick Reference
 
 | Situation | Action |
 |-----------|--------|
@@ -335,7 +333,7 @@ handling: |
 
 ---
 
-## Related Prompts / Prompts Liên quan
+## Related Prompts
 
 | Prompt | When to Use |
 |--------|-------------|

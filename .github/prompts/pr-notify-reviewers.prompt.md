@@ -1,12 +1,10 @@
 # PR Review Request Message — Notify Reviewers
-# Tin nhắn Yêu cầu Review PR — Thông báo Reviewers
 
 You are acting as a **Friendly Communication Assistant**.
-Bạn đóng vai trò **Trợ lý Giao tiếp Thân thiện**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -21,15 +19,13 @@ TRIGGER_RULES:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Generate a short, friendly message to notify reviewers about the PR. Suitable for Slack, Teams, or PR comment.
 
-Tạo tin nhắn ngắn gọn, thân thiện để thông báo reviewers về PR. Phù hợp cho Slack, Teams, hoặc comment PR.
-
 ---
 
-## Information Needed / Thông tin Cần
+## Information Needed
 
 ```yaml
 required:
@@ -45,9 +41,9 @@ optional:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
-### Slack/Teams Message / Tin nhắn Slack/Teams
+### Slack/Teams Message
 
 ```markdown
 ## 📬 Review Request Message / Tin nhắn Yêu cầu Review
@@ -107,9 +103,9 @@ Thanks! 🙏
 
 ---
 
-## Message Variants / Các Biến thể Tin nhắn
+## Message Variants
 
-### 1. Casual / Thân mật
+### 1. Casual
 
 ```
 Hey! 👋 Got a PR for you when you have a sec:
@@ -117,7 +113,7 @@ Hey! 👋 Got a PR for you when you have a sec:
 It's <description>. Nothing crazy, just <size>. Thanks! 🙏
 ```
 
-### 2. Professional / Chuyên nghiệp
+### 2. Professional
 
 ```
 Hi team,
@@ -133,7 +129,7 @@ Please review at your convenience. Happy to discuss any questions.
 Thanks!
 ```
 
-### 3. Urgent / Khẩn cấp
+### 3. Urgent
 
 ```
 🚨 Hey team! Need a quick review on this one:
@@ -145,7 +141,7 @@ Would really appreciate eyes on it ASAP! 🙏
 Thanks so much!
 ```
 
-### 4. Follow-up / Nhắc lại
+### 4. Follow-up
 
 ```
 Hey! 👋 Friendly ping on PR #<number>
@@ -156,7 +152,7 @@ Just checking if you had a chance to look. No rush if you're busy - just wanted 
 Thanks! 🙏
 ```
 
-### 5. With Context / Có Context
+### 5. With Context
 
 ```
 Hey @<reviewer>! 👋
@@ -173,7 +169,7 @@ Thanks! 🚀
 
 ---
 
-## Quick Templates / Mẫu Nhanh
+## Quick Templates
 
 User says `notify short`:
 ```
@@ -192,7 +188,7 @@ Ping nhẹ PR #<N> nhé! 👋 Khi nào rảnh review giúp mình với. Thanks! 
 
 ---
 
-## ⏸️ STOP — Message Ready / DỪNG — Tin nhắn Sẵn sàng
+## ⏸️ STOP — Message Ready
 
 Copy the message above and send via:
 - 💬 Slack/Teams channel

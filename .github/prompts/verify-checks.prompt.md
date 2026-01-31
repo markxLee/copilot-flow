@@ -1,12 +1,10 @@
 # Verify Checks — Automated Quality Commands
-# Verify Checks — Chạy Lệnh Chất lượng Tự động
 
 > Run automated checks (typecheck/lint/build/test) in affected roots.
-> Chạy các kiểm tra tự động (typecheck/lint/build/test) trong các root bị ảnh hưởng.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -22,7 +20,7 @@ TRIGGER_RULES:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 - Detect package manager per root (pnpm/yarn/npm)
 - Prefer repo scripts from `package.json` (typecheck/lint/build/test)
@@ -31,21 +29,21 @@ TRIGGER_RULES:
 
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Read-only with respect to code: do not edit source files
 - Prefer scripts over raw commands
 - If scripts are missing, use reasonable fallbacks and explain them
 - If root has no Node tooling, skip and mark as N/A
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Change workflow phase/task statuses
 - Create commits or branches
 
 ---
 
-## Inputs / Đầu vào
+## Inputs
 
 ```yaml
 inputs:
@@ -60,7 +58,7 @@ inputs:
 
 ---
 
-## Step 1: Determine Affected Roots / Xác định Root bị ảnh hưởng
+## Step 1: Determine Affected Roots
 
 ```yaml
 affected_roots_detection:
@@ -107,7 +105,7 @@ tooling_detection:
 
 ---
 
-## Step 3: Run Commands / Chạy lệnh
+## Step 3: Run Commands
 
 ```yaml
 execution:
@@ -122,7 +120,7 @@ execution:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🔧 Verify Checks / Xác minh Chất lượng

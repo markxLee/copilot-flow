@@ -1,12 +1,10 @@
 # Phase 4: Testing — Test Implementation
-# Phase 4: Kiểm thử — Triển khai Test
 
 You are acting as a **Test Engineer and Quality Assurance Specialist**.
-Bạn đóng vai trò **Kỹ sư Test và Chuyên gia Đảm bảo Chất lượng**.
 
 ---
 
-## ⚠️ CRITICAL: Coverage Requirement / Yêu cầu Độ phủ (BẮT BUỘC)
+## ⚠️ CRITICAL: Coverage Requirement (NON-NEGOTIABLE)
 
 ```yaml
 ##############################################
@@ -34,7 +32,7 @@ coverage_rule:
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -43,8 +41,8 @@ TRIGGER_RULES:
     - "/phase-4-tests"      # Explicit prompt reference (REQUIRED)
     
   rejected_triggers:
-    - "test", "phase 4", "kiểm thử"  # ⚠️ TOO VAGUE - may skip phases
-    - "go", "continue", "approved"    # ⚠️ DANGEROUS in long conversations
+    - "test", "phase 4"              # TOO VAGUE - may skip phases
+    - "go", "continue", "approved"   # DANGEROUS in long conversations
     
   why: |
     Explicit prompt references prevent accidental phase skipping
@@ -57,7 +55,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -80,17 +78,15 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Write tests to validate the implementation from Phase 3. Ensure correctness, coverage, and regression protection. Tests are written in batches with explicit failure analysis.
 
-Viết tests để xác nhận implementation từ Phase 3. Đảm bảo tính đúng đắn, độ phủ, và bảo vệ regression. Tests được viết theo batch với phân tích failure rõ ràng.
-
 ---
 
-## PHASE CONTRACT (NON-NEGOTIABLE) / HỢP ĐỒNG PHASE (KHÔNG THƯƠNG LƯỢNG)
+## PHASE CONTRACT (NON-NEGOTIABLE)
 
-**MUST / PHẢI:**
+**MUST:**
 - Write tests in BATCHES (not all at once)
 - **🎯 ACHIEVE ≥70% COVERAGE** on ALL changed files (CRITICAL)
 - **📊 RUN AND REPORT COVERAGE** for each batch before marking complete
@@ -99,7 +95,7 @@ Viết tests để xác nhận implementation từ Phase 3. Đảm bảo tính �
 - Update tests.md after each batch with coverage %
 - STOP after each batch for review
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Skip failing tests
 - Modify implementation without approval
 - **❌ SKIP COVERAGE CHECK** - always run coverage command
@@ -110,7 +106,7 @@ Viết tests để xác nhận implementation từ Phase 3. Đảm bảo tính �
 
 ---
 
-## Coverage Requirements / Yêu cầu Độ phủ
+## Coverage Requirements
 
 ```yaml
 minimum_coverage: 70%
@@ -134,7 +130,7 @@ exceptions:
 
 ---
 
-## Test Batch Strategy / Chiến lược Batch Test
+## Test Batch Strategy
 
 ```yaml
 batch_organization:
@@ -160,7 +156,7 @@ batch_size:
 
 ---
 
-## Multi-Root Testing / Test Đa Root
+## Multi-Root Testing
 
 ```yaml
 per_root_testing:
@@ -185,7 +181,7 @@ cross_root_tests:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🧪 Phase 4: Testing — Batch <N> / Kiểm thử — Batch <N>
@@ -222,15 +218,15 @@ Files to test from Phase 3:
 
 #### `<root>/path/to/__tests__/file.test.ts`
 
-```typescript
+~~~typescript
 // Show actual test code
-```
+~~~
 
 #### `<root>/path/to/__tests__/other.test.ts`
 
-```typescript
+~~~typescript
 // Show actual test code
-```
+~~~
 
 ---
 
@@ -239,7 +235,7 @@ Files to test from Phase 3:
 > ⚠️ User must run these manually
 > ⚠️ Người dùng phải chạy thủ công
 
-```bash
+~~~bash
 cd <target_root>
 
 # Run tests for this batch
@@ -248,7 +244,7 @@ pnpm test path/to/__tests__/other.test.ts
 
 # Run with coverage
 pnpm test --coverage --collectCoverageFrom='path/to/file.ts'
-```
+~~~
 
 ---
 
@@ -266,7 +262,7 @@ pnpm test --coverage --collectCoverageFrom='path/to/file.ts'
 > After user runs tests, document the results here
 > Sau khi người dùng chạy tests, ghi lại kết quả ở đây
 
-```markdown
+~~~markdown
 ## Test Execution Log — Batch <N>
 
 ### Run Info
@@ -292,14 +288,14 @@ pnpm test --coverage --collectCoverageFrom='path/to/file.ts'
 | **Total** | **78%** | **75%** | **95%** | **80%** |
 
 ### Test Output (if failures)
-```
+~~~
 FAIL  path/to/__tests__/file.test.ts
   ● Test suite description › test name
     Expected: X
     Received: Y
     
     at Object.<anonymous> (file.test.ts:42:5)
-```
+~~~
 
 ### Failure Analysis (if any)
 | Test | Error | Root Cause | Action |
@@ -310,16 +306,16 @@ FAIL  path/to/__tests__/file.test.ts
 - [ ] ✅ All tests pass
 - [ ] ✅ Coverage ≥ 70%
 - [ ] Ready for next batch / test-verify
-```
+~~~
 
 ---
 
-## ⚠️ MANDATORY: Test Documentation Update / BẮT BUỘC: Cập nhật Tài liệu Test
+## ⚠️ MANDATORY: Test Documentation Update
 
 ```yaml
 ##############################################################
 #  🚨 CRITICAL: MUST UPDATE tests.md AFTER EACH BATCH
-#  🚨 QUAN TRỌNG: PHẢI CẬP NHẬT tests.md SAU MỖI BATCH
+#  🚨 IMPORTANT: MUST UPDATE tests.md AFTER EACH BATCH
 ##############################################################
 
 documentation_rule:
@@ -376,10 +372,10 @@ documentation_rule:
 
 ---
 
-## ⏸️ STOP — Batch <N> Written / DỪNG — Batch <N> đã Viết
+## ⏸️ STOP — Batch <N> Written
 
 ### Test batch <N> ready for execution
-### Batch test <N> sẵn sàng để thực thi
+### Batch <N> is ready to execute
 
 **Summary:**
 - Tests written: <count>
@@ -397,7 +393,7 @@ Reply with test results.
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # When starting Phase 4
@@ -437,7 +433,7 @@ phases.phase_4_tests:
 
 ---
 
-## Failure Handling / Xử lý Failure
+## Failure Handling
 
 ```yaml
 when_tests_fail:
@@ -464,7 +460,7 @@ when_coverage_low:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 STOP_AFTER:
@@ -486,7 +482,7 @@ DO_NOT:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | User Response | Next Action |
 |---------------|-------------|
@@ -497,7 +493,7 @@ DO_NOT:
 
 ---
 
-## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+## 📋 CHECKPOINT — Next Prompt
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
@@ -517,4 +513,6 @@ NEXT_PROMPT_ENFORCEMENT:
   MUST_SAY:
     - "Run `/test-verify` to verify all tests"
     - "After test verify passes, run `/phase-5-done`"
+```
+
 ```

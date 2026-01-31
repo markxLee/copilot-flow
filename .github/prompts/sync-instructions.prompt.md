@@ -1,21 +1,17 @@
 # Sync Instructions - Tech Stack Analysis & Generation
 
 > Analyze each workspace root's tech stack and generate appropriate `.instructions.md` files.
-> Phân tích tech stack của từng root và tự động tạo `.instructions.md` phù hợp.
 
 ---
 
-## 🎯 Purpose / Mục đích
+## 🎯 Purpose
 
 **OLD approach (deprecated):** Copy shared templates → All roots get same instructions
 **NEW approach:** Analyze each root → Generate tailored instructions per tech stack
 
-Mỗi root có tech stack riêng, thậm chí monorepo có nhiều stack trong từng app/package.
-AI cần phân tích và tạo instructions phù hợp cho từng context.
-
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 - User says: `sync instructions`, `generate instructions`, `/sync-instructions`
 - User says: `sync instructions to <root>` - specific root only

@@ -1,11 +1,10 @@
-# Rollback Prompt / Hoàn tác
+# Rollback Prompt
 
 > Undo implementation changes when something goes wrong.
-> Hoàn tác các thay đổi implementation khi có lỗi xảy ra.
 
 ---
 
-## 🎯 Purpose / Mục đích
+## 🎯 Purpose
 
 Safely undo code changes from the current or previous task when:
 - Implementation introduced bugs
@@ -13,21 +12,17 @@ Safely undo code changes from the current or previous task when:
 - User wants to try different solution
 - Code review rejected with major issues
 
-Hoàn tác an toàn các thay đổi code khi:
-- Implementation gây ra bugs
-- Approach sai
-- User muốn thử solution khác
-- Code review reject với issues lớn
+
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
   accepted_triggers:
     - "/rollback"                # Explicit prompt reference (RECOMMENDED)
-    - "rollback", "undo", "revert", "hoàn tác", "quay lại"  # Clear intent
+    - "rollback", "undo", "revert"  # Clear intent
     - "that didn't work", "start over", "try again"
     
   why: |
@@ -37,7 +32,7 @@ TRIGGER_RULES:
 
 ---
 
-## Prerequisites / Điều kiện Tiên quyết
+## Prerequisites
 
 ```yaml
 required:
@@ -48,7 +43,7 @@ required:
 
 ---
 
-## Step 1: Assess Rollback Scope / Đánh giá Phạm vi
+## Step 1: Assess Rollback Scope
 
 ```yaml
 actions:
@@ -68,7 +63,7 @@ actions:
 
 ---
 
-## Step 2: Present Rollback Options / Trình bày Tùy chọn
+## Step 2: Present Rollback Options
 
 ```markdown
 ## 🔄 Rollback Options / Tùy chọn Hoàn tác
@@ -128,7 +123,7 @@ Which option? / Chọn tùy chọn nào?
 
 ---
 
-## Step 3: Execute Rollback / Thực hiện Hoàn tác
+## Step 3: Execute Rollback
 
 ### Option 1: Rollback Current Task
 
@@ -258,7 +253,7 @@ Nếu đã push, cần dùng `git revert` thay vì `git reset`.
 
 ---
 
-## Step 4: Update State / Cập nhật State
+## Step 4: Update State
 
 ```yaml
 state_update_after_rollback:
@@ -282,7 +277,7 @@ state_update_after_rollback:
 
 ---
 
-## Step 5: Document in impl-log.md / Ghi vào impl-log
+## Step 5: Document in impl-log.md
 
 Add entry:
 ```markdown
@@ -302,7 +297,7 @@ Add entry:
 
 ---
 
-## ⏸️ STOP — Rollback Complete / DỪNG — Hoàn tác Xong
+## ⏸️ STOP — Rollback Complete
 
 ```markdown
 ## ✅ Rollback Complete / Hoàn tác Hoàn tất
@@ -334,7 +329,7 @@ Add entry:
 
 ---
 
-## Safety Rules / Quy tắc An toàn
+## Safety Rules
 
 ```yaml
 safety:
@@ -354,7 +349,7 @@ safety:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | User Choice | Next Action |
 |-------------|-------------|
@@ -366,7 +361,7 @@ safety:
 
 ---
 
-## Example / Ví dụ
+## Example
 
 ```
 User: rollback

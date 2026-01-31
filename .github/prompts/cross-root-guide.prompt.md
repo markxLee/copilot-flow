@@ -1,14 +1,12 @@
-# Cross-Root Auto-Config / Tự động Cấu hình Đa Root
+# Cross-Root Auto-Config
 
 > **AUTO-ANALYZE** workspace roots, **ASK** if unclear, then **SAVE**.
-> **TỰ ĐỘNG PHÂN TÍCH** các workspace roots, **HỎI** nếu chưa rõ, rồi **LƯU**.
-> 
-> This prompt auto-detects what it can, and asks user to clarify uncertain parts.
-> Prompt này tự detect được gì thì detect, hỏi user làm rõ những phần không chắc.
+>
+> This prompt auto-detects what it can, and asks the user to clarify uncertain parts.
 
 ---
 
-## 🎯 Purpose / Mục đích
+## 🎯 Purpose
 
 When triggered, Copilot will:
 1. **Auto-scan** all workspace roots
@@ -16,15 +14,9 @@ When triggered, Copilot will:
 3. **Ask user** to clarify uncertain patterns (low confidence)
 4. **Save** accurate config to WORKSPACE_CONTEXT.md (Section 9)
 
-Khi kích hoạt, Copilot sẽ:
-1. **Tự scan** tất cả workspace roots
-2. **Tự detect** patterns chắc chắn (high confidence)
-3. **Hỏi user** làm rõ patterns không chắc (low confidence)
-4. **Lưu** config chính xác vào WORKSPACE_CONTEXT.md (Section 9)
-
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 - User says: `cross-root`, `configure cross-root`, `setup roots`
 - First time setting up workspace
@@ -32,7 +24,7 @@ Khi kích hoạt, Copilot sẽ:
 
 ---
 
-## Step 1: Scan All Roots / Quét Tất cả Roots
+## Step 1: Scan All Roots
 
 ```yaml
 actions:
@@ -57,7 +49,7 @@ actions:
 
 ---
 
-## Step 2: Auto-Detect Patterns / Tự động Detect Patterns
+## Step 2: Auto-Detect Patterns
 
 For each pattern, assign a **confidence level**:
 - ✅ **HIGH**: Clear evidence found → auto-include in config
@@ -171,7 +163,7 @@ example_medium_confidence:
 
 ---
 
-## Step 3: Auto-Determine Build Order / Tự động Xác định Thứ tự Build
+## Step 3: Auto-Determine Build Order
 
 ```yaml
 logic:
@@ -209,7 +201,7 @@ example:
 
 ---
 
-## Step 4: Auto-Determine PR Strategy / Tự động Xác định Chiến lược PR
+## Step 4: Auto-Determine PR Strategy
 
 ```yaml
 logic:
@@ -232,7 +224,7 @@ example:
 
 ---
 
-## Step 5: Generate & Show Config / Generate & Hiển thị Config
+## Step 5: Generate & Show Config
 
 ```yaml
 output_format:
@@ -295,7 +287,7 @@ after_user_answers:
 
 ---
 
-## Step 6: SAVE to WORKSPACE_CONTEXT.md / LƯU vào File
+## Step 6: SAVE to WORKSPACE_CONTEXT.md
 
 ```yaml
 on_user_confirms_yes:
@@ -327,7 +319,7 @@ on_user_says_adjust:
 
 ---
 
-## Quick Commands / Lệnh Nhanh
+## Quick Commands
 
 | Command | Action |
 |---------|--------|
@@ -337,7 +329,7 @@ on_user_says_adjust:
 
 ---
 
-## Reference: Implementation Workflows / Tham khảo cho Implementation
+## Reference: Implementation Workflows
 
 When implementing cross-root changes, follow these patterns:
 
@@ -370,7 +362,7 @@ cd apphub-vision && pnpm build
 
 ---
 
-## Tracking in Workflow State / Theo dõi trong State
+## Tracking in Workflow State
 
 When working on cross-root tasks, update `.workflow-state.yaml`:
 
@@ -388,7 +380,7 @@ affected_roots:
 
 ---
 
-## 📌 Next Step / Bước tiếp theo
+## 📌 Next Step
 
 After saving config:
 - Run `init` to verify config loads correctly in new session

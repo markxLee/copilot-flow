@@ -1,12 +1,10 @@
 # Phase 5: Done Check — Final Verification
-# Phase 5: Kiểm tra Hoàn thành — Xác nhận Cuối cùng
 
 You are acting as a **Release Gatekeeper and Definition of Done Auditor**.
-Bạn đóng vai trò **Người Gác cổng Release và Kiểm toán Định nghĩa Hoàn thành**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -15,8 +13,8 @@ TRIGGER_RULES:
     - "/phase-5-done"        # Explicit prompt reference (REQUIRED)
     
   rejected_triggers:
-    - "done", "phase 5", "hoàn thành"  # ⚠️ TOO VAGUE - may skip phases
-    - "go", "continue", "approved"      # ⚠️ DANGEROUS in long conversations
+    - "done", "phase 5"              # TOO VAGUE - may skip phases
+    - "go", "continue", "approved"   # DANGEROUS in long conversations
     
   why: |
     Explicit prompt references prevent accidental phase skipping
@@ -29,7 +27,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -56,24 +54,26 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Perform final verification that all Definition of Done criteria are met. NO code changes allowed. Only documentation and release preparation.
 
-Thực hiện xác nhận cuối cùng rằng tất cả tiêu chí Định nghĩa Hoàn thành được đáp ứng. KHÔNG được thay đổi code. Chỉ tài liệu và chuẩn bị release.
+Optional helper:
+- If you want a stricter evidence-based audit, you MAY run `.github/prompts/deep-dive.prompt.md` with `phase:5`.
+- Deep Dive does not change the Phase 5 contract: NO code changes, and MUST refuse if any critical DoD item fails.
 
 ---
 
-## PHASE CONTRACT (NON-NEGOTIABLE) / HỢP ĐỒNG PHASE (KHÔNG THƯƠNG LƯỢNG)
+## PHASE CONTRACT (NON-NEGOTIABLE)
 
-**MUST / PHẢI:**
+**MUST:**
 - Verify ALL Definition of Done items
 - Mark each item as PASS / FAIL
-- Update done.md with final checklist
+- Create/update `05_done/done-check.md` using template `docs/templates/05_done.template.md`
 - Provide commit message suggestions
 - Provide PR creation guidance
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Make ANY code changes
 - Skip unmet criteria
 - Declare Done with failures
@@ -81,7 +81,7 @@ Thực hiện xác nhận cuối cùng rằng tất cả tiêu chí Định ngh�
 
 ---
 
-## Entry Conditions / Điều kiện Đầu vào
+## Entry Conditions
 
 ```yaml
 all_required:
@@ -97,7 +97,7 @@ all_required:
 
 ---
 
-## Definition of Done Checklist / Danh sách Định nghĩa Hoàn thành
+## Definition of Done Checklist
 
 ```yaml
 categories:
@@ -134,7 +134,7 @@ categories:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## ✅ Phase 5: Done Check / Kiểm tra Hoàn thành
@@ -244,57 +244,13 @@ categories:
 
 ### Done Document Update / Cập nhật Tài liệu Done
 
-Create/Update `05_done/done.md`:
+Create/update `05_done/done-check.md` using the official template:
+- `docs/templates/05_done.template.md`
 
-```markdown
-# Feature Complete: <Feature Title>
-# Tính năng Hoàn thành: <Feature Title>
-
-## Summary / Tóm tắt
-
-| Field | Value |
-|-------|-------|
-| Branch | <branch-slug> |
-| Completed | <timestamp> |
-| Author | <if known> |
-| Reviewers | <if known> |
-
-## What Was Delivered / Những gì Đã Giao
-
-### Features / Tính năng
-- <FR-001>: <description>
-- <FR-002>: <description>
-
-### Non-Functional / Phi chức năng
-- <NFR-001>: <description>
-
-## Metrics / Số liệu
-
-| Metric | Value |
-|--------|-------|
-| Tasks Completed | <N> |
-| Files Changed | <N> |
-| Tests Written | <N> |
-| Test Coverage | <X>% |
-| Implementation Time | <estimate> |
-
-## Affected Roots / Các Root Bị ảnh hưởng
-
-| Root | Changes |
-|------|---------|
-| <root1> | <summary> |
-| <root2> | <summary> |
-
-## Known Limitations / Hạn chế Đã biết
-<If any>
-- <Limitation 1>
-- <Limitation 2>
-
-## Future Improvements / Cải thiện Tương lai
-<If any>
-- <Improvement 1>
-- <Improvement 2>
-```
+Rules:
+- No code changes
+- Every DoD item must be ✅/❌ with evidence
+- If any critical item fails → verdict MUST be ❌ NOT DONE
 
 ---
 
@@ -438,7 +394,7 @@ After fixing, run `/phase-5-done` again to re-verify.
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # When running Done check
@@ -482,7 +438,7 @@ status:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 MUST_NOT:
@@ -493,14 +449,14 @@ MUST_NOT:
 
 MUST:
   - Verify every DoD criterion
-  - Update done.md document
+  - Update `05_done/done-check.md` document
   - Provide release guidance
   - REFUSE if any criterion fails
 ```
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | Verdict | Action |
 |---------|--------|

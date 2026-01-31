@@ -1,12 +1,10 @@
 # Workflow Status — Current State Summary
-# Trạng thái Workflow — Tóm tắt Trạng thái Hiện tại
 
 > Read-only status view of the current workflow (if any).
-> Chỉ xem trạng thái workflow hiện tại (không thay đổi gì).
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -21,7 +19,7 @@ TRIGGER_RULES:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 - Detect whether a workflow exists for the current branch
 - Summarize phase/task progress, blockers, and next recommended prompt
@@ -29,9 +27,9 @@ TRIGGER_RULES:
 
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Read-only: do not modify any file
 - Use the same workflow auto-detect logic as init-context:
   - Read `WORKSPACE_CONTEXT.md` → get `meta.default_docs_root`
@@ -40,13 +38,13 @@ TRIGGER_RULES:
   - Look for `<docs_root>/docs/runs/<slug>/.workflow-state.yaml`
 - If state found: summarize; if not found: explain and suggest `/work-intake`
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Start a new workflow automatically
 - Advance phases or mark approvals
 
 ---
 
-## Status Output / Output Trạng thái
+## Status Output
 
 ```markdown
 ## 📍 Workflow Status / Trạng thái Workflow
@@ -78,7 +76,7 @@ TRIGGER_RULES:
 
 ---
 
-## Common Outcomes / Trường hợp Thường gặp
+## Common Outcomes
 
 - **No workflow found:** suggest `/init` then `/work-intake`
 - **Workflow found but blocked:** show blockers and suggest `/work-update` or the next relevant review prompt

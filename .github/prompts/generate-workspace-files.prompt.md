@@ -1,11 +1,10 @@
-# Generate Workspace Files / Tạo Workspace Files
+# Generate Workspace Files
 
 > Generate .code-workspace and ARCHITECTURE.md dynamically from WORKSPACE_CONTEXT.md
-> Tạo các workspace files động từ WORKSPACE_CONTEXT.md
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 - User says: `generate workspace file`, `create workspace file`
 - User says: `generate architecture`, `create architecture`

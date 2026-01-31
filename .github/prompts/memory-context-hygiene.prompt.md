@@ -1,29 +1,25 @@
 # Memory & Context Hygiene — Reset & Realign
-# Vệ sinh Bộ nhớ & Context — Reset & Căn chỉnh lại
 
 You are acting as a **Context Manager and Memory Auditor**.
-Bạn đóng vai trò **Quản lý Context và Kiểm toán Bộ nhớ**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
-- User says `reset` / `hygiene` / `clean context` / `làm sạch`
+- User says `reset` / `hygiene` / `clean context`
 - Long conversation causing confusion
 - Copilot seems to lose track of state
 - Before critical phase transitions
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Reset and realign context when long discussions cause confusion. Summarize current state, clear assumptions, and re-establish ground truth from authoritative sources.
 
-Reset và căn chỉnh lại context khi thảo luận dài gây nhầm lẫn. Tóm tắt trạng thái hiện tại, xóa assumptions, và thiết lập lại ground truth từ nguồn tin cậy.
-
 ---
 
-## When to Use / Khi nào Dùng
+## When to Use
 
 ```yaml
 indicators:
@@ -38,7 +34,7 @@ indicators:
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -66,7 +62,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🧹 Context Reset / Reset Context
@@ -165,10 +161,9 @@ Examples:
 
 ---
 
-## ⏸️ STOP — Confirm Before Proceeding / DỪNG — Xác nhận Trước khi Tiếp tục
+## ⏸️ STOP — Confirm Before Proceeding
 
 ### Context has been reset from authoritative sources.
-### Context đã được reset từ nguồn tin cậy.
 
 **Please confirm:**
 1. ✅ The summary above is accurate
@@ -176,7 +171,7 @@ Examples:
 3. ❌ Or correct any misunderstandings
 
 Reply:
-- `confirmed` / `đúng rồi` — Proceed with next action
+- `confirmed` — Proceed with next action
 - `correct <what>` — Fix misunderstanding first
 - `show state` — Display full state file
 - `show <doc>` — Read specific phase doc
@@ -184,7 +179,7 @@ Reply:
 
 ---
 
-## Deep Reset Option / Tùy chọn Reset Sâu
+## Deep Reset Option
 
 If user says `deep reset` or `reset full`:
 
@@ -207,7 +202,7 @@ deep_reset_steps:
 
 ---
 
-## Quick Reset Option / Tùy chọn Reset Nhanh
+## Quick Reset Option
 
 If user says `quick reset`:
 
@@ -224,7 +219,7 @@ Confirmed? Reply `go` to continue.
 
 ---
 
-## State File Not Found / Không tìm thấy State File
+## State File Not Found
 
 If no `.workflow-state.yaml`:
 
@@ -243,7 +238,7 @@ Which would you like to do?
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 MUST:
@@ -261,7 +256,7 @@ MUST_NOT:
 
 ---
 
-## Tips for User / Mẹo cho Người dùng
+## Tips for User
 
 **When to call reset:**
 - Copilot says something that contradicts your understanding

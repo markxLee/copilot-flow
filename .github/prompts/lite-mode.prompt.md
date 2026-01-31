@@ -1,11 +1,10 @@
-# Lite Mode / Chế độ Nhanh
+# Lite Mode
 
 > Streamlined workflow for simple tasks that don't need all 6 phases.
-> Workflow rút gọn cho task đơn giản không cần đủ 6 phases.
 
 ---
 
-## 🎯 Purpose / Mục đích
+## 🎯 Purpose
 
 Skip unnecessary phases for small, well-defined tasks:
 - Simple bug fixes with clear cause
@@ -14,16 +13,11 @@ Skip unnecessary phases for small, well-defined tasks:
 - Documentation updates
 - Refactoring with limited scope
 
-Bỏ qua các phase không cần thiết cho task nhỏ, rõ ràng:
-- Bug fix đơn giản với nguyên nhân rõ
-- Feature nhỏ (< 3 files)
-- Thay đổi config
-- Cập nhật documentation
-- Refactoring phạm vi hẹp
+
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -31,7 +25,6 @@ TRIGGER_RULES:
     - "/lite-mode"               # Explicit prompt reference (RECOMMENDED)
     - "lite: <description>"      # Prefix syntax
     - "quick: <description>"     # Prefix syntax
-    - "nhanh: <description>"     # Vietnamese prefix
     - "simple fix", "small change", "quick task"
     
   why: |
@@ -41,7 +34,7 @@ TRIGGER_RULES:
 
 ---
 
-## When to Use / Khi nào Dùng
+## When to Use
 
 ```yaml
 use_lite_mode:
@@ -77,7 +70,7 @@ do_not_use_lite_mode:
 
 ---
 
-## Lite Mode Phases / Các Phase Lite Mode
+## Lite Mode Phases
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -103,7 +96,7 @@ Compared to Full Mode:
 
 ---
 
-## Step 1: Capture / Nắm bắt
+## Step 1: Capture
 
 When user triggers lite mode:
 
@@ -167,7 +160,7 @@ Ready to implement? Say `go` or describe any constraints.
 
 ---
 
-## Step 2: Implement / Triển khai
+## Step 2: Implement
 
 ```yaml
 implement_actions:
@@ -229,7 +222,7 @@ Reply:
 
 ---
 
-## Step 3: Verify / Xác nhận
+## Step 3: Verify
 
 After user approves:
 
@@ -247,7 +240,7 @@ verify_actions:
 
 **Output:**
 ```markdown
-## ✅ Lite Mode Complete / Chế độ Nhanh Hoàn tất
+## ✅ Lite Mode Complete
 
 ### Task Summary / Tóm tắt Task
 
@@ -307,7 +300,7 @@ git commit -m "fix(ui): add loading state to submit button"
 
 ---
 
-## State Management / Quản lý State
+## State Management
 
 Lite mode creates minimal state:
 
@@ -328,12 +321,12 @@ Or standalone (no state file needed for truly quick tasks).
 
 ---
 
-## Escalation to Full Mode / Nâng lên Full Mode
+## Escalation to Full Mode
 
 If during lite mode, complexity is discovered:
 
 ```markdown
-## ⚠️ Complexity Detected / Phát hiện Phức tạp
+## ⚠️ Complexity Detected
 
 While implementing, I found this task is more complex than expected:
 
@@ -360,7 +353,7 @@ Switch to **Full Workflow** for proper:
 
 ---
 
-## Integration with Full Workflow / Tích hợp với Workflow Đầy đủ
+## Integration with Full Workflow
 
 ```yaml
 integration:
@@ -386,7 +379,7 @@ integration:
 
 ---
 
-## Safety Rules / Quy tắc An toàn
+## Safety Rules
 
 ```yaml
 safety:
@@ -405,11 +398,11 @@ safety:
 
 ---
 
-## Quick Commands in Lite Mode / Lệnh Nhanh
+## Quick Commands in Lite Mode
 
 | Command | Action |
 |---------|--------|
-| `go` / `tiếp` | Proceed to next step |
+| `go` | Proceed to next step |
 | `ok` / `approved` | Approve and continue |
 | `issue: <text>` | Report a problem |
 | `rollback` | Undo changes |
@@ -418,7 +411,7 @@ safety:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | Stage | Next Prompt |
 |-------|-------------|
@@ -429,7 +422,7 @@ safety:
 
 ---
 
-## Example / Ví dụ
+## Example
 
 ```
 User: lite: fix the typo in the login error message

@@ -1,12 +1,10 @@
 # Work Intake — Work Description Capture
-# Mô tả Công việc — Thu thập và Chuẩn hóa
 
 You are acting as a **Delivery Intake Coordinator**.
-Bạn đóng vai trò **Điều phối viên Tiếp nhận Yêu cầu**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 After `init-context`, when user:
 - Describes a feature/bug/task
@@ -15,34 +13,32 @@ After `init-context`, when user:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Capture and normalize a **raw work request** into a clear, structured **Work Description** that will be used as the single source of truth for the entire workflow.
 
-Thu thập và chuẩn hóa **yêu cầu công việc thô** thành **Mô tả Công việc** có cấu trúc rõ ràng, làm nguồn tin cậy duy nhất cho toàn bộ workflow.
+---
+
+## Rules
+
+**MUST:**
+- Ask for missing critical information
+- Structure the work clearly
+- Document all assumptions
+- Classify work type
+- Stay neutral — no solutioning
+
+**MUST NOT:**
+- Write spec or design
+- Create tasks
+- Implement code
+- Infer unstated requirements
 
 ---
 
-## Rules / Quy tắc
+## Work Types
 
-**MUST / PHẢI:**
-- Ask for missing critical information / Hỏi thông tin còn thiếu
-- Structure the work clearly / Cấu trúc công việc rõ ràng
-- Document all assumptions / Ghi nhận mọi giả định
-- Classify work type / Phân loại loại công việc
-- Stay neutral — no solutioning / Giữ trung lập — không đưa giải pháp
-
-**MUST NOT / KHÔNG ĐƯỢC:**
-- Write spec or design / Viết spec hoặc thiết kế
-- Create tasks / Tạo tasks
-- Implement code / Viết code
-- Infer unstated requirements / Suy diễn yêu cầu không được nêu
-
----
-
-## Work Types / Loại Công việc
-
-| Type | Description / Mô tả |
+| Type | Description |
 |------|---------------------|
 | FEATURE | New functionality / behavior change |
 | BUGFIX | Incorrect behavior with repro steps |
@@ -50,11 +46,11 @@ Thu thập và chuẩn hóa **yêu cầu công việc thô** thành **Mô tả C
 | TEST | Test fixes, new tests, flakiness |
 | DOCS | Documentation changes only |
 
-If uncertain → classify as FEATURE / Nếu không chắc → chọn FEATURE
+If uncertain → classify as FEATURE
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -65,12 +61,12 @@ steps:
      action: FEATURE | BUGFIX | MAINTENANCE | TEST | DOCS
      
   3. Extract and structure:
-     - Problem statement / Vấn đề
-     - Expected outcome / Kết quả mong đợi
-     - In scope / Trong phạm vi
-     - Out of scope / Ngoài phạm vi
-     - Constraints / Ràng buộc
-     - Assumptions / Giả định
+     - Problem statement
+     - Expected outcome
+     - In scope
+     - Out of scope
+     - Constraints
+     - Assumptions
      
   4. Identify missing information
      action: List questions that MUST be answered
@@ -114,7 +110,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 📋 Work Description / Mô tả Công việc
@@ -193,7 +189,7 @@ steps:
 
 ---
 
-## Artifact Creation / Tạo Artifact
+## Artifact Creation
 
 Save Work Description to:
 ```
@@ -235,7 +231,7 @@ status:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 - Do NOT proceed if Missing Information exists
 - Do NOT generate spec or design
@@ -243,9 +239,9 @@ status:
 
 ---
 
-## ⚠️ Edge Cases & Error Handling / Xử lý Biên & Lỗi
+## ⚠️ Edge Cases & Error Handling
 
-### Case 1: User gives vague description / Mô tả mơ hồ
+### Case 1: User gives vague description
 ```yaml
 trigger: "Fix the bug" / "Make it better" / "Update the thing"
 action:
@@ -257,7 +253,7 @@ action:
   3. Wait for answers before proceeding
 ```
 
-### Case 0: Missing workspace context / Thiếu ngữ cảnh workspace
+### Case 0: Missing workspace context
 ```yaml
 trigger: "No WORKSPACE_CONTEXT.md" / "Unknown docs_root" / "Not set up"
 action:
@@ -265,7 +261,7 @@ action:
    2. Suggest running: "/setup-workspace"
 ```
 
-### Case 2: User describes solution not problem / Mô tả giải pháp không phải vấn đề
+### Case 2: User describes solution not problem
 ```yaml
 trigger: "Add a Redis cache" / "Use PostgreSQL instead"
 action:
@@ -277,7 +273,7 @@ action:
   4. Note that design decisions will be evaluated in Phase 0
 ```
 
-### Case 3: Scope too large / Phạm vi quá lớn
+### Case 3: Scope too large
 ```yaml
 trigger: "Rewrite the entire app" / "Add all missing features"
 action:
@@ -290,7 +286,7 @@ action:
   4. Suggest splitting into multiple work items
 ```
 
-### Case 4: Work already exists / Công việc đã tồn tại
+### Case 4: Work already exists
 ```yaml
 trigger: Check .workflow-state.yaml shows active work
 action:
@@ -303,7 +299,7 @@ action:
   3. Do NOT overwrite without confirmation
 ```
 
-### Case 5: Multiple roots affected / Nhiều root bị ảnh hưởng
+### Case 5: Multiple roots affected
 ```yaml
 trigger: Work spans multiple repositories
 action:
@@ -315,7 +311,7 @@ action:
   4. Document build order in constraints
 ```
 
-### Case 6: Missing context / Thiếu ngữ cảnh
+### Case 6: Missing context
 ```yaml
 trigger: WORKSPACE_CONTEXT.md not found or tooling_root not set
 action:
@@ -327,7 +323,7 @@ action:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
@@ -348,7 +344,6 @@ NEXT_PROMPT_ENFORCEMENT:
     ```
     
     DO NOT proceed without running `/work-review` first.
-    KHÔNG tiến hành khi chưa chạy `/work-review`.
     ---
 
   if: Information missing
@@ -368,7 +363,7 @@ NEXT_PROMPT_ENFORCEMENT:
 
 ---
 
-## Example / Ví dụ
+## Example
 
 ```
 User: Add analytics tracking to the dashboard to track user behavior

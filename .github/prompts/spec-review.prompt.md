@@ -1,12 +1,10 @@
 # Spec Review — Specification Completeness & Quality Gate
-# Review Spec — Cổng Kiểm tra Chất lượng & Đầy đủ
 
 You are acting as a **Technical Specification Reviewer**.
-Bạn đóng vai trò **Người Review Đặc tả Kỹ thuật**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -28,7 +26,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -48,17 +46,15 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Review the specification for completeness, consistency with Phase 0 analysis, and quality. Identify gaps, ambiguities, and issues before proceeding to task planning.
 
-Review đặc tả về tính đầy đủ, nhất quán với phân tích Phase 0, và chất lượng. Xác định gaps, điểm mơ hồ, và vấn đề trước khi lập kế hoạch task.
-
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Check spec against Phase 0 analysis
 - Verify all acceptance criteria are testable
 - Check cross-root consistency
@@ -66,7 +62,7 @@ Review đặc tả về tính đầy đủ, nhất quán với phân tích Phase
 - Verify no scope creep from approved design
 - Provide clear PASS / NEEDS REVISION verdict
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Modify the spec directly
 - Add new requirements
 - Skip any review category
@@ -74,9 +70,9 @@ Review đặc tả về tính đầy đủ, nhất quán với phân tích Phase
 
 ---
 
-## Review Categories / Các hạng mục Review
+## Review Categories
 
-### 1. Completeness Check / Kiểm tra Đầy đủ
+### 1. Completeness Check
 
 ```yaml
 checklist:
@@ -88,7 +84,7 @@ checklist:
   - Error handling specified: ⬜
 ```
 
-### 2. Consistency Check / Kiểm tra Nhất quán
+### 2. Consistency Check
 
 ```yaml
 checklist:
@@ -99,7 +95,7 @@ checklist:
   - Data contracts match component interfaces: ⬜
 ```
 
-### 3. Quality Check / Kiểm tra Chất lượng
+### 3. Quality Check
 
 ```yaml
 checklist:
@@ -110,7 +106,7 @@ checklist:
   - Bilingual content is complete: ⬜
 ```
 
-### 4. Cross-Root Check / Kiểm tra Đa Root
+### 4. Cross-Root Check
 
 ```yaml
 checklist:
@@ -121,7 +117,7 @@ checklist:
   - Build order considered: ⬜
 ```
 
-### 5. Risk Check / Kiểm tra Rủi ro
+### 5. Risk Check
 
 ```yaml
 checklist:
@@ -133,7 +129,7 @@ checklist:
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -161,7 +157,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🔍 Spec Review / Review Đặc tả
@@ -308,7 +304,7 @@ Or if you want to override: `approve --force` (not recommended)
 
 ---
 
-## Artifact Updates / Cập nhật Artifact
+## Artifact Updates
 
 ```yaml
 artifacts:
@@ -323,7 +319,7 @@ artifacts:
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # If PASS
@@ -364,7 +360,7 @@ phases.phase_1_spec:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```markdown
 ---
@@ -382,7 +378,7 @@ Please fix the issues above, then run `review` again.
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 **If PASS + User approves:**
 ```
@@ -399,7 +395,7 @@ Please fix the issues above, then run `review` again.
 
 ---
 
-## Example / Ví dụ
+## Example
 
 ```markdown
 ## 🔍 Spec Review / Review Đặc tả
@@ -451,7 +447,7 @@ Then run `review` again.
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:

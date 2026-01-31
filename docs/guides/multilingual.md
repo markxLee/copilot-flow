@@ -68,10 +68,21 @@
 | Content Type | Bilingual? | Reason |
 |--------------|------------|--------|
 | Phase docs (analysis, spec, tasks) | ✅ Yes | Need quick comprehension |
+| Copilot prompts (instructions) | ❌ No | Keep prompts English-only for clarity and lower token noise |
 | Code comments | ❌ No | English standard |
 | API docs | ❌ No | Technical reference |
 | README overview | ✅ Partial | Key sections only |
 | Error messages | ❌ No | English for debugging |
+
+---
+
+## 🧠 Prompt Language Rule (Recommended)
+
+🇬🇧 Prompts under `.github/prompts/` should be **English-only** for instructions, rules, and flows. This keeps the instructions unambiguous for Copilot and reduces token overhead.
+
+🇻🇳 Các prompt trong `.github/prompts/` nên viết **English-only** cho phần hướng dẫn/rules/flow để Copilot hiểu rõ hơn và giảm nhiễu token.
+
+**Bilingual should be reserved for generated artifacts** (Phase docs and reference cards) via the templates in `docs/templates/`.
 
 ---
 

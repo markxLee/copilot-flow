@@ -1,12 +1,10 @@
 # PR Description Generator — Create Pull Request
-# Tạo Mô tả PR — Tạo Pull Request
 
 You are acting as a **PR Description Writer and Release Communicator**.
-Bạn đóng vai trò **Người Viết Mô tả PR và Truyền thông Release**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -15,7 +13,7 @@ TRIGGER_RULES:
     - "/pr-description"          # Explicit prompt reference (REQUIRED)
     
   rejected_triggers:
-    - "pr", "create pr", "tạo pr"  # ⚠️ TOO VAGUE
+    - "pr", "create pr"  # ⚠️ TOO VAGUE
     - "go", "continue"            # ⚠️ DANGEROUS in long conversations
     
   why: |
@@ -27,7 +25,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -40,7 +38,7 @@ pre_checks:
      - 02_tasks/tasks.md (task list)
      - 03_impl/impl-log.md (changes)
      - 04_tests/tests.md (coverage)
-     - 05_done/done.md (summary)
+      - 05_done/done-check.md (summary)
      
   3. Get branch info:
      command: git rev-parse --abbrev-ref HEAD
@@ -51,15 +49,13 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Generate a comprehensive PR description file that can be copied to GitHub/GitLab PR. Include all relevant context for reviewers.
 
-Tạo file mô tả PR toàn diện có thể copy vào GitHub/GitLab PR. Bao gồm tất cả context liên quan cho reviewers.
-
 ---
 
-## Information Gathering / Thu thập Thông tin
+## Information Gathering
 
 ```yaml
 required_info:
@@ -84,7 +80,7 @@ optional_info:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 📝 PR Description Generated / Mô tả PR Đã tạo
@@ -102,7 +98,7 @@ Created: `<docs_root>/docs/runs/<branch-slug>/PR_DESCRIPTION.md`
 
 ---
 
-## PR Description Template / Mẫu Mô tả PR
+## PR Description Template
 
 Create file `PR_DESCRIPTION.md`:
 
@@ -362,14 +358,14 @@ kubectl rollout undo deployment/<name>
 
 ---
 
-## 📝 Additional Notes / Ghi chú Thêm
+## 📝 Additional Notes
 
 <Any other context reviewers should know>
 ```
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 status:
@@ -384,7 +380,7 @@ artifacts:
 
 ---
 
-## ⏸️ STOP — PR Description Ready / DỪNG — Mô tả PR Sẵn sàng
+## ⏸️ STOP — PR Description Ready
 
 ### Created: `docs/runs/<branch-slug>/PR_DESCRIPTION.md`
 
@@ -405,7 +401,7 @@ cat docs/runs/<branch-slug>/PR_DESCRIPTION.md | pbcopy
 
 ---
 
-## Customization / Tùy chỉnh
+## Customization
 
 User can say:
 - `pr minimal` → Short version without all sections

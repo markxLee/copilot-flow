@@ -1,12 +1,10 @@
 # Test Verification — Phase 4 Quality Gate
-# Xác nhận Test — Cổng Chất lượng Phase 4
 
 You are acting as a **Test Quality Auditor and Coverage Analyst**.
-Bạn đóng vai trò **Kiểm toán Chất lượng Test và Phân tích Độ phủ**.
 
 ---
 
-## ⚠️ CRITICAL: Coverage Gate / Cổng Độ phủ (BẮT BUỘC)
+## ⚠️ CRITICAL: Coverage Gate (NON-NEGOTIABLE)
 
 ```yaml
 ##############################################
@@ -47,7 +45,7 @@ coverage_gate:
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -70,7 +68,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -92,17 +90,15 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Verify that all tests pass, coverage meets requirements (≥70%), and implementation is properly validated. This is the final gate before declaring the feature complete.
 
-Xác nhận tất cả tests pass, độ phủ đạt yêu cầu (≥70%), và implementation được validate đúng cách. Đây là cổng cuối cùng trước khi tuyên bố feature hoàn thành.
-
 ---
 
-## Verification Categories / Các hạng mục Xác nhận
+## Verification Categories
 
-### 1. Test Execution Status / Trạng thái Thực thi Test
+### 1. Test Execution Status
 
 ```yaml
 checklist:
@@ -112,7 +108,7 @@ checklist:
   - No flaky tests identified: ⬜
 ```
 
-### 2. Coverage Analysis / Phân tích Độ phủ
+### 2. Coverage Analysis
 
 ```yaml
 ##############################################
@@ -134,7 +130,7 @@ coverage_blocking_rule: |
     action = Return to /phase-4-tests
 ```
 
-### 3. Test Quality / Chất lượng Test
+### 3. Test Quality
 
 ```yaml
 checklist:
@@ -145,7 +141,7 @@ checklist:
   - Error cases tested: ⬜
 ```
 
-### 4. Requirements Coverage / Độ phủ Yêu cầu
+### 4. Requirements Coverage
 
 ```yaml
 checklist:
@@ -154,7 +150,7 @@ checklist:
   - Acceptance criteria verifiable: ⬜
 ```
 
-### 5. Multi-Root Verification / Xác nhận Đa Root
+### 5. Multi-Root Verification
 
 ```yaml
 checklist:
@@ -165,7 +161,7 @@ checklist:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## ✅ Test Verification Report / Báo cáo Xác nhận Test
@@ -208,12 +204,12 @@ checklist:
 
 #### Overall Coverage / Độ phủ Tổng thể
 
-```
+~~~
 Statements   : <X>% ( <covered>/<total> )
 Branches     : <X>% ( <covered>/<total> )
 Functions    : <X>% ( <covered>/<total> )
 Lines        : <X>% ( <covered>/<total> )
-```
+~~~
 
 #### Per-File Coverage / Độ phủ Theo File
 
@@ -306,7 +302,9 @@ Lines        : <X>% ( <covered>/<total> )
 
 ---
 
-## Verdict Decision / Quyết định Kết luận
+```
+
+## Verdict Decision
 
 ```yaml
 ##############################################
@@ -342,7 +340,7 @@ coverage_exception:
 
 ---
 
-## ⏸️ STOP — Verification Complete / DỪNG — Xác nhận Hoàn thành
+## ⏸️ STOP — Verification Complete
 
 ### Verdict: <PASS / FAIL>
 
@@ -359,7 +357,7 @@ coverage_exception:
 
 ---
 
-## 📋 CHECKPOINT — Next Prompt / Prompt Tiếp theo
+## 📋 CHECKPOINT — Next Prompt
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
@@ -404,7 +402,7 @@ Run `/phase-3-impl T-XXX` to fix implementation issue.
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # After verification
@@ -442,7 +440,7 @@ status:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 MUST_NOT:
@@ -460,7 +458,7 @@ MUST:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 | Verdict | User Response | Next Action |
 |---------|---------------|-------------|

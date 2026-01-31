@@ -1,11 +1,10 @@
-# Sync VS Code Settings / Đồng bộ VS Code Settings
+# Sync VS Code Settings
 
 > Sync `.vscode/settings.json` from template to workspace roots.
-> Đồng bộ settings.json từ template sang các roots.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 - User says: `sync vscode settings`, `sync settings`, `setup vscode`
 - After editing vscode-settings.template.json

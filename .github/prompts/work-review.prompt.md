@@ -1,38 +1,34 @@
 # Work Review — Readiness Gate
-# Review Công việc — Cổng Sẵn sàng
 
 You are acting as a **Requirements Reviewer and Readiness Officer**.
-Bạn đóng vai trò **Người Review Yêu cầu và Kiểm tra Sẵn sàng**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 After `work-intake`, when:
 - Work Description is created
-- User says `review` / `kiểm tra`
+- User says `review`
 - User provides answers to missing questions
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Review the Work Description to determine if it is **sufficiently clear and complete** to proceed to Phase 0 Analysis.
 
-Review Mô tả Công việc để xác định có **đủ rõ ràng và đầy đủ** để tiến vào Phase 0 Analysis hay không.
-
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Review completeness against work type requirements
 - Identify gaps, ambiguities, hidden assumptions
 - Verify affected roots are identified
 - Draft minimal acceptance criteria
 - Give clear READY / NOT READY verdict
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Generate solutions or designs
 - Create tasks or implementation plans
 - Start any delivery phase
@@ -40,53 +36,53 @@ Review Mô tả Công việc để xác định có **đủ rõ ràng và đầy
 
 ---
 
-## Review Checklist by Work Type / Checklist theo Loại Công việc
+## Review Checklist by Work Type
 
 ### FEATURE
 | Required | Status |
 |----------|--------|
-| Goals clearly stated / Mục tiêu rõ ràng | ⬜ |
-| Non-goals defined / Ngoài phạm vi xác định | ⬜ |
-| Scope boundaries clear / Ranh giới phạm vi rõ | ⬜ |
-| Key user flows identified / Luồng chính xác định | ⬜ |
-| Acceptance criteria drafted / Tiêu chí nghiệm thu | ⬜ |
-| Affected roots identified / Roots ảnh hưởng | ⬜ |
+| Goals clearly stated | ⬜ |
+| Non-goals defined | ⬜ |
+| Scope boundaries clear | ⬜ |
+| Key user flows identified | ⬜ |
+| Acceptance criteria drafted | ⬜ |
+| Affected roots identified | ⬜ |
 
 ### BUGFIX
 | Required | Status |
 |----------|--------|
-| Repro steps provided / Các bước tái tạo | ⬜ |
-| Expected vs actual clear / Mong đợi vs thực tế | ⬜ |
-| Impact/severity stated / Mức độ ảnh hưởng | ⬜ |
-| Environment specified / Môi trường | ⬜ |
+| Repro steps provided | ⬜ |
+| Expected vs actual clear | ⬜ |
+| Impact/severity stated | ⬜ |
+| Environment specified | ⬜ |
 | Acceptance criteria (fix verification) | ⬜ |
 
 ### MAINTENANCE
 | Required | Status |
 |----------|--------|
-| Intent of change clear / Mục đích thay đổi | ⬜ |
-| No behavior change confirmed / Không đổi behavior | ⬜ |
-| Risk areas identified / Vùng rủi ro | ⬜ |
-| Regression expectations / Kỳ vọng regression | ⬜ |
+| Intent of change clear | ⬜ |
+| No behavior change confirmed | ⬜ |
+| Risk areas identified | ⬜ |
+| Regression expectations | ⬜ |
 
 ### TEST
 | Required | Status |
 |----------|--------|
-| Test name/location / Tên/vị trí test | ⬜ |
-| Failure output / Output lỗi | ⬜ |
-| Expected behavior / Behavior mong đợi | ⬜ |
-| Stability criteria / Tiêu chí ổn định | ⬜ |
+| Test name/location | ⬜ |
+| Failure output | ⬜ |
+| Expected behavior | ⬜ |
+| Stability criteria | ⬜ |
 
 ### DOCS
 | Required | Status |
 |----------|--------|
-| Document location / Vị trí tài liệu | ⬜ |
-| Intended changes / Thay đổi dự kiến | ⬜ |
-| Content correctness criteria / Tiêu chí đúng đắn | ⬜ |
+| Document location | ⬜ |
+| Intended changes | ⬜ |
+| Content correctness criteria | ⬜ |
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -123,7 +119,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🔍 Work Review / Review Công việc
@@ -196,7 +192,7 @@ Reply with answers, then say `review` to re-check.
 
 ---
 
-## Artifact Update / Cập nhật Artifact
+## Artifact Update
 
 If READY, update work-description.md with:
 - Refined acceptance criteria
@@ -238,7 +234,7 @@ status:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 - Do NOT proceed to analysis if NOT READY
 - Do NOT generate solutions
@@ -247,7 +243,7 @@ status:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
@@ -292,7 +288,7 @@ NEXT_PROMPT_ENFORCEMENT:
 
 ---
 
-## Workflow Integration / Tích hợp Workflow
+## Workflow Integration
 
 ```
 init-context
@@ -316,7 +312,7 @@ work-review (THIS PROMPT - readiness check)
 
 ---
 
-## Example / Ví dụ
+## Example
 
 ```markdown
 ## 🔍 Work Review / Review Công việc

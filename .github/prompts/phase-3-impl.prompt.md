@@ -1,12 +1,10 @@
 # Phase 3: Implementation — Task Execution
-# Phase 3: Triển khai — Thực thi Task
 
 You are acting as a **Controlled Implementation Executor**.
-Bạn đóng vai trò **Người Thực thi Triển khai Có Kiểm soát**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -24,7 +22,7 @@ TRIGGER_RULES:
     - "go"           # Too generic, may skip steps
     - "implement"    # Ambiguous without task ID
     - "continue"     # May jump to wrong phase
-    - "tiếp"         # Same issue in Vietnamese
+    - "tiếp"         # Too generic, may skip steps
     
   on_invalid_trigger:
     action: |
@@ -371,17 +369,15 @@ SELF_APPROVAL:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Implement EXACTLY ONE task from the approved Task Plan, then STOP for review. This ensures controlled, reviewable progress through the implementation.
 
-Triển khai CHÍNH XÁC MỘT task từ Task Plan đã duyệt, sau đó DỪNG để review. Điều này đảm bảo tiến độ có kiểm soát và có thể review.
-
 ---
 
-## PHASE CONTRACT (NON-NEGOTIABLE) / HỢP ĐỒNG PHASE (KHÔNG THƯƠNG LƯỢNG)
+## PHASE CONTRACT (NON-NEGOTIABLE)
 
-**MUST / PHẢI:**
+**MUST:**
 - Implement EXACTLY ONE task per execution
 - Follow approved task scope strictly
 - Work in correct root for the task
@@ -389,7 +385,7 @@ Triển khai CHÍNH XÁC MỘT task từ Task Plan đã duyệt, sau đó DỪNG
 - Provide verification steps (not execute)
 - STOP and wait for review after each task
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Implement multiple tasks in one response
 - Expand scope beyond current task
 - Skip verification steps
@@ -399,7 +395,7 @@ Triển khai CHÍNH XÁC MỘT task từ Task Plan đã duyệt, sau đó DỪNG
 
 ---
 
-## Git Safety Rule / Quy tắc An toàn Git
+## Git Safety Rule
 
 ```yaml
 FORBIDDEN_GIT_OPERATIONS:
@@ -421,9 +417,9 @@ RULE: If git write operation needed → STOP → Instruct user to do manually
 
 ---
 
-## ⚠️ Edge Cases & Error Handling / Xử lý Biên & Lỗi
+## ⚠️ Edge Cases & Error Handling
 
-### Case 1: Task depends on incomplete task / Task phụ thuộc task chưa xong
+### Case 1: Task depends on incomplete task
 ```yaml
 trigger: Current task has dependency on task not yet complete
 action:
@@ -438,7 +434,7 @@ action:
   4. Wait for user decision
 ```
 
-### Case 2: File already modified externally / File đã bị sửa bên ngoài
+### Case 2: File already modified externally
 ```yaml
 trigger: git status shows uncommitted changes in target file
 action:
@@ -452,7 +448,7 @@ action:
   4. Document decision in impl-log.md
 ```
 
-### Case 3: Task scope unclear / Phạm vi task không rõ
+### Case 3: Task scope unclear
 ```yaml
 trigger: Task description is ambiguous
 action:
@@ -465,7 +461,7 @@ action:
   5. Then proceed with implementation
 ```
 
-### Case 4: Implementation conflicts with spec / Triển khai mâu thuẫn với spec
+### Case 4: Implementation conflicts with spec
 ```yaml
 trigger: During implementation, discover spec is not feasible
 action:
@@ -479,7 +475,7 @@ action:
   5. Wait for user decision before continuing
 ```
 
-### Case 5: Cross-root dependency failed / Phụ thuộc đa root thất bại
+### Case 5: Cross-root dependency failed
 ```yaml
 trigger: Task in root A needs package from root B that won't build
 action:
@@ -496,7 +492,7 @@ action:
      - "Mock the dependency temporarily"
 ```
 
-### Case 6: Test failure during implementation / Test thất bại khi triển khai
+### Case 6: Test failure during implementation
 ```yaml
 trigger: User reports test failure after task implementation
 action:
@@ -512,7 +508,7 @@ action:
      - Document why test changed
 ```
 
-### Case 7: Implementation too large / Triển khai quá lớn
+### Case 7: Implementation too large
 ```yaml
 trigger: Single task requires >10 files or >500 lines changed
 action:
@@ -528,7 +524,7 @@ action:
 
 ---
 
-## Multi-Root Task Execution / Thực thi Task Đa Root
+## Multi-Root Task Execution
 
 ```yaml
 execution_context:
@@ -581,7 +577,7 @@ execution_context:
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -626,7 +622,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ### After `/impl go` — Implementation Complete
 
@@ -721,7 +717,7 @@ Task T-XXX đã triển khai. Đợi review.
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 STATE_UPDATE_ENFORCEMENT:
@@ -754,7 +750,7 @@ STATE_UPDATE_ENFORCEMENT:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```yaml
 STOP_AFTER:
@@ -777,7 +773,7 @@ DO_NOT:
 
 ---
 
-## Error Handling / Xử lý Lỗi
+## Error Handling
 
 ```yaml
 if_task_blocked:
@@ -804,7 +800,7 @@ if_wrong_root:
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 ```yaml
 FLOW_SUMMARY:

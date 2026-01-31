@@ -1,15 +1,11 @@
 # Solo Orchestrator — One-Command Flow for Solo Work
-# Solo Orchestrator — Điều phối 1 lệnh cho làm việc solo
 
 > A lightweight orchestrator that keeps the governed workflow rules,
 > but reduces ceremony for a solo developer (one user story, one implementer).
->
-> Bộ điều phối nhẹ, vẫn giữ luật governed workflow,
-> nhưng giảm ceremony cho dev làm solo (1 user story, 1 người thực hiện).
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -28,7 +24,7 @@ TRIGGER_RULES:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 - Decide the best path for SOLO work (Lite vs Governed) based on scope/risks
 - Keep user-facing steps minimal while preserving correctness
@@ -37,21 +33,21 @@ TRIGGER_RULES:
 
 ---
 
-## Non-Negotiables / Luật cứng
+## Non-Negotiables
 
-**MUST / PHẢI:**
+**MUST:**
 - Respect approval gates (no skipping phases)
 - Keep artifacts under `<docs_root>/docs/runs/<branch-slug>/` when using governed workflow
 - Prefer `/verify-checks` for automation; `/code-review` for human review + work alignment
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Auto-start a workflow if one exists (must ask user to resume/new)
 - Auto-create/switch git branches
 - Implement code directly from this prompt (this is orchestration only)
 
 ---
 
-## Inputs / Đầu vào
+## Inputs
 
 ```yaml
 inputs:
@@ -67,7 +63,7 @@ inputs:
 
 ---
 
-## Orchestration Algorithm / Thuật toán Điều phối
+## Orchestration Algorithm
 
 ```yaml
 steps:
@@ -115,7 +111,7 @@ decision_rules:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🧭 Solo Orchestrator / Điều phối Solo
@@ -137,7 +133,7 @@ decision_rules:
 
 ---
 
-## Recommended Command Sequences / Chuỗi lệnh khuyến nghị
+## Recommended Command Sequences
 
 ### A) Lite (solo, small)
 

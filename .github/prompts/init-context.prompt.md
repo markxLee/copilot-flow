@@ -1,22 +1,21 @@
-# Initialize Context / Khởi tạo Ngữ cảnh
+# Initialize Context
 # Entry point for every Copilot session in this workspace
-# Điểm bắt đầu cho mỗi phiên Copilot trong workspace này
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 User says one of:
-- "init" / "start" / "bắt đầu"
-- "context" / "ngữ cảnh"
+- "init" / "start"
+- "context"
 - Opens new chat session
-- "help" / "hướng dẫn"
+- "help"
 
 ---
 
-## Instructions / Hướng dẫn
+## Instructions
 
-### Step 1: Load Workspace Context / Đọc ngữ cảnh Workspace
+### Step 1: Load Workspace Context
 
 ```yaml
 actions:
@@ -38,7 +37,7 @@ actions:
      - relationships → Cross-root dependencies
 ```
 
-### Step 2: Determine docs_root / Xác nhận docs_root
+### Step 2: Determine docs_root
 
 ```yaml
 determination:
@@ -72,7 +71,7 @@ determination:
      - Has write access
 ```
 
-### Step 3: Load Cross-Root Workflows / Đọc Cấu hình Đa Root
+### Step 3: Load Cross-Root Workflows
 
 ```yaml
 cross_root_detection:
@@ -98,21 +97,21 @@ cross_root_detection:
        pr_strategies: <loaded strategies>
 ```
 
-### Step 4: Check for Existing Workflow / Kiểm tra Workflow đang có
+### Step 4: Check for Existing Workflow
 
 ```yaml
 CRITICAL_AUTO_DETECT_WORKFLOW:
-  # ⚠️ AI KHÔNG có memory giữa sessions
-  # PHẢI auto-detect workflow từ WORKSPACE_CONTEXT.md + git branch
+  # ⚠️ Copilot has no memory between sessions.
+  # Always auto-detect workflow from WORKSPACE_CONTEXT.md + git branch.
   
   step_1_read_workspace_context_first:
-    # ĐỌC WORKSPACE_CONTEXT.md TRƯỚC để biết default_docs_root
+    # Read WORKSPACE_CONTEXT.md first to get default_docs_root
     file: copilot-flow/WORKSPACE_CONTEXT.md
     extract: meta.default_docs_root
     example: "apphub-vision"
     
   step_2_get_branch_from_docs_root:
-    # QUAN TRỌNG: Chạy git TẠI default_docs_root, không phải tại tooling_root
+    # IMPORTANT: Run git in default_docs_root, not tooling_root
     command: git -C <default_docs_root> rev-parse --abbrev-ref HEAD
     example: git -C apphub-vision rev-parse --abbrev-ref HEAD
     result: "feature/bp-32-add-payment-detail"
@@ -151,7 +150,7 @@ CRITICAL_AUTO_DETECT_WORKFLOW:
         3. goto: Step 5B (New Session Mode)
 ```
 
-### Step 4B: Detect Base Branch (ALWAYS CONFIRM) / Xác định Branch Gốc
+### Step 4B: Detect Base Branch (ALWAYS CONFIRM)
 
 ```yaml
 base_branch_detection:
@@ -176,7 +175,7 @@ base_branch_detection:
           # Fallback: check if develop exists
           - git rev-parse --verify origin/develop 2>/dev/null && echo "develop"
      
-     b. ALWAYS ask user to confirm (không tự quyết định):
+    b. ALWAYS ask user to confirm (never auto-decide):
         "### 🎯 Base Branch / Branch Gốc
         
         Branch này sẽ merge vào đâu? / Where will this branch merge into?
@@ -202,7 +201,7 @@ base_branch_detection:
      meta.base_branch: <user_confirmed_value>
 ```
 
-### Step 5A: Resume Mode / Chế độ Tiếp tục
+### Step 5A: Resume Mode
 
 ```yaml
 resume_actions:
@@ -237,7 +236,7 @@ resume_actions:
   3. Wait for user choice
 ```
 
-### Step 5B: New Session Mode / Chế độ Phiên mới
+### Step 5B: New Session Mode
 
 ```yaml
 new_session_actions:
@@ -272,7 +271,7 @@ new_session_actions:
   2. Wait for user input
 ```
 
-### Step 6: Initialize Workflow (if requested) / Khởi tạo Workflow
+### Step 6: Initialize Workflow (if requested)
 
 ```yaml
 init_workflow:
@@ -338,7 +337,7 @@ init_workflow:
        # DO NOT auto-run work-intake, let user trigger explicitly
 ```
 
-### Step 7: Work Description Flow / Luồng Mô tả Công việc
+### Step 7: Work Description Flow
 
 ```yaml
 work_flow:
@@ -381,7 +380,7 @@ work_flow:
 
 ---
 
-## Context Summary Output / Tóm tắt Ngữ cảnh
+## Context Summary Output
 
 After initialization, always show:
 
@@ -427,9 +426,9 @@ If cross_root_workflows NOT configured, instead show:
 
 ---
 
-## Quick Reference Card / Thẻ Tham chiếu Nhanh
+## Quick Reference Card
 
-Show when user says "help" / Hiển thị khi user nói "help":
+Show when user says "help":
 
 ```markdown
 ## 📚 Copilot Workflow Quick Reference
@@ -489,7 +488,7 @@ Show when user says "help" / Hiển thị khi user nói "help":
 
 ---
 
-## Error Handling / Xử lý Lỗi
+## Error Handling
 
 ### No WORKSPACE_CONTEXT.md
 ```yaml
@@ -547,7 +546,7 @@ action: |
 
 ---
 
-## Session Persistence Notes / Ghi chú Lưu trữ Phiên
+## Session Persistence Notes
 
 ```yaml
 what_persists:
@@ -573,7 +572,7 @@ best_practice:
 
 ---
 
-## Example Session / Ví dụ Phiên
+## Example Session
 
 ```
 User: init

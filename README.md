@@ -22,6 +22,21 @@
 
 ## 🚀 Quick Start
 
+### 📖 New to Copilot-Flow?
+
+**Read the complete walkthrough first:**
+
+👉 **[Workflow Example Guide](docs/guides/workflow-example.md)** — Full end-to-end example from setup to PR (~15 min read)
+
+This guide covers:
+- Workspace setup step-by-step
+- Work intake and clarifying questions
+- All phases (0-5) with real examples
+- Self-review before PR
+- Quick reference card
+
+---
+
 ### 1. First-Time Setup (One-time)
 
 **What is Multi-Root Workspace?**
@@ -73,6 +88,33 @@ Copilot automatically runs `/work-intake` → asks clarifying questions → `/wo
 /lite-mode fix typo in error message
 ```
 Skips phases 0-2, implements directly.
+
+### 6. Hard Problems (Deep Dive — Optional)
+
+🇬🇧 Use Deep Dive when the problem is messy/high-risk (unclear requirements, architecture decisions, security concerns), and you want multiple perspectives before committing to implementation.
+
+🇻🇳 Dùng Deep Dive khi bài toán khó/nhiều rủi ro (yêu cầu mơ hồ, cần quyết định kiến trúc, có yếu tố security), để lấy nhiều góc nhìn trước khi bắt tay implement.
+
+**Session-based workflow:**
+```
+/deep-dive start phase:0       # Start session for Phase 0 (Analysis)
+/deep-dive run architect       # Get Architect perspective
+/deep-dive run critic          # Get Critic perspective  
+/deep-dive run security        # Get Security perspective
+/deep-dive synthesize          # Generate consensus from all turns
+/deep-dive end                 # Close session
+```
+
+**Supported phases:** 0 (Analysis), 1 (Spec), 2 (Task Plan), 5 (Done Check)
+
+**Option A (Copilot-only):** Run roles directly in chat
+**Option B (External runner):** Use CLI + external LLM API
+
+🇬🇧 Note: Option B calls an external LLM API (OpenAI or OpenAI-compatible). It does **not** use the VS Code GitHub Copilot backend/subscription. You must provide your own API key and accept provider billing/data-sharing.
+
+🇻🇳 Lưu ý: Option B gọi API của một LLM bên ngoài (OpenAI hoặc OpenAI-compatible). Nó **không** dùng backend/subscription GitHub Copilot trong VS Code. Bạn cần tự cung cấp API key và chấp nhận chi phí/chia sẻ dữ liệu theo provider.
+
+Deep Dive always writes a **timestamped log per session** under `docs/runs/<branch-slug>/` to avoid overwrites. After that, Copilot (as Architect + Tech Lead) synthesizes results into the canonical workflow artifacts.
 
 ### 🤔 Which Mode to Use?
 
@@ -169,6 +211,19 @@ Device B: git pull → /init → resume → continue Phase 3
 | `/phase-5-done` | 5 | Start Done Check |
 | `/pr-description` | Post | Generate PR description |
 | `/pr-notify-reviewers` | Post | Generate reviewer notification |
+
+### Optional: Deep Dive (Hard Problems)
+
+| Prompt | Action |
+|--------|--------|
+| `/deep-dive start phase:<0\|1\|2\|5>` | Start deep-dive session for a phase |
+| `/deep-dive run <role>` | Run a perspective (architect, critic, security, strict) |
+| `/deep-dive run custom:<name>` | Run custom role with user-defined focus |
+| `/deep-dive add` | User adds their own analysis to session |
+| `/deep-dive status` | Show session progress (turns, roles run) |
+| `/deep-dive synthesize` | Generate consensus from all turns |
+| `/deep-dive end` | Close session and save log |
+| `/deep-dive end --discard` | Abort session without saving |
 
 ### Safety & Quality Commands
 
@@ -369,6 +424,8 @@ Detailed documentation is available in separate guides:
 | ⭐ [Workflow Example](docs/guides/workflow-example.md) | **Complete end-to-end example** from setup to PR |
 | [Setup Guide](docs/guides/setup.md) | Step-by-step workspace setup, configuration, verification |
 | [Multilingual Guide](docs/guides/multilingual.md) | Why bilingual, format rules, adding new languages |
+| [Deep Dive Guide](docs/guides/deep-dive/README.md) | Session-based multi-perspective analysis for Phase 0/1/2/5 (roles, commands, synthesis) |
+| [Option B Runner (B2 Orchestrator)](docs/guides/b2/README.md) | External API runner details + disclaimer (not Copilot backend) |
 | [Workflow Contract](docs/workflow/contract.md) | Full workflow rules and specifications |
 
 ### Quick Reference
@@ -650,6 +707,8 @@ After running `/memory-context-hygiene`, follow with `/workflow-resume` to reloa
 | ⭐ [Workflow Example](docs/guides/workflow-example.md) | Complete end-to-end example |
 | [Setup Guide](docs/guides/setup.md) | Detailed workspace setup |
 | [Multilingual Guide](docs/guides/multilingual.md) | Bilingual format, adding languages |
+| [Deep Dive Guide (Option A/B)](docs/guides/deep-dive/README.md) | Optional deep-dive flow + role definitions |
+| [Option B Runner (B2 Orchestrator)](docs/guides/b2/README.md) | External runner + API disclaimer |
 | [Workflow Contract](docs/workflow/contract.md) | Full rules and specifications |
 | [Templates](docs/templates/) | Phase document templates (v4.0) |
 | [Copilot Instructions](.github/copilot-instructions.md) | Entry point for Copilot |

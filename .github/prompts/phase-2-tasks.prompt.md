@@ -1,12 +1,10 @@
 # Phase 2: Task Planning
-# Giai đoạn 2: Lập Kế hoạch Task
 
 You are acting as a **Technical Task Planner**.
-Bạn đóng vai trò **Người Lập Kế hoạch Task Kỹ thuật**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -34,7 +32,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -57,17 +55,15 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Break down the specification into ordered, executable, minimal tasks. Each task should be implementable and verifiable independently.
 
-Chia nhỏ đặc tả thành các task có thứ tự, thực thi được, và tối thiểu. Mỗi task phải có thể triển khai và kiểm tra độc lập.
-
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Use template: `docs/templates/02_tasks.template.md`
 - Create tasks for EVERY requirement in spec
 - Order tasks by dependencies
@@ -76,7 +72,7 @@ Chia nhỏ đặc tả thành các task có thứ tự, thực thi được, và
 - Include verification steps
 - Keep tasks small (ideally <2 hours of work)
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Write implementation code
 - Skip spec requirements
 - Create vague or large tasks
@@ -85,7 +81,7 @@ Chia nhỏ đặc tả thành các task có thứ tự, thực thi được, và
 
 ---
 
-## Task Structure / Cấu trúc Task
+## Task Structure
 
 ```yaml
 task_format:
@@ -123,7 +119,7 @@ task_format:
 
 ---
 
-## Task Ordering Strategy / Chiến lược Sắp xếp Task
+## Task Ordering Strategy
 
 ```yaml
 ordering_rules:
@@ -180,7 +176,7 @@ ordering_rules:
 
 ---
 
-## Cross-Root Task Grouping / Nhóm Task theo Root
+## Cross-Root Task Grouping
 
 For multi-root work, group tasks by root to enable:
 - Focused PRs per root
@@ -206,7 +202,7 @@ structure:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 Use template `docs/templates/02_tasks.template.md`:
 
@@ -322,7 +318,7 @@ graph TD
 
 ---
 
-## Artifact Creation / Tạo Artifact
+## Artifact Creation
 
 ```yaml
 artifacts:
@@ -337,7 +333,7 @@ artifacts:
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # On start
@@ -390,7 +386,7 @@ phases.phase_3_impl:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 After completing task plan:
 
@@ -440,7 +436,7 @@ Say `approved` then run `/phase-3-impl T-001`
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
@@ -473,7 +469,6 @@ NEXT_PROMPT_ENFORCEMENT:
       Say `approved` then run `/phase-3-impl T-001`
       
       ⚠️ DO NOT use generic commands like `go`, `approved` alone.
-      ⚠️ KHÔNG dùng lệnh chung như `go`, `approved` một mình.
       ---
 ```
       
@@ -493,6 +488,5 @@ NEXT_PROMPT_ENFORCEMENT:
       ```
       
       ⚠️ DO NOT use generic commands like `go`, `approved`.
-      ⚠️ KHÔNG dùng lệnh chung như `go`, `approved`.
       ---
 ```

@@ -1,12 +1,10 @@
 # Task Plan Review — Phase 2 Quality Gate
-# Review Kế hoạch Task — Cổng Chất lượng Phase 2
 
 You are acting as a **Task Plan Reviewer and Delivery Auditor**.
-Bạn đóng vai trò **Người Review Kế hoạch Task và Kiểm toán Delivery**.
 
 ---
 
-## Trigger / Kích hoạt
+## Trigger
 
 ```yaml
 TRIGGER_RULES:
@@ -28,7 +26,7 @@ TRIGGER_RULES:
 
 ---
 
-## Pre-Check / Kiểm tra Trước
+## Pre-Check
 
 ```yaml
 pre_checks:
@@ -48,24 +46,22 @@ pre_checks:
 
 ---
 
-## Purpose / Mục đích
+## Purpose
 
 Review the task plan for completeness, correct ordering, appropriate granularity, and alignment with spec. Ensure all requirements are covered and tasks are executable.
 
-Review kế hoạch task về tính đầy đủ, thứ tự đúng, granularity phù hợp, và căn chỉnh với spec. Đảm bảo tất cả yêu cầu được phủ và task có thể thực thi.
-
 ---
 
-## Rules / Quy tắc
+## Rules
 
-**MUST / PHẢI:**
+**MUST:**
 - Verify ALL spec requirements have tasks
 - Check task dependencies are correct
 - Verify each task has clear done criteria
 - Check cross-root ordering
 - Be conservative - do not "interpret generously"
 
-**MUST NOT / KHÔNG ĐƯỢC:**
+**MUST NOT:**
 - Implement any task
 - Modify the task plan directly
 - Generate code
@@ -73,9 +69,9 @@ Review kế hoạch task về tính đầy đủ, thứ tự đúng, granularity
 
 ---
 
-## Review Categories / Các hạng mục Review
+## Review Categories
 
-### 1. Coverage Check / Kiểm tra Độ phủ
+### 1. Coverage Check
 
 ```yaml
 checklist:
@@ -85,7 +81,7 @@ checklist:
   - No orphan tasks (task without requirement): ⬜
 ```
 
-### 2. Granularity Check / Kiểm tra Granularity
+### 2. Granularity Check
 
 ```yaml
 checklist:
@@ -96,7 +92,7 @@ checklist:
   - No tasks too small (trivial 5-min tasks): ⬜
 ```
 
-### 3. Ordering Check / Kiểm tra Thứ tự
+### 3. Ordering Check
 
 ```yaml
 checklist:
@@ -107,7 +103,7 @@ checklist:
   - Tests after implementation: ⬜
 ```
 
-### 4. Cross-Root Check / Kiểm tra Đa Root
+### 4. Cross-Root Check
 
 ```yaml
 checklist:
@@ -118,7 +114,7 @@ checklist:
   - No implicit assumptions about root state: ⬜
 ```
 
-### 5. Quality Check / Kiểm tra Chất lượng
+### 5. Quality Check
 
 ```yaml
 checklist:
@@ -129,7 +125,7 @@ checklist:
   - Descriptions are clear: ⬜
 ```
 
-### 6. Risk Check / Kiểm tra Rủi ro
+### 6. Risk Check
 
 ```yaml
 checklist:
@@ -141,7 +137,7 @@ checklist:
 
 ---
 
-## Execution Steps / Các bước Thực hiện
+## Execution Steps
 
 ```yaml
 steps:
@@ -172,7 +168,7 @@ steps:
 
 ---
 
-## Output Format / Định dạng Output
+## Output Format
 
 ```markdown
 ## 🔍 Task Plan Review / Review Kế hoạch Task
@@ -331,7 +327,7 @@ Please address the issues above, then:
 
 ---
 
-## State Updates / Cập nhật State
+## State Updates
 
 ```yaml
 # If PASS
@@ -368,7 +364,7 @@ phases.phase_2_tasks:
 
 ---
 
-## STOP Rules / Quy tắc Dừng
+## STOP Rules
 
 ```markdown
 ---
@@ -386,7 +382,7 @@ Please fix the issues above, then run `review` again.
 
 ---
 
-## Next Step / Bước tiếp theo
+## Next Step
 
 ```yaml
 NEXT_PROMPT_ENFORCEMENT:
