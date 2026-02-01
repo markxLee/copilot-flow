@@ -1,4 +1,5 @@
 # Workflow Resume Prompt
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 # Use this prompt to continue work from a saved state
 
 ---

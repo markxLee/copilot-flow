@@ -1,4 +1,5 @@
 # Cross-Root Auto-Config
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > **AUTO-ANALYZE** workspace roots, **ASK** if unclear, then **SAVE**.
 >
@@ -307,8 +308,8 @@ on_user_confirms_yes:
      
      File: `WORKSPACE_CONTEXT.md` (Section 9)
      
-     New sessions will auto-load this config via `init-context`.
-     Session mới sẽ tự động đọc config này qua `init-context`."
+     New sessions will auto-load this config via `cf-init`.
+     Session mới sẽ tự động đọc config này qua `cf-init`."
 
 on_user_says_adjust:
   - Parse user feedback
@@ -387,7 +388,7 @@ After saving config:
 - Cross-root relationships will display automatically
 
 **Related Prompts:**
-- [init-context.prompt.md](init-context.prompt.md) - Auto-loads cross-root config
+- [cf-init.prompt.md](cf-init.prompt.md) - Auto-loads cross-root config
 - [workspace-update-root.prompt.md](workspace-update-root.prompt.md) - Update workspace roots
 
 ````

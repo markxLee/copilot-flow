@@ -1,4 +1,5 @@
 # Setup Workspace — Full Initialization Pipeline
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Runs the full workspace setup pipeline:
 > discovery → cross-root → sync instructions → generate workspace files

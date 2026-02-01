@@ -1,4 +1,5 @@
 # PR Description Generator — Create Pull Request
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **PR Description Writer and Release Communicator**.
 

@@ -1,4 +1,5 @@
 # Solo Orchestrator — One-Command Flow for Solo Work
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > A lightweight orchestrator that keeps the governed workflow rules,
 > but reduces ceremony for a solo developer (one user story, one implementer).

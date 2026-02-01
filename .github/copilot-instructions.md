@@ -1,4 +1,5 @@
 # Copilot Workflow Instructions
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 This file is read automatically by GitHub Copilot.
 It defines how Copilot MUST behave in this workspace.
@@ -139,11 +140,12 @@ COPILOT_MUST_NOT:
 ### Workflow Commands
 | Command | Action |
 |---------|--------|
-| `/init` | Initialize session, load context |
+| `/cf-init` | Initialize session, load context |
 | `/solo-orchestrator` | Auto-pick Lite vs Governed |
 | `/lite-mode <desc>` | Start lite mode for simple tasks |
 | `/workflow-resume` | Resume from saved state |
 | `/workflow-status` | Show current workflow status |
+| `/cf-context-reset` | Reset context if confused |
 
 ### Phase Commands
 | Command | Action |
@@ -280,8 +282,10 @@ RULES:
 - [docs/workflow/contract.md](../docs/workflow/contract.md) - Full workflow rules
 - [WORKSPACE_CONTEXT.md](../WORKSPACE_CONTEXT.md) - Workspace configuration
 - [docs/templates/](../docs/templates/) - All document templates
+- [docs/guides/command-reference.md](../docs/guides/command-reference.md) - Full command reference
+- [docs/guides/troubleshooting.md](../docs/guides/troubleshooting.md) - Troubleshooting guide
 
 ---
 
-**Contract Version:** 2.0
-**Last Updated:** 2026-01-31
+**Contract Version:** 1.0
+**Last Updated:** 2026-02-01

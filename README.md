@@ -161,26 +161,26 @@ Is this a quick fix (< 30 min, clear scope)?
 
 | Scenario | Command | Why |
 |----------|---------|-----|
-| Start of day / new chat | `/init-context` | Loads context + checks for existing workflow |
-| VS Code restarted | `/init-context` | Same - context needs reload |
-| Changed device / computer | `/init-context` → `resume` | State is in git, just reload |
+| Start of day / new chat | `/cf-init` | Loads context + checks for existing workflow |
+| VS Code restarted | `/cf-init` | Same - context needs reload |
+| Changed device / computer | `/cf-init` → `resume` | State is in git, just reload |
 | Session lost mid-phase | `/workflow-resume` | Reads `.workflow-state.yaml` directly |
-| Copilot giving wrong answers | `/memory-context-hygiene` | Clears confused context |
-| Long conversation (50+ messages) | `/memory-context-hygiene` | Prevents context overflow |
+| Copilot giving wrong answers | `/cf-context-reset` | Clears confused context |
+| Long conversation (50+ messages) | `/cf-context-reset` | Prevents context overflow |
 
 **Recovery Flow:**
 ```
 Session lost?
-├─ Have uncommitted work? → Commit first, then `/init-context`
-├─ Already committed? → `/init-context` → say `resume`
-└─ Copilot confused? → `/memory-context-hygiene` → `/workflow-resume`
+├─ Have uncommitted work? → Commit first, then `/cf-init`
+├─ Already committed? → `/cf-init` → say `resume`
+└─ Copilot confused? → `/cf-context-reset` → `/workflow-resume`
 ```
 
 **Multi-device workflow:**
 ```
 Device A: Working on Phase 3
     ↓ commit + push
-Device B: git pull → /init → resume → continue Phase 3
+Device B: git pull → /cf-init → resume → continue Phase 3
 ```
 
 ### Workflow Phase Prompts
@@ -232,7 +232,7 @@ Device B: git pull → /init → resume → continue Phase 3
 | `/workflow-resume` | Resume from saved state |
 | `/rollback` | Undo implementation changes |
 | `/lite-mode` | Start lite mode |
-| `/memory-context-hygiene` | Clear confused state |
+| `/cf-context-reset` | Clear confused state |
 | `/strict-review` | Self-review before PR (critical reviewer) |
 | `/strict-review <file>` | Review specific file |
 | `/strict-review --pr` | Full PR review with hater prediction |
@@ -264,7 +264,7 @@ Device B: git pull → /init → resume → continue Phase 3
 └──────────────────────────────────┬──────────────────────────────────┘
                                    ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│ P0: /phase-0-analysis → analysis.md            → ⏸️ APPROVAL        │
+│ P0: /phase-0-analysis → solution-design.md     → ⏸️ APPROVAL        │
 ├─────────────────────────────────────────────────────────────────────┤
 │ P1: /phase-1-spec     → spec.md → [/spec-review]     → ⏸️ APPROVAL  │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -290,7 +290,7 @@ Device B: git pull → /init → resume → continue Phase 3
 
 | Phase | Name | Output | Gate | Review Prompt |
 |-------|------|--------|------|---------------|
-| 0 | Analysis & Design | `analysis.md` | ⏸️ Approval | - |
+| 0 | Analysis & Design | `solution-design.md` | ⏸️ Approval | - |
 | 1 | Specification | `spec.md` | ⏸️ Approval | `/spec-review` |
 | 2 | Task Planning | `tasks.md` | ⏸️ Approval | `/task-plan-review` |
 | 3 | Implementation | `impl-log.md` | ⏸️ Two-Gate | `/code-review`, `/code-fix-*` |
@@ -382,7 +382,7 @@ copilot-flow/
 ├── .github/
 │   ├── copilot-instructions.md   # Entry point for Copilot
 │   ├── prompts/                  # All workflow prompts
-│   │   ├── init-context.prompt.md
+│   │   ├── cf-init.prompt.md
 │   │   ├── work-intake.prompt.md
 │   │   ├── phase-0-analysis.prompt.md
 │   │   ├── phase-1-spec.prompt.md
@@ -594,11 +594,11 @@ phases:
 
 | Problem | Solution |
 |---------|----------|
-| "No workflow found" | Run `/init`, then describe work |
+| "No workflow found" | Run `/cf-init`, then describe work |
 | "Phase X not approved" | Complete review, then approve |
 | "Wrong root for docs" | Check `docs_root` in `.workflow-state.yaml` |
 | Session lost | Run `/workflow-resume` to reload state |
-| Copilot confused | Run `/memory-context-hygiene` or start new chat |
+| Copilot confused | Run `/cf-context-reset` or start new chat |
 | Wrong implementation | Run `/rollback` to undo |
 
 ---
@@ -639,7 +639,7 @@ Still tracks changes in `.workflow-state.yaml`.
 <summary><b>Q: What if Copilot gets confused or stuck?</b></summary>
 
 ```
-/memory-context-hygiene
+/cf-context-reset
 ```
 Resets Copilot's context. Then `/workflow-resume` to continue from state.
 
@@ -666,27 +666,27 @@ code workspace.code-workspace
 ```
 Then in Copilot:
 ```
-/init-context
+/cf-init
 ```
 Copilot will detect existing workflow and ask if you want to resume.
 
 </details>
 
 <details>
-<summary><b>Q: What's the difference between /init-context and /workflow-resume?</b></summary>
+<summary><b>Q: What's the difference between /cf-init and /workflow-resume?</b></summary>
 
 | Command | Does What |
 |---------|----------|
-| `//init-context` | Full initialization: loads WORKSPACE_CONTEXT.md, checks branch, finds workflow state, shows options |
+| `/cf-init` | Full initialization: loads WORKSPACE_CONTEXT.md, checks branch, finds workflow state, shows options |
 | `/workflow-resume` | Direct resume: reads `.workflow-state.yaml` immediately, shows current phase |
 
-**Use `/init-context`** at start of session (recommended).
+**Use `/cf-init`** at start of session (recommended).
 **Use `/workflow-resume`** when you know workflow exists and want quick resume.
 
 </details>
 
 <details>
-<summary><b>Q: When should I use /memory-context-hygiene?</b></summary>
+<summary><b>Q: When should I use /cf-context-reset?</b></summary>
 
 Use when Copilot:
 - Repeats itself or gives contradictory answers
@@ -694,7 +694,7 @@ Use when Copilot:
 - Suggests wrong files or approaches
 - Conversation is very long (50+ messages)
 
-After running `/memory-context-hygiene`, follow with `/workflow-resume` to reload state.
+After running `/cf-context-reset`, follow with `/workflow-resume` to reload state.
 
 </details>
 

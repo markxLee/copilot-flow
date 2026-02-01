@@ -1,4 +1,5 @@
 # Verify Checks — Automated Quality Commands
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Run automated checks (typecheck/lint/build/test) in affected roots.
 

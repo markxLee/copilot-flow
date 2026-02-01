@@ -1,4 +1,5 @@
 # Workflow Status — Current State Summary
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Read-only status view of the current workflow (if any).
 
@@ -31,7 +32,7 @@ TRIGGER_RULES:
 
 **MUST:**
 - Read-only: do not modify any file
-- Use the same workflow auto-detect logic as init-context:
+- Use the same workflow auto-detect logic as cf-init:
   - Read `WORKSPACE_CONTEXT.md` → get `meta.default_docs_root`
   - Get branch from docs_root repo
   - Resolve branch slug

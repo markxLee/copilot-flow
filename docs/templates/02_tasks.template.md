@@ -1,5 +1,5 @@
 # Task Plan — `<Feature Name>`
-<!-- Template v4.0 | Inline Bilingual Format with Visual Flags -->
+<!-- Template Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 <!-- 🇻🇳 Vietnamese first, 🇬🇧 English follows — for easy scanning -->
 
 ---
@@ -218,7 +218,59 @@ pnpm test
 
 ---
 
-## 7. Risk per Task
+## 7. Test Plan
+<!-- REQUIRED for all modes - Plan tests before implementation -->
+<!-- Standard mode: Test code written in Phase 4 -->
+<!-- TDD mode: Test code written in Phase 3 (before implementation) -->
+
+### 7.1 Test Strategy
+
+🇻🇳 Mô tả chiến lược testing: unit tests, integration tests, e2e tests. Định nghĩa coverage target.
+
+🇬🇧 Describe testing strategy: unit tests, integration tests, e2e tests. Define coverage targets.
+
+| Type | Scope | Coverage Target |
+|------|-------|-----------------|
+| Unit | Business logic, utilities | 80% |
+| Integration | API endpoints, data flows | Key paths |
+| E2E | Critical user journeys | Happy paths |
+
+### 7.2 Test Cases by Task
+
+| TC ID | Task | Test Description | Type | Expected Result |
+|-------|------|------------------|------|-----------------|
+| TC-001 | T-001 | `<test description>` | Unit | `<expected>` |
+| TC-002 | T-001 | `<test description>` | Unit | `<expected>` |
+| TC-003 | T-002 | `<test description>` | Integration | `<expected>` |
+| TC-004 | T-003 | `<test description>` | E2E | `<expected>` |
+
+### 7.3 Edge Cases & Error Scenarios
+
+🇻🇳 Liệt kê các trường hợp biên và kịch bản lỗi cần test.
+
+🇬🇧 List edge cases and error scenarios to test.
+
+| TC ID | Scenario | Input | Expected Behavior |
+|-------|----------|-------|-------------------|
+| TC-E01 | Empty input | `null` / `undefined` | Graceful error handling |
+| TC-E02 | Invalid format | `<invalid data>` | Validation error |
+| TC-E03 | Network failure | N/A | Retry with backoff |
+
+### 7.4 Test Data Requirements
+
+🇻🇳 Dữ liệu test cần chuẩn bị trước.
+
+🇬🇧 Test data to prepare in advance.
+
+```typescript
+// Test fixtures or mock data
+const testUser = { id: 'test-1', name: 'Test User' };
+const mockResponse = { status: 200, data: {...} };
+```
+
+---
+
+## 8. Risk per Task
 
 | Task | Risk | Mitigation |
 |------|------|------------|

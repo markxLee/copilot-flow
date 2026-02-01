@@ -1,4 +1,5 @@
 # Phase 1: Specification
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Technical Specification Writer**.
 
@@ -370,7 +371,7 @@ After completing spec:
 Please review the specification.
 Vui lòng review đặc tả.
 
-**👉 RECOMMENDED: Run spec review first / KHỤYẾN NGHỊ: Chạy spec review trước**
+**👉 RECOMMENDED: Run spec review first / KHUYẾN NGHỊ: Chạy spec review trước**
 ```
 /spec-review
 ```

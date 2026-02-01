@@ -1,4 +1,5 @@
 # Generate Workspace Files
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Generate .code-workspace and ARCHITECTURE.md dynamically from WORKSPACE_CONTEXT.md
 

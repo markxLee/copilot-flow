@@ -1,4 +1,5 @@
 # Work Intake — Work Description Capture
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Delivery Intake Coordinator**.
 
@@ -6,7 +7,7 @@ You are acting as a **Delivery Intake Coordinator**.
 
 ## Trigger
 
-After `init-context`, when user:
+After `cf-init`, when user:
 - Describes a feature/bug/task
 - Says `start: <description>`
 - Provides raw work request

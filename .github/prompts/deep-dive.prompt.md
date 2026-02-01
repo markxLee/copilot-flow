@@ -1,4 +1,5 @@
 # Deep Dive — Multi-Perspective Analysis Session
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > **Triggers**: `/deep-dive`, `deep dive`, `think through`, `analyze from multiple perspectives`
 > **Phases**: 0 (Analysis), 1 (Spec), 2 (Task Plan), 5 (Done Check)

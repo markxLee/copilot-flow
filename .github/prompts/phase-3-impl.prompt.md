@@ -1,4 +1,5 @@
 # Phase 3: Implementation — Task Execution
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Controlled Implementation Executor**.
 
@@ -278,7 +279,7 @@ PLANNING_OUTPUT:
     
     **If NOT OK:**
     - Point out the issue
-    - Or run `/memory-context-hygiene` to reset context
+    - Or run `/cf-context-reset` to reset context
     
   stop_here: true
   wait_for: "/impl go"
@@ -296,17 +297,120 @@ IMPLEMENTATION:
     - Gate 1 (Planning) must be approved
     - If user runs "/impl go" without prior planning → Re-run planning first
     
-  execution:
-    1. Make code changes as planned
-    2. Follow project conventions
-    3. Keep changes minimal and focused
-    4. Update impl-log.md
-    5. Update state file
+  # ⚠️ CRITICAL: Check dev_mode to determine execution flow
+  mode_check:
+    source: .workflow-state.yaml → meta.dev_mode
     
-  post_condition:
-    - All planned files created/modified
-    - impl-log.md updated with task entry
-    - State updated: task status = "awaiting-review"
+  execution_by_mode:
+    # ========================================
+    # STANDARD MODE: Implementation first
+    # ========================================
+    standard:
+      sequence:
+        1. Make code changes as planned
+        2. Follow project conventions
+        3. Keep changes minimal and focused
+        4. Update impl-log.md
+        5. Update state file
+        
+      post_condition:
+        - All planned files created/modified
+        - impl-log.md updated with task entry
+        - State updated: task status = "awaiting-review"
+        
+    # ========================================
+    # TDD MODE: Test first, then implementation
+    # ========================================
+    tdd:
+      sequence:
+        # STEP 4.1: Write failing test (RED)
+        1_write_test:
+          action: |
+            a. Read Test Plan from 02_tasks/tasks.md section 7
+            b. Find test cases for current task (TC-XXX → T-XXX)
+            c. Write test code based on test case descriptions
+            d. Run test → MUST FAIL (RED)
+          
+          output: |
+            ### 🔴 TDD Step 1: Write Failing Test
+            
+            **Test Case:** TC-XXX
+            **Description:** <from test plan>
+            
+            ```typescript
+            // Test file: <path>
+            describe('<feature>', () => {
+              it('<test description>', () => {
+                // Arrange
+                // Act  
+                // Assert
+              });
+            });
+            ```
+            
+            **Run test:**
+            ```bash
+            pnpm test <test-file>
+            ```
+            
+            **Expected:** ❌ FAIL (function/module not implemented yet)
+            
+            ---
+            ⏸️ Confirm test fails, then continue with `/impl go`
+            
+          wait_for: User confirms test fails
+          
+        # STEP 4.2: Write implementation (GREEN)
+        2_implement:
+          action: |
+            a. Implement minimum code to make test pass
+            b. Follow project conventions
+            c. Keep implementation minimal (just enough to pass)
+            d. Run test → MUST PASS (GREEN)
+            
+          output: |
+            ### 🟢 TDD Step 2: Implementation
+            
+            **Files changed:**
+            | File | Action | Purpose |
+            |------|--------|---------|
+            | `path/file.ts` | Create | <why> |
+            
+            **Run test:**
+            ```bash
+            pnpm test <test-file>
+            ```
+            
+            **Expected:** ✅ PASS
+            
+            ---
+            ⏸️ Confirm test passes, then continue with `/impl go`
+            
+          wait_for: User confirms test passes
+          
+        # STEP 4.3: Refactor (optional)
+        3_refactor:
+          action: |
+            a. Review implementation for code quality
+            b. Refactor if needed (keep tests passing)
+            c. Final test run to verify
+            
+          output: |
+            ### 🔵 TDD Step 3: Refactor (Optional)
+            
+            **Refactoring applied:**
+            - <change 1>
+            - <change 2>
+            
+            **Final test run:** ✅ All tests pass
+            
+          optional: true
+          
+      post_condition:
+        - Test file created with passing tests
+        - Implementation passes all tests
+        - impl-log.md updated with TDD steps
+        - State updated: task status = "awaiting-review"
 ```
 
 ---

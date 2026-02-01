@@ -1,4 +1,5 @@
 # Work Review — Readiness Gate
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Requirements Reviewer and Readiness Officer**.
 
@@ -291,7 +292,7 @@ NEXT_PROMPT_ENFORCEMENT:
 ## Workflow Integration
 
 ```
-init-context
+cf-init
      ↓
 work-intake (capture raw request)
      ↓

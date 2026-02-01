@@ -1,5 +1,5 @@
 # Done Check — `<Feature Name>`
-<!-- Template v4.0 | Inline Bilingual Format with Visual Flags -->
+<!-- Template Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 <!-- 🇻🇳 Vietnamese first, 🇬🇧 English follows — for easy scanning -->
 
 ---

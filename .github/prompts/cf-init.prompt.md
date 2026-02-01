@@ -1,4 +1,5 @@
 # Initialize Context
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 # Entry point for every Copilot session in this workspace
 
 ---
@@ -282,19 +283,45 @@ init_workflow:
        - Ask user to confirm (see Step 2)
        - Default: primary affected root
        
-    2. Create branch directory:
+    2. Ask for development mode:
+       prompt: |
+         "### 🔧 Development Mode / Chế độ Phát triển
+         
+         How would you like to develop?
+         Bạn muốn phát triển theo cách nào?
+         
+         | Mode | Description |
+         |------|-------------|
+         | **standard** | Write tests after implementation (Phase 4) |
+         | **tdd** | Test-Driven: write tests BEFORE code (Phase 3) |
+         
+         **Benefits of TDD:**
+         - Forces you to think about requirements first
+         - Tests become living documentation
+         - Higher confidence in changes
+         - Better test coverage
+         
+         **Choose mode (default: standard):**"
+       
+       options:
+         standard: "Tests written in Phase 4 after implementation"
+         tdd: "Tests written first in Phase 3, then implementation"
+       default: standard
+       
+    3. Create branch directory:
        path: <docs_root>/docs/runs/<branch-slug>/
        
-    3. Create state file from template:
+    4. Create state file from template:
        source: <tooling_root>/docs/templates/workflow-state.template.yaml
        target: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
        
-    4. Initialize state:
+    5. Initialize state:
        meta:
          branch_slug: <branch-slug>
          docs_root: <docs_root>
          tooling_root: <tooling_root>
          feature_name: <from user description>
+         dev_mode: <user_choice>           # standard | tdd
          created_at: <now>
          last_updated: <now>
          affected_roots:
@@ -310,10 +337,10 @@ init_workflow:
          next_action: "Capture work description"
          blockers: []
          
-    5. Create README.md for reviewers:
+    6. Create README.md for reviewers:
        path: <docs_root>/docs/runs/<branch-slug>/README.md
        
-    6. Announce:
+    7. Announce:
        "
        ## ✅ Workflow Initialized / Workflow đã khởi tạo
        
@@ -321,6 +348,7 @@ init_workflow:
        |--------|----- -|
        | Feature | <feature-name> |
        | Branch | `<branch-slug>` |
+       | Dev Mode | `<dev_mode>` |
        | Docs Location | `<docs_root>/docs/runs/<branch-slug>/` |
        | Templates From | `<tooling_root>/docs/templates/` |
        | Affected Roots | <list of roots> |
@@ -333,7 +361,7 @@ init_workflow:
        ```
        "
        
-    7. STOP and wait for user to run /work-intake
+    8. STOP and wait for user to run /work-intake
        # DO NOT auto-run work-intake, let user trigger explicitly
 ```
 

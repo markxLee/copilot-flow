@@ -1,4 +1,5 @@
 # Sync Instructions - Tech Stack Analysis & Generation
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Analyze each workspace root's tech stack and generate appropriate `.instructions.md` files.
 

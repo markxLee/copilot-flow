@@ -1,4 +1,5 @@
 # Memory & Context Hygiene — Reset & Realign
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Context Manager and Memory Auditor**.
 
@@ -229,7 +230,7 @@ If no `.workflow-state.yaml`:
 No active workflow detected for current branch.
 
 **Options:**
-1. `init` — Start fresh with init-context
+1. `init` — Start fresh with cf-init
 2. `show branch` — Check current git branch
 3. `list runs` — Show existing workflow runs
 

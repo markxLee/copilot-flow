@@ -1,4 +1,6 @@
 # Workflow State File / File Trạng thái Workflow
+# Template Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01
+#
 # This file tracks progress and enables resuming work at any point
 # File này theo dõi tiến độ và cho phép tiếp tục công việc bất cứ lúc nào
 #
@@ -17,6 +19,11 @@ meta:
   created_at: <ISO-8601-timestamp>     # When workflow started
   last_updated: <ISO-8601-timestamp>   # Last state change
   updated_by: copilot                  # copilot | user
+  
+  # Development mode / Chế độ phát triển
+  # standard: Write tests after implementation (Phase 4)
+  # tdd: Test-Driven Development - write tests first (Phase 3)
+  dev_mode: standard                   # standard | tdd
   
   # Base branch for diff comparison / Branch gốc để so sánh diff
   # Used by /code-review for batch review
@@ -67,7 +74,7 @@ phases:
     approved_by: <user | auto>
     
     artifacts:
-      - path: 00_analysis/request-analysis.md
+      - path: 00_analysis/solution-design.md
         status: <pending | draft | complete>
       - path: 00_analysis/solution-design.md
         status: <pending | draft | complete>

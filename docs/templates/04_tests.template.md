@@ -1,6 +1,30 @@
 # Test Plan & Log — `<Feature Name>`
-<!-- Template v4.0 | Inline Bilingual Format with Visual Flags -->
+<!-- Template Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 <!-- 🇻🇳 Vietnamese first, 🇬🇧 English follows — for easy scanning -->
+
+---
+
+## Mode-Specific Role
+
+<!-- Phase 4 có vai trò khác nhau tùy dev_mode -->
+
+| Mode | Phase 4 Role |
+|------|-------------|
+| **Standard** | Write tests + Run tests + Log results |
+| **TDD** | Run full suite + Integration/E2E tests + Coverage validation |
+
+### TDD Mode Note
+🇻🇳 Trong TDD mode, unit tests đã được viết ở Phase 3. Phase 4 tập trung vào:
+- Chạy full test suite (tất cả tests từ Phase 3)
+- Viết integration/E2E tests nếu cần
+- Verify coverage đạt target
+- Regression testing
+
+🇬🇧 In TDD mode, unit tests were written in Phase 3. Phase 4 focuses on:
+- Running full test suite (all tests from Phase 3)
+- Writing integration/E2E tests if needed
+- Verifying coverage meets target
+- Regression testing
 
 ---
 
@@ -9,6 +33,7 @@
 | Aspect | Value |
 |--------|-------|
 | Feature | `<name>` |
+| Dev Mode | Standard / TDD |
 | Test Types | Unit / Integration / E2E |
 | Total Tests | `<N>` |
 | Passed | `<X>` |

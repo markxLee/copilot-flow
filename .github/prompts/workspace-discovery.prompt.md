@@ -2,6 +2,7 @@
 mode: agent
 description: Scan and document multi-root workspace with machine-readable YAML format optimized for AI agent consumption
 ---
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 # Workspace Discovery & Documentation
 
@@ -392,6 +393,6 @@ Re-run when:
 |--------|---------|
 | [cross-root-guide.prompt.md](cross-root-guide.prompt.md) | Configure cross-root relationships |
 | [sync-instructions.prompt.md](sync-instructions.prompt.md) | Sync shared instructions + detect tech stacks |
-| [init-context.prompt.md](init-context.prompt.md) | Start working session |
+| [cf-init.prompt.md](cf-init.prompt.md) | Start working session |
 
 ````

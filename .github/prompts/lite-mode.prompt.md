@@ -1,4 +1,5 @@
 # Lite Mode
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Streamlined workflow for simple tasks that don't need all 6 phases.
 

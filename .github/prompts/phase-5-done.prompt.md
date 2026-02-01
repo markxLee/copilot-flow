@@ -1,4 +1,5 @@
 # Phase 5: Done Check — Final Verification
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Release Gatekeeper and Definition of Done Auditor**.
 

@@ -152,7 +152,7 @@ Copilot: 📍 Workspace Status
 ### Step 2.1: Initialize Session
 
 ```
-You: /init
+You: /cf-init
 
 Copilot: 📍 Session Initialized
          
@@ -965,7 +965,7 @@ Copilot: ### 🇬🇧 Documentation / 🇻🇳 Tài liệu
          
          | Document | Location | Status |
          |----------|----------|--------|
-         | analysis.md | 00_analysis/ | ✅ Complete |
+         | solution-design.md | 00_analysis/ | ✅ Complete |
          | spec.md | 01_spec/ | ✅ Complete |
          | tasks.md | 02_tasks/ | ✅ Complete |
          | impl-log.md | 03_impl/ | ✅ Complete |
@@ -1293,7 +1293,7 @@ Copilot: ## 📝 Requirement Change Detected
          
          | Document | Action Needed |
          |----------|---------------|
-         | analysis.md | No change |
+         | solution-design.md | No change |
          | spec.md | Add FR-009, FR-010 |
          | tasks.md | Add T-009: Sound feature |
          | impl-log.md | Will update during impl |
@@ -1323,7 +1323,7 @@ Copilot: ✅ Created: spec-update-1.md
 ```
 # After VS Code restart, open Copilot chat
 
-You: /init
+You: /cf-init
 
 Copilot: 📍 Session Initialized
          
@@ -1381,7 +1381,7 @@ code boostcommerce.code-workspace
 Then in Copilot on Device B:
 
 ```
-You: /init
+You: /cf-init
 
 Copilot: 📍 Session Initialized
          
@@ -1416,7 +1416,7 @@ Signs Copilot is confused:
 - Gives contradictory instructions
 
 ```
-You: /memory-context-hygiene
+You: /cf-context-reset
 
 Copilot: 🧹 Context Hygiene
          
@@ -1465,7 +1465,7 @@ Copilot: 📍 Workflow Resumed
 After ~50+ messages, Copilot may lose context. Proactively clean up:
 
 ```
-You: /memory-context-hygiene
+You: /cf-context-reset
 
 Copilot: 🧹 Context cleared.
          
@@ -1482,9 +1482,9 @@ Copilot: 📍 Workflow Resumed
 
 | Command | When to Use |
 |---------|-------------|
-| `/init` | Start of day, new chat, VS Code restart |
+| `/cf-init` | Start of day, new chat, VS Code restart |
 | `/workflow-resume` | Quick resume when you know workflow exists |
-| `/memory-context-hygiene` | Copilot confused, long conversation |
+| `/cf-context-reset` | Copilot confused, long conversation |
 
 **Why state file matters:**
 ```yaml
@@ -1521,7 +1521,7 @@ Copilot: ## 📋 Quick Reference Card
          ### Session Commands
          | Prompt | Action |
          |--------|--------|
-         | `/init` | Start session |
+         | `/cf-init` | Start session |
          | `/workflow-resume` | Resume from state |
          | `/workflow-status` | Show current status |
          | `/quick-ref` | Show this card |
@@ -1565,7 +1565,7 @@ Copilot: ## 📋 Quick Reference Card
          | Prompt | Action |
          |--------|--------|
          | `/rollback` | Undo changes |
-         | `/memory-context-hygiene` | Clear confused state |
+         | `/cf-context-reset` | Clear confused state |
          | `/lite-mode <desc>` | Quick task mode |
          | `/strict-review` | Self-review before PR (critical reviewer) |
          | `/strict-review --pr` | Full PR review with hater prediction |

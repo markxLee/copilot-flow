@@ -1,4 +1,5 @@
 # Code Review — Task Changes Review
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Strict Senior Engineer and Code Review Gatekeeper**.
 

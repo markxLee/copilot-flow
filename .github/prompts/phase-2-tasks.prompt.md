@@ -1,4 +1,5 @@
 # Phase 2: Task Planning
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 You are acting as a **Technical Task Planner**.
 
@@ -41,12 +42,18 @@ pre_checks:
      check: phases.phase_1_spec.status == "approved"
      if_not: STOP and ask user to approve Phase 1 first
      
-  2. Load spec artifacts:
+  2. Read dev_mode from state:
+     path: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+     extract: meta.dev_mode
+     default: standard
+     store: session.dev_mode
+     
+  3. Load spec artifacts:
      - 01_spec/spec.md
       - 00_analysis/solution-design.md  # preferred (canonical)
       - 00_analysis/analysis.md         # legacy alias (accept if present)
      
-  3. Update state:
+  4. Update state:
      status.current_phase: 2
      status.phase_name: tasks
      status.phase_status: in-progress
@@ -58,6 +65,8 @@ pre_checks:
 ## Purpose
 
 Break down the specification into ordered, executable, minimal tasks. Each task should be implementable and verifiable independently.
+
+**Additionally for TDD mode**: Create Test Plan with test cases mapped to tasks.
 
 ---
 
@@ -71,6 +80,7 @@ Break down the specification into ordered, executable, minimal tasks. Each task 
 - Define clear done criteria for each task
 - Include verification steps
 - Keep tasks small (ideally <2 hours of work)
+- **All Modes**: Create Test Plan (Section 7 of template) with test cases for each task
 
 **MUST NOT:**
 - Write implementation code
@@ -78,6 +88,7 @@ Break down the specification into ordered, executable, minimal tasks. Each task 
 - Create vague or large tasks
 - Merge unrelated tasks
 - Ignore cross-root dependencies
+- Skip Test Plan section
 
 ---
 
@@ -172,6 +183,59 @@ ordering_rules:
   6. Tests last (per feature):
      - Unit tests after implementation
      - Integration tests after units
+```
+
+---
+
+## Test Plan (All Modes)
+
+```yaml
+TEST_PLAN_RULES:
+  # Test Plan is REQUIRED for ALL modes
+  # Difference is WHEN test code is written:
+  # - Standard: Test code written in Phase 4 (after implementation)
+  # - TDD: Test code written in Phase 3 (before implementation)
+  
+  requirement: REQUIRED  # Always required, regardless of dev_mode
+    
+  test_plan_structure:
+    # Section 7 of 02_tasks.template.md
+    
+    7.1_test_strategy:
+      - Define test types: unit, integration, e2e
+      - Set coverage targets per type
+      - Identify mocking boundaries
+      
+    7.2_test_cases_by_task:
+      format: |
+        | TC ID | Task | Test Description | Type | Expected Result |
+        |-------|------|------------------|------|-----------------|
+        | TC-001 | T-001 | <what to test> | Unit | <expected> |
+        | TC-002 | T-001 | <another test> | Unit | <expected> |
+        | TC-003 | T-002 | <integration> | Integration | <expected> |
+      
+      rules:
+        - Every task MUST have at least 1 test case
+        - TC ID format: TC-XXX (maps to T-XXX task)
+        - Include happy path + error scenarios
+        
+    7.3_edge_cases:
+      - Empty/null inputs
+      - Invalid data formats
+      - Network failures
+      - Timeout scenarios
+      
+    7.4_test_data:
+      - Define fixtures
+      - Mock data structures
+      - Setup/teardown needs
+      
+  output_note: |
+    In TDD mode, Phase 3 will:
+    1. Read Test Plan from tasks.md
+    2. Write failing test (TC-XXX) before implementing (T-XXX)
+    3. Implement to make test pass
+    4. Refactor if needed
 ```
 
 ---
@@ -365,6 +429,11 @@ phases.phase_2_tasks:
     by_root:
       <root1>: <count>
       <root2>: <count>
+  # TDD mode additional tracking
+  test_plan:
+    included: <true | false>  # true if dev_mode == tdd
+    test_cases_count: <N>     # Total TC-XXX entries
+    coverage_target: <X>%     # From test strategy
   artifacts:
     - path: 02_tasks/tasks.md
       status: complete
@@ -377,11 +446,13 @@ phases.phase_3_impl:
       root: <root>
       status: pending
       depends_on: []
+      test_cases: [TC-001, TC-002]  # TDD: linked test cases
     - id: T-002
       title: <title>
       root: <root>
       status: pending
       depends_on: [T-001]
+      test_cases: [TC-003]
 ```
 
 ---
@@ -398,17 +469,20 @@ After completing task plan:
 ### Summary / Tóm tắt
 | Aspect | Value |
 |--------|-------|
+| Dev Mode | <standard / tdd> |
 | Total Tasks | <N> |
 | By Root | <root1>: X, <root2>: Y |
 | Estimated Effort | <Z> hours |
 | Sync Points | <K> |
+| Test Plan | <Included ✅ / Not included> |
+| Test Cases | <N> (TDD mode only) |
 
 ### Task List / Danh sách Task
 
-| ID | Title | Root | Est |
-|----|-------|------|-----|
-| T-001 | ... | ... | S |
-| T-002 | ... | ... | M |
+| ID | Title | Root | Est | Test Cases |
+|----|-------|------|-----|------------|
+| T-001 | ... | ... | S | TC-001, TC-002 |
+| T-002 | ... | ... | M | TC-003 |
 
 ### Requirements Coverage / Độ phủ Yêu cầu
 - FR-001 → T-001, T-002 ✅
@@ -425,7 +499,7 @@ After completing task plan:
 Please review the task plan.
 Vui lòng review kế hoạch task.
 
-**👉 RECOMMENDED: Run task plan review first / KHỤYẾN NGHỊ: Chạy task plan review trước**
+**👉 RECOMMENDED: Run task plan review first / KHUYẾN NGHỊ: Chạy task plan review trước**
 ```
 /task-plan-review
 ```
@@ -469,24 +543,5 @@ NEXT_PROMPT_ENFORCEMENT:
       Say `approved` then run `/phase-3-impl T-001`
       
       ⚠️ DO NOT use generic commands like `go`, `approved` alone.
-      ---
-```
-      
-      ---
-      ## ⏸️ CHECKPOINT: Task Plan Complete
-      
-      ### 📋 Next Steps (EXPLICIT PROMPTS REQUIRED)
-      
-      **Option 1: Detailed review (recommended)**
-      ```
-      /task-plan-review
-      ```
-      
-      **Option 2: Approve and start Phase 3 with first task**
-      ```
-      /phase-3-impl T-001
-      ```
-      
-      ⚠️ DO NOT use generic commands like `go`, `approved`.
       ---
 ```

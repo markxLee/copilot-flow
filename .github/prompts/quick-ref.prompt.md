@@ -1,4 +1,5 @@
 # Quick Reference Card
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Cheat sheet for Copilot Workflow commands and phases.
 

@@ -2,6 +2,7 @@
 mode: agent
 description: Incrementally update WORKSPACE_CONTEXT.md when a new workspace root is added
 ---
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 # Workspace Context Update: New Root Added
 

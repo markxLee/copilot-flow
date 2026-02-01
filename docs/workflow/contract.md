@@ -1,6 +1,6 @@
-# Copilot Workflow Contract — Multi-Root Workspace Edition (v2 Slim)
+# Copilot Workflow Contract — Multi-Root Workspace Edition
 
-> **Version 2.0** — Governance-focused. Execution details are in individual phase prompts.
+> **Version 1.0** — First Official Release. Governance-focused. Execution details are in individual phase prompts.
 
 This contract defines the **mandatory governance rules** when using Copilot in a **multi-root workspace**.
 
@@ -97,8 +97,40 @@ All workflow docs MUST live under:
 
 ---
 
+## Development Modes
+
+```yaml
+dev_mode:
+  standard:
+    description: "Traditional approach - tests after implementation"
+    test_plan: "REQUIRED in Phase 2 (plan tests before impl)"
+    phase_3: "Implementation only"
+    phase_4: "Write tests (based on Test Plan) + Run + Verify coverage"
+    
+  tdd:
+    description: "Test-Driven Development - tests before implementation"
+    test_plan: "REQUIRED in Phase 2"
+    phase_3: "For each task: Write failing test → Implement → Verify pass"
+    phase_4: "Run full suite + Integration/E2E tests + Coverage validation"
+```
+
+**Mode Selection**: Asked during workflow initialization (`/init`).
+
+---
+
 ## Phase Workflow Overview
 
+### Standard Mode Flow
+```
+Phase 2 (Tasks) → Phase 3 (Impl) → Phase 4 (Write & Run Tests) → Phase 5
+```
+
+### TDD Mode Flow
+```
+Phase 2 (Tasks + Test Plan) → Phase 3 (Test → Impl → Verify) → Phase 4 (Validate) → Phase 5
+```
+
+### Detailed Flow
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ PHASE 0: ANALYSIS & DESIGN                                      │
@@ -114,19 +146,21 @@ All workflow docs MUST live under:
                               ▼ ⏸️ USER APPROVAL
 ┌─────────────────────────────────────────────────────────────────┐
 │ PHASE 2: TASK PLANNING                                          │
-│ Break down → Order by root → Define contracts                   │
+│ Break down → Order by root → Test Plan (required for TDD)       │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼ ⏸️ USER APPROVAL
 ┌─────────────────────────────────────────────────────────────────┐
 │ PHASE 3: IMPLEMENTATION                                         │
-│ One task at a time → Log → Verify → STOP                        │
+│ Standard: Implement → Log → Review                              │
+│ TDD: Write test (🔴) → Implement (🟢) → Refactor (🔵)           │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼ ⏸️ USER APPROVAL (per task)
 ┌─────────────────────────────────────────────────────────────────┐
 │ PHASE 4: TESTING                                                │
-│ Write tests → Run → Log results → Fix failures                  │
+│ Standard: Write tests → Run → Log results                       │
+│ TDD: Run full suite → Integration tests → Verify coverage       │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼ ⏸️ USER APPROVAL
@@ -145,9 +179,9 @@ All workflow docs MUST live under:
 |-------|--------|------------|
 | 0 | [/phase-0-analysis](../../.github/prompts/phase-0-analysis.prompt.md) | solution-design.md, diagrams |
 | 1 | [/phase-1-spec](../../.github/prompts/phase-1-spec.prompt.md) | spec.md, cross-root-impact.md |
-| 2 | [/phase-2-tasks](../../.github/prompts/phase-2-tasks.prompt.md) | tasks.md |
-| 3 | [/phase-3-impl](../../.github/prompts/phase-3-impl.prompt.md) | impl-log.md, code changes |
-| 4 | [/phase-4-tests](../../.github/prompts/phase-4-tests.prompt.md) | test-plan.md, test-log.md |
+| 2 | [/phase-2-tasks](../../.github/prompts/phase-2-tasks.prompt.md) | tasks.md, test-plan (TDD) |
+| 3 | [/phase-3-impl](../../.github/prompts/phase-3-impl.prompt.md) | impl-log.md, code + tests (TDD) |
+| 4 | [/phase-4-tests](../../.github/prompts/phase-4-tests.prompt.md) | test-log.md, coverage report |
 | 5 | [/phase-5-done](../../.github/prompts/phase-5-done.prompt.md) | done-check.md, release-notes.md |
 
 > **Note**: See individual prompts for detailed execution steps, YAML schemas, and STOP points.
@@ -211,11 +245,12 @@ Priority order (highest first):
 ### Workflow Commands
 | Command | Action |
 |---------|--------|
-| `/init` | Initialize session |
+| `/cf-init` | Initialize session |
 | `/solo-orchestrator` | Auto-pick Lite vs Governed |
 | `/lite-mode <desc>` | Quick task (skip full workflow) |
 | `/workflow-resume` | Resume from saved state |
 | `/workflow-status` | Show current status |
+| `/cf-context-reset` | Reset context if confused |
 
 ### Phase Commands
 | Command | Action |
@@ -256,12 +291,11 @@ Priority order (highest first):
 ## See Also
 
 - [copilot-instructions.md](../../.github/copilot-instructions.md) — Entry point instructions
-- [init-context.prompt.md](../../.github/prompts/init-context.prompt.md) — Session initialization
+- [cf-init.prompt.md](../../.github/prompts/cf-init.prompt.md) — Session initialization
 - [WORKSPACE_CONTEXT.md](../../WORKSPACE_CONTEXT.md) — Workspace configuration
 - [Templates](../templates/) — All document templates
 
 ---
 
-**Contract Version**: 2.0 (Slim)  
-**Lines**: ~250 (down from 1043)  
-**Last Updated**: 2026-01-30
+**Contract Version**: 1.0  
+**Last Updated**: 2026-02-01

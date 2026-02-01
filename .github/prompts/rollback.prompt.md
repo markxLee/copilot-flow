@@ -1,4 +1,5 @@
 # Rollback Prompt
+<!-- Version: 1.0 | Contract: v1.0 | Last Updated: 2026-02-01 -->
 
 > Undo implementation changes when something goes wrong.
 
