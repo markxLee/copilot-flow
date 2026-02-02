@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../apphub-vision"
+		},
+		{
+			"path": "../boost-pfs-backend"
+		},
+		{
+			"path": "../reviews-assets"
+		}
+	],
+	"settings": {
+		"prisma.pinToPrisma6": true
+	}
+}
