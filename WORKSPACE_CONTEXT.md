@@ -14,7 +14,7 @@ meta:
   roots_count: 4
   primary_root: apphub-vision
   tooling_root: copilot-flow      # Where prompts, templates, instructions live (STATIC)
-  default_docs_root: copilot-flow  # Default root for workflow docs (can override per-feature)
+  default_docs_root: apphub-vision  # Default root for workflow docs (can override per-feature)
 
 roots:
   apphub-vision:

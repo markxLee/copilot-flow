@@ -11,7 +11,7 @@ After `cf-init`, when user:
 - Describes a feature/bug/task
 - Says `start: <description>`
 - Provides raw work request
-- Provides link to BRD in Confluence or JRA in Jira
+- **Provides link to BRD in Confluence or JRA in Jira** → **AUTO-FETCH content**
 - Provides raw BRD content from external sources
 
 ---
@@ -39,49 +39,74 @@ Capture and normalize a **raw work request** into a clear, structured **Work Des
 
 ---
 
-## Handling External Sources (BRD, JRA)
+## URL Auto-Detection & Fetch
 
-**MUST:**
-- Accept links to Confluence pages or Jira tickets
-- Fetch raw content using available tools when possible
-- Ask for raw text if automated fetch fails
-- Combine external BRD/JRA with user-provided technical descriptions
-- Document source of information
+**MUST:** When user input contains BRD/JRA URLs, automatically fetch content.
+
+### Detection Patterns:
+- **Confluence BRD**: `https://*.atlassian.net/wiki/*` → `--type confluence`
+- **Jira JRA**: `https://*.atlassian.net/browse/*` → `--type jira`
+
+### Auto-Fetch Process:
+1. **Detect URL** in user description
+2. **Check .env** exists and has credentials
+3. **Run fetch_external.py** immediately:
+   ```bash
+   python .github/scripts/fetch_external.py "<detected_url>" --type <confluence|jira>
+   ```
+4. **Handle failures**:
+   - No .env: Ask user to setup credentials
+   - Auth fail: Ask user to check credentials
+   - Network fail: Use fetch_webpage tool
+   - All fail: Ask for raw content
+
+### Content Integration:
+- **Merge fetched content** with user technical descriptions
+- **Include attachments** references in work description
+- **Document source** in Sources section
+- **Prioritize user details** over generic BRD content
+
+### Example:
+```
+User: "Implement subscription management page per BRD: https://clearerio.atlassian.net/wiki/x/YIa4Fw"
+
+AI: [Auto-detects URL] → [Runs fetch_external.py] → [Extracts content] → [Creates work description]
+```
 
 **Process for External Sources:**
-1. **Confluence BRD:**
-   - Setup credentials in `.env` file first:
+1. **Setup Environment:**
+   - Copy example environment file: `cp .github/scripts/env.example .github/scripts/.env`
+   - Edit `.env` with your Atlassian credentials:
      ```
      CONFLUENCE_USERNAME=your.email@company.com
      CONFLUENCE_TOKEN=your_api_token
+     JIRA_USERNAME=your.email@company.com
+     JIRA_TOKEN=your_api_token
      ```
-   - Then run: `python .github/scripts/fetch_external.py <url> --type confluence`
+
+2. **Confluence BRD:**
+   - Run: `python .github/scripts/fetch_external.py <url> --type confluence`
    - Extract key sections: Problem, Requirements, Acceptance Criteria from full page content
    - Also fetch attachments (diagrams, docs, images) if available
    - Content is returned in structured JSON format (ATLAS_DOC_FORMAT)
    - If script fails, fall back to fetch_webpage or ask for raw content
 
-2. **Jira JRA:**
-   - Setup credentials in `.env` file first:
-     ```
-     JIRA_USERNAME=your.email@company.com
-     JIRA_TOKEN=your_api_token
-     ```
-   - Then run: `python .github/scripts/fetch_external.py <url> --type jira`
+3. **Jira JRA:**
+   - Run: `python .github/scripts/fetch_external.py <url> --type jira`
    - Extract: Description, Acceptance Criteria, Comments
    - If script fails, fall back to fetch_webpage or ask for raw content
 
-3. **Authentication:**
+4. **Authentication:**
    - Use environment variables from `.env` file: CONFLUENCE_USERNAME, CONFLUENCE_TOKEN, JIRA_USERNAME, JIRA_TOKEN
    - Never pass credentials as command line arguments
    - Never store credentials in code
 
-4. **Content & Attachments:**
+5. **Content & Attachments:**
    - Confluence pages return full content in JSON format (headings, text, tables, media)
    - Attachments include documents, diagrams, wireframes, specs with download URLs
    - Jira tickets return structured issue data
 
-5. **Combination:**
+6. **Combination:**
    - Merge BRD/JRA content with technical descriptions
    - Include attachment references and download links in work description
    - Prioritize user-provided technical details over generic BRD
@@ -109,11 +134,19 @@ If uncertain → classify as FEATURE
 steps:
   1. Check for external sources
      action: |
-       If user provides Confluence/Jira link:
-         - Use fetch_external.py script to get raw content with auth
-         - If script fails or no auth provided, use fetch_webpage tool
-         - If both fail, ask for raw text
+       AUTO-DETECT URLs in user input:
+       - Confluence: https://*.atlassian.net/wiki/* → fetch_external.py --type confluence
+       - Jira: https://*.atlassian.net/browse/* → fetch_external.py --type jira
+       
+       If URL detected:
+         - IMMEDIATELY run fetch_external.py script to get raw content
+         - If .env not configured, ask user to setup credentials first
+         - If script fails, fallback to fetch_webpage tool
+         - If both fail, ask user to provide raw content manually
+       
        If user provides raw BRD/JRA content directly, use it
+       
+       ALWAYS document source: "Fetched from [URL]" or "Provided by user"
      
   2. Read raw work request + external content
      action: Understand what user wants, combining all sources
