@@ -187,6 +187,45 @@ ordering_rules:
 
 ---
 
+## Parallel Execution Notes (Section 3.5)
+
+```yaml
+PARALLEL_NOTES_RULES:
+  # OPTIONAL section - include when parallelism is relevant
+  
+  when_to_include:
+    - More than 3 tasks total
+    - Multiple tasks share same dependency
+    - Tasks modify different files
+    
+  when_to_skip:
+    - Linear dependency chain (A → B → C)
+    - All tasks modify same file
+    - Less than 3 tasks
+    
+  how_to_identify_parallel:
+    rule_1: "Same dependency, different files → CAN parallel"
+    rule_2: "No dependency between them → CAN parallel"
+    rule_3: "Same file modified → MUST sequential"
+    rule_4: "Cross-root with sync → MUST sequential"
+    
+  output_format:
+    parallel_groups:
+      - group: A
+        tasks: [T-002, T-003]
+        reason: "Same dependency (T-001), different files"
+    sequential_constraints:
+      - sequence: "T-007 → T-008"
+        reason: "Same file: service.ts"
+        
+  note: |
+    This is a HINT for human developers.
+    Copilot-Flow execution model is still one-task-at-a-time.
+    Developer decides whether to optimize using parallel execution.
+```
+
+---
+
 ## Test Plan (All Modes)
 
 ```yaml

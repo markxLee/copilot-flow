@@ -16,6 +16,59 @@ This contract defines the **mandatory governance rules** when using Copilot in a
 
 ---
 
+## Quick Rules Reference
+
+> **One-stop lookup** — All MUST/MUST NOT rules in one place.
+
+```yaml
+COPILOT_MUST:
+  workflow:
+    - Follow phases in order (0 → 1 → 2 → 3 → 4 → 5)
+    - STOP at every approval gate — wait for user
+    - Update .workflow-state.yaml after significant actions
+    - Read WORKSPACE_CONTEXT.md before cross-root work
+    
+  documentation:
+    - Store workflow docs in: <docs_root>/docs/runs/<branch-slug>/
+    - Use templates from: <tooling_root>/docs/templates/
+    - Log all implementation in impl-log.md
+    
+  code:
+    - Read root conventions before implementing
+    - Follow root-specific error handling pattern
+    - Review only diffs vs base_branch (diff-scoped discipline)
+    
+  multi_root:
+    - Check Section 9 of WORKSPACE_CONTEXT.md for cross-root workflows
+    - Follow documented build order
+    - Respect sync type (immediate vs versioned)
+
+COPILOT_MUST_NOT:
+  workflow:
+    - Skip phases or approval gates
+    - Auto-create/switch git branches
+    - Proceed without user approval at gates
+    
+  documentation:
+    - Write workflow docs outside docs/runs/<branch-slug>/
+    - Create docs from scratch — always use templates
+    
+  code:
+    - Implement before Phase 0+1 approved
+    - Guess cross-root relationships
+    - Ignore root-specific conventions
+
+PRIORITY_ORDER:  # When rules conflict
+  1: User explicit instruction
+  2: This contract (governance)
+  3: Phase prompts (execution)
+  4: WORKSPACE_CONTEXT.md (cross-root)
+  5: Root copilot-instructions.md
+  6: Conversation context
+```
+
+---
+
 ## Key Definitions
 
 ### Branch Slug

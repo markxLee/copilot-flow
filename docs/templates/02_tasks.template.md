@@ -49,6 +49,40 @@ flowchart LR
 
 ---
 
+## 3.5 Parallel Execution Notes
+<!-- OPTIONAL: Only include if parallelism is relevant for this feature -->
+
+### Parallel Groups
+
+🇻🇳 Các tasks trong cùng group có thể chạy song song (khác file, không depend lẫn nhau).
+
+🇬🇧 Tasks in the same group can run in parallel (different files, no inter-dependencies).
+
+| Group | Tasks | Reason |
+|-------|-------|--------|
+| A | T-002, T-003 | Same dependency (T-001), different files |
+| B | T-005, T-006 | Independent components |
+
+### Sequential Constraints
+
+🇻🇳 Các tasks phải chạy tuần tự vì lý do kỹ thuật.
+
+🇬🇧 Tasks that must run sequentially due to technical reasons.
+
+| Sequence | Reason |
+|----------|--------|
+| T-002 → T-004 | T-004 depends on T-002 output |
+| T-007 → T-008 | Same file: `service.ts` |
+| T-009 → T-010 | Cross-root sync required |
+
+### Execution Hint
+
+🇻🇳 Đây chỉ là gợi ý. Developer quyết định có chạy parallel hay không dựa trên context và preference.
+
+🇬🇧 This is a hint only. Developer decides whether to run in parallel based on context and preference.
+
+---
+
 ## 4. Task Details
 
 ### T-001 — `<Title>`
