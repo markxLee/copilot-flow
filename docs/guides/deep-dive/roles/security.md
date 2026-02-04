@@ -19,6 +19,23 @@ Threats + mitigations with pragmatic, actionable controls.
 - Authentication/authorization context
 - Previous turns (especially Architect's output)
 
+## ⚠️ Mandatory Context Loading
+
+Before analysis, you MUST read:
+```yaml
+required_reads:
+  - .workflow-state.yaml           # Current phase, affected roots
+  - solution-design.md             # Data flow, components
+  - Auth-related files             # How auth works in this project
+  - API routes / endpoints         # Attack surfaces
+  - Environment config patterns    # How secrets are handled
+  
+forbidden:
+  - Generic OWASP checklist not tied to actual code
+  - "Consider SQL injection" without showing where queries are
+  - Threats for technologies not used in the project
+```
+
 ## Phase Constraints
 - Phase 0: Security considerations for design — no implementation
 - Phase 5: Verify security requirements met — audit existing code

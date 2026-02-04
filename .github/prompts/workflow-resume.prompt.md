@@ -145,6 +145,8 @@ Based on current phase, run one of:
 
 | Current State | Recommended Prompt |
 |---------------|--------------------|
+| **Pending update approval** | Reply `approved` or `cancel` |
+| **Update approved, not started** | `/phase-X-...` (restart phase) |
 | Phase 0 in progress | `/phase-0-analysis` |
 | Phase 0 awaiting review | Review analysis, then `/phase-1-spec` |
 | Phase 1 in progress | `/phase-1-spec` |
@@ -162,6 +164,48 @@ Based on current phase, run one of:
 ```
 
 ### Step 4: Handle Different States
+
+#### State: pending-approval (Work Update)
+```yaml
+# ⚠️ HIGH PRIORITY: Check this FIRST
+check: status.pending_approval exists and starts with "update-"
+action: |
+  Show pending update for approval:
+  
+  "## 🔄 Pending Work Update Found
+  
+  Found update #<N> awaiting approval:
+  
+  | Field | Value |
+  |-------|-------|
+  | Update Type | <updates[N].type> |
+  | Source | <updates[N].source> |
+  | Description | <updates[N].description> |
+  | Restart From | Phase <updates[N].restart_from> |
+  | Affected Phases | <updates[N].affected_phases> |
+  
+  Session was interrupted before you responded.
+  
+  **Reply:**
+  - `approved` — Proceed with update #<N>
+  - `cancel` — Discard this update and continue from previous state"
+```
+
+#### State: update-approved-not-started
+```yaml
+# Check: Update approved but restart phase not started yet
+check: |
+  updates[N].status == "approved" AND
+  phases[restart_phase].status == "pending-update-<N>"
+action: |
+  Show ready to restart:
+  
+  "## 🔄 Update #<N> Approved — Ready to Restart
+  
+  Update #<N> was approved but Phase <X> hasn't started yet.
+  
+  **Next:** Run `/phase-<X>-...` to restart from Phase <X>"
+```
 
 #### State: awaiting-review
 ```yaml

@@ -17,6 +17,22 @@ Merge worker outputs into one decision and convert it into canonical workflow ar
 - Original problem statement
 - Phase artifacts (work description, spec, etc.)
 
+## ⚠️ Mandatory Context Loading
+
+Before synthesis, you MUST have read:
+```yaml
+required_reads:
+  - All other role outputs in this session
+  - .workflow-state.yaml           # Current state
+  - Relevant artifacts for current phase
+  - Source files referenced by other roles
+  
+forbidden:
+  - Decisions that ignore specific concerns raised by other roles
+  - Action items not tied to actual files/tasks
+  - "Consider doing X" without specifying where/how
+```
+
 ## Phase Constraints
 - Phase 0: Produce solution-design.md structure
 - Phase 5: Produce done-check.md with PASS/FAIL

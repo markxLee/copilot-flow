@@ -242,10 +242,14 @@ on_command: "/deep-dive run <role>"
 steps:
   1. Load role definition from docs/guides/deep-dive/roles/<role>.md
   2. Load problem context from session + phase artifacts
-  3. APPLY phase constraints (forbidden actions)
-  4. Execute role analysis within phase boundaries
-  5. Append turn to session log
-  6. Show "Turn N complete. Next: /deep-dive run <role> or /deep-dive synthesize"
+  3. ⚠️ MANDATORY: Load actual source files in affected roots
+     - Use semantic_search to find relevant files
+     - Read at least 3-5 source files related to the work
+     - Read WORKSPACE_CONTEXT.md for conventions
+  4. APPLY phase constraints (forbidden actions)
+  5. Execute role analysis WITH SPECIFIC FILE REFERENCES
+  6. Append turn to session log
+  7. Show "Turn N complete. Next: /deep-dive run <role> or /deep-dive synthesize"
 
 on_command: "/deep-dive synthesize"
 steps:
@@ -391,6 +395,46 @@ role_file_structure:
     - "## Input Requirements"
 ```
 
+### ⚠️ CRITICAL: Mandatory Context Loading (Before ANY Role)
+
+**Problem**: Roles without project context produce generic, useless questions.
+
+**Solution**: Every role MUST load actual project context before analysis.
+
+```yaml
+on_any_role_run:
+  STEP_1_LOAD_WORKFLOW_STATE:
+    read: <docs_root>/docs/runs/<branch-slug>/.workflow-state.yaml
+    extract: [current_phase, affected_roots, work_description, blockers]
+    
+  STEP_2_LOAD_PHASE_ARTIFACTS:
+    phase_0: [work-description.md, any prior analysis]
+    phase_1: [work-description.md, solution-design.md]
+    phase_2: [solution-design.md, spec.md]
+    phase_5: [spec.md, tasks.md, impl-log.md, test-log.md]
+    
+  STEP_3_LOAD_ACTUAL_CODE:
+    action: Read files in affected_roots relevant to work
+    tools: [read_file, semantic_search, grep_search]
+    minimum: At least 3-5 relevant source files
+    
+  STEP_4_LOAD_WORKSPACE_CONTEXT:
+    read: WORKSPACE_CONTEXT.md
+    extract: [conventions for affected roots, relationships, build order]
+
+FORBIDDEN_OUTPUTS:
+  - Generic questions: "Have you considered performance?" (without pointing to code)
+  - OWASP checklist items not tied to actual endpoints
+  - Architecture suggestions ignoring existing structure
+  - Risks not referencing specific files or components
+  
+REQUIRED_OUTPUT_FORMAT:
+  every_concern_must_have:
+    - Specific file/function reference: "In [src/auth.ts](src/auth.ts#L45)..."
+    - Evidence from actual code: "The current implementation does X..."
+    - Actionable suggestion: "Change Y in Z file to..."
+```
+
 ### Example Role Execution
 
 When running `/deep-dive run architect`:
@@ -399,20 +443,25 @@ When running `/deep-dive run architect`:
 inputs:
   - Problem statement (from session log or Phase 0 work description)
   - Existing turns in session (for context)
-  - Relevant codebase context (if applicable)
+  - ACTUAL source files in affected roots (MANDATORY)
+  - WORKSPACE_CONTEXT.md conventions (MANDATORY)
 
 process:
-  1. Adopt Architect persona
-  2. Read role definition
-  3. Analyze problem through Architect lens
-  4. Structure output per template
+  1. Read .workflow-state.yaml to understand current context
+  2. Read phase artifacts (work description, prior analysis)
+  3. READ ACTUAL CODE FILES in affected roots (semantic_search, read_file)
+  4. Read WORKSPACE_CONTEXT.md for conventions and relationships
+  5. Adopt Architect persona
+  6. Read role definition
+  7. Analyze problem through Architect lens WITH SPECIFIC FILE REFERENCES
+  8. Structure output per template
 
 output:
-  - Proposed approaches (2-3)
-  - Recommended approach
-  - Key design decisions
-  - Interfaces/contracts
-  - Migration notes
+  - Proposed approaches (2-3) with file references
+  - Recommended approach citing actual code structure
+  - Key design decisions based on existing patterns
+  - Interfaces/contracts with specific file locations
+  - Migration notes referencing actual affected files
 ```
 
 ---

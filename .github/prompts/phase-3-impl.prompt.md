@@ -91,7 +91,36 @@ CONTEXT_LOADING:
         - status.current_phase
         - status.current_task
         - phases.phase_3_impl.tasks (all task statuses)
+        - meta.dev_mode  # ⚠️ CRITICAL: Check TDD vs Standard
       required: true
+      
+    ##############################################################
+    #  🚨 TDD CHECK: MUST DO IMMEDIATELY AFTER READING STATE
+    ##############################################################
+    1b_tdd_mode_check:
+      action: "CHECK dev_mode and DISPLAY prominently"
+      condition: meta.dev_mode == "tdd"
+      if_tdd: |
+        MUST display in planning output:
+        ┌─────────────────────────────────────────────┐
+        │  🧪 TDD MODE ACTIVE                         │
+        │  Workflow: Write Test → Implement → Verify  │
+        │  Test Plan: tasks.md Section 7              │
+        └─────────────────────────────────────────────┘
+        
+        AND load Test Plan from tasks.md Section 7
+        
+      if_standard: |
+        Display in planning output:
+        ┌─────────────────────────────────────────────┐
+        │  📦 STANDARD MODE                           │
+        │  Workflow: Implement → Test (Phase 4)       │
+        └─────────────────────────────────────────────┘
+      
+      MUST_NOT:
+        - Forget to check dev_mode
+        - Skip displaying mode banner
+        - Proceed with TDD without reading Test Plan
       
     2_read_tasks:
       action: "READ tasks.md"
@@ -118,6 +147,23 @@ CONTEXT_LOADING:
         - Requirements related to current task
         - Acceptance criteria
       required: true
+      
+    5_read_test_plan:
+      action: "READ Test Plan from tasks.md Section 7"
+      path: "<docs_root>/docs/runs/<branch-slug>/02_tasks/tasks.md"
+      section: "Section 7: Test Plan"
+      extract:
+        - Test cases for current task (TC-XXX → T-XXX)
+        - Test strategy (unit/integration/e2e)
+        - Edge cases to cover
+        - Test data requirements
+      required_if: meta.dev_mode == "tdd"  # Required for TDD
+      recommended_if: meta.dev_mode == "standard"  # Load anyway for context
+      
+      why: |
+        Test Plan was created in Phase 2 for a reason:
+        - TDD: Need test cases to write tests BEFORE implementation
+        - Standard: Need test cases for Phase 4, but useful context now
       
   on_file_not_found:
     action: STOP
@@ -209,12 +255,22 @@ PLANNING_OUTPUT:
     | tasks.md | ✅ Read |
     | impl-log.md | ✅ Read |
     | spec.md | ✅ Read |
+    | Test Plan (Section 7) | ✅ Read |
+    
+    ### 🎯 Development Mode / Chế độ Phát triển
+    
+    ┌─────────────────────────────────────────────────┐
+    │  <MODE_BANNER>                                  │
+    │  TDD: 🧪 Write Test → Implement → Verify        │
+    │  Standard: 📦 Implement → Test (Phase 4)        │
+    └─────────────────────────────────────────────────┘
     
     ### Current State / Trạng thái Hiện tại
     
     | Field | Value |
     |-------|-------|
     | Phase | 3 - Implementation |
+    | Dev Mode | TDD / Standard |
     | Completed Tasks | T-001 ✅, T-002 ✅, T-003 ✅ |
     | Current Task | T-004 |
     | Remaining | T-005, T-006, ... |
@@ -265,12 +321,27 @@ PLANNING_OUTPUT:
     
     ---
     
+    ### 🧪 Test Cases for This Task (from Test Plan) / Test Cases cho Task này
+    
+    > From tasks.md Section 7.2
+    
+    | TC ID | Description | Type | Expected Result |
+    |-------|-------------|------|-----------------|
+    | TC-XXX-1 | <test description> | Unit | <expected> |
+    | TC-XXX-2 | <test description> | Unit | <expected> |
+    
+    **TDD Mode**: Will write these tests FIRST, then implement.
+    **Standard Mode**: These tests will be written in Phase 4.
+    
+    ---
+    
     ## ⏸️ GATE 1: Confirm Approach / Xác nhận Hướng đi
     
     **Please review:**
     1. Is this the correct task?
     2. Does the approach align with requirements?
     3. Are the files to change correct?
+    4. **[TDD Only]** Are the test cases correct?
     
     **If OK, proceed with:**
     ```

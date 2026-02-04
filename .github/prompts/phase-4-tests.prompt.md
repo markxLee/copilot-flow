@@ -67,12 +67,47 @@ pre_checks:
   2. Load implementation summary:
      from: <docs_root>/docs/runs/<branch-slug>/03_impl/impl-log.md
      
-  3. Identify testable components:
+  ##############################################################
+  #  🚨 CRITICAL: MUST LOAD TEST PLAN FROM PHASE 2
+  ##############################################################
+  3. Load Test Plan (MANDATORY):
+     from: <docs_root>/docs/runs/<branch-slug>/02_tasks/tasks.md
+     section: "Section 7: Test Plan"
+     extract:
+       - Test Strategy (7.1)
+       - Test Cases by Task (7.2) - TC-XXX mappings
+       - Edge Cases (7.3)
+       - Test Data (7.4)
+     required: true
+     
+     MUST_DO:
+       - Read entire Section 7 before writing ANY test
+       - Use TC-XXX IDs from Test Plan in test file names/descriptions
+       - Cover ALL test cases listed for each task
+       - Follow test strategy defined in 7.1
+       
+     MUST_NOT:
+       - Invent test cases without checking Test Plan first
+       - Skip test cases defined in Test Plan
+       - Ignore edge cases from Section 7.3
+       - Write tests without referencing TC-XXX IDs
+       
+     on_missing_test_plan:
+       action: WARN and continue with basic coverage
+       message: |
+         ⚠️ WARNING: Test Plan (Section 7) not found in tasks.md
+         Phase 2 should have created a Test Plan.
+         
+         Proceeding with basic test coverage based on impl-log.md.
+         Consider running `/phase-2-tasks` to add Test Plan.
+     
+  4. Identify testable components:
      - Files changed in Phase 3
      - New functions/classes added
      - Modified behavior
+     - Map to test cases from Test Plan (TC-XXX)
      
-  4. Determine test roots:
+  5. Determine test roots:
      - Which roots have code changes
      - Test framework per root
 ```
@@ -203,6 +238,16 @@ Files to test from Phase 3:
 |------|---------|---------------|
 | `path/to/file.ts` | New functions | High |
 | `path/to/other.ts` | Modified logic | Medium |
+
+### Test Plan Reference (from Phase 2) / Tham chiếu Test Plan
+
+> ⚠️ Tests MUST follow the Test Plan created in Phase 2
+
+| TC ID | Task | Description | Type | Status |
+|-------|------|-------------|------|--------|
+| TC-001 | T-001 | <from tasks.md Section 7> | Unit | ⏳ |
+| TC-002 | T-001 | <from tasks.md Section 7> | Unit | ⏳ |
+| TC-003 | T-002 | <from tasks.md Section 7> | Integration | ⏳ |
 
 ---
 

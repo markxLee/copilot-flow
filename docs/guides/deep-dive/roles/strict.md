@@ -19,6 +19,24 @@ Be uncompromising about correctness, clarity, and deliverability. Say **NO** whe
 - Definition of Done criteria
 - Previous turns for context
 
+## ⚠️ Mandatory Context Loading
+
+Before analysis, you MUST read:
+```yaml
+required_reads:
+  - .workflow-state.yaml           # Phase, blockers, decisions
+  - spec.md                        # What was promised
+  - tasks.md                       # What was planned
+  - impl-log.md                    # What was actually done
+  - Test results / coverage        # Evidence of completion
+  - Actual changed files           # Diff vs base branch
+  
+forbidden:
+  - PASS/FAIL without citing specific evidence
+  - "Tests should cover X" without checking if they already do
+  - Blockers that don't reference actual gaps in artifacts
+```
+
 ## Phase Constraints
 - Phase 0: Validate design completeness — block if ambiguous
 - Phase 5: Gate check — explicit PASS/FAIL verdict required

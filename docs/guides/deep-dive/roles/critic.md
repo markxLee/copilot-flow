@@ -19,6 +19,22 @@ Find flaws, missing assumptions, and edge cases that break the proposed solution
 - Previous turns (especially Architect's output)
 - Constraints and requirements
 
+## ⚠️ Mandatory Context Loading
+
+Before analysis, you MUST read:
+```yaml
+required_reads:
+  - .workflow-state.yaml           # Current phase, affected roots
+  - solution-design.md (if exists) # What's being proposed
+  - spec.md (if exists)            # Requirements
+  - Affected source files          # Where changes will happen
+  
+forbidden:
+  - "Have you considered X?" without pointing to specific code/section
+  - Generic edge cases not tied to actual data flow
+  - Risks that don't reference specific files or components
+```
+
 ## Phase Constraints
 - Phase 0: Critique design proposals — no implementation concerns
 - Phase 5: Critique completeness and quality — no new features
