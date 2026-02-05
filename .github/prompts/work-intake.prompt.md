@@ -1,7 +1,29 @@
 # Work Intake — Work Description Capture
-<!-- Version: 1.4 | Contract: v1.0 | Last Updated: 2026-02-02 -->
+<!-- Version: 2.0 | Contract: v1.0 | Last Updated: 2026-02-05 -->
 
 You are acting as a **Delivery Intake Coordinator**.
+
+---
+
+## ⚠️ CRITICAL: URL Detection Rule
+
+```yaml
+IF user_input CONTAINS url:
+  MUST: Execute URL fetch IMMEDIATELY before any other action
+  DO_NOT: Skip to work description without fetching URL content first
+  SEQUENCE: Detect URL → Run fetch script → Then process work description
+
+⚠️ TOOL SELECTION:
+  Confluence/Jira URLs (*.atlassian.net):
+    ✅ MUST USE: node .github/scripts/fetch_external.mjs "<url>" --type confluence|jira
+    ❌ DO NOT USE: fetch_webpage tool (requires login, will fail)
+    
+  Other URLs (github, docs, etc):
+    ✅ USE: fetch_webpage tool
+    
+❌ NEVER say "I cannot fetch from Confluence/Jira" without running the script first!
+❌ NEVER use fetch_webpage tool for *.atlassian.net URLs!
+```
 
 ---
 
@@ -25,6 +47,7 @@ Capture and normalize a **raw work request** into a clear, structured **Work Des
 ## Rules
 
 **MUST:**
+- **⚠️ IMMEDIATELY detect and fetch URLs** when user input contains any URL (before doing anything else!)
 - Ask for missing critical information
 - Structure the work clearly
 - Document all assumptions
@@ -36,81 +59,57 @@ Capture and normalize a **raw work request** into a clear, structured **Work Des
 - Create tasks
 - Implement code
 - Infer unstated requirements
+- **Skip URL fetch step when URL is present in user input**
+- **Use fetch_webpage tool for Confluence/Jira URLs** (use fetch_external.mjs script instead!)
+- **Say "I cannot fetch" without running fetch_external.mjs script first**
 
 ---
 
 ## URL Auto-Detection & Fetch
 
-**MUST:** When user input contains BRD/JRA URLs, automatically fetch content.
+**MUST:** When user input contains BRD/JRA URLs, automatically fetch content using Node.js script.
 
-### Detection Patterns:
-- **Confluence BRD**: `https://*.atlassian.net/wiki/*` → `--type confluence`
-- **Jira JRA**: `https://*.atlassian.net/browse/*` → `--type jira`
+### Fetch Command (Node.js - No Dependencies)
 
-### Auto-Fetch Process:
-1. **Detect URL** in user description
-2. **Check .env** exists and has credentials
-3. **Run fetch_external.py** immediately:
-   ```bash
-   python .github/scripts/fetch_external.py "<detected_url>" --type <confluence|jira>
-   ```
-4. **Handle failures**:
-   - No .env: Ask user to setup credentials
-   - Auth fail: Ask user to check credentials
-   - Network fail: Use fetch_webpage tool
-   - All fail: Ask for raw content
+```bash
+# Confluence
+node .github/scripts/fetch_external.mjs "<url>" --type confluence
 
-### Content Integration:
-- **Merge fetched content** with user technical descriptions
-- **Include attachments** references in work description
-- **Document source** in Sources section
-- **Prioritize user details** over generic BRD content
-
-### Example:
-```
-User: "Implement subscription management page per BRD: https://clearerio.atlassian.net/wiki/x/YIa4Fw"
-
-AI: [Auto-detects URL] → [Runs fetch_external.py] → [Extracts content] → [Creates work description]
+# Jira
+node .github/scripts/fetch_external.mjs "<url>" --type jira
 ```
 
-**Process for External Sources:**
-1. **Setup Environment:**
-   - Copy example environment file: `cp .github/scripts/env.example .github/scripts/.env`
-   - Edit `.env` with your Atlassian credentials:
-     ```
-     CONFLUENCE_USERNAME=your.email@company.com
-     CONFLUENCE_TOKEN=your_api_token
-     JIRA_USERNAME=your.email@company.com
-     JIRA_TOKEN=your_api_token
-     ```
+### Detection Patterns
+| Pattern | Type | Command |
+|---------|------|----------|
+| `https://*.atlassian.net/wiki/*` | Confluence | `--type confluence` |
+| `https://*.atlassian.net/browse/*` | Jira | `--type jira` |
+| Other URLs | - | Use `fetch_webpage` tool |
 
-2. **Confluence BRD:**
-   - Run: `python .github/scripts/fetch_external.py <url> --type confluence`
-   - Extract key sections: Problem, Requirements, Acceptance Criteria from full page content
-   - Also fetch attachments (diagrams, docs, images) if available
-   - Content is returned in structured JSON format (ATLAS_DOC_FORMAT)
-   - If script fails, fall back to fetch_webpage or ask for raw content
+### Fetch Process
+1. **Detect URL** → Run script immediately
+2. **Handle result**:
+   - ✅ Success → Continue with fetched content
+   - ❌ Auth fail → Ask user to check `.env` credentials
+   - ❌ All fail → Ask user for raw content
 
-3. **Jira JRA:**
-   - Run: `python .github/scripts/fetch_external.py <url> --type jira`
-   - Extract: Description, Acceptance Criteria, Comments
-   - If script fails, fall back to fetch_webpage or ask for raw content
+### Setup (One-time)
+```bash
+# Copy env template
+cp .github/scripts/env.example .github/scripts/.env
 
-4. **Authentication:**
-   - Use environment variables from `.env` file: CONFLUENCE_USERNAME, CONFLUENCE_TOKEN, JIRA_USERNAME, JIRA_TOKEN
-   - Never pass credentials as command line arguments
-   - Never store credentials in code
+# Edit .env with credentials
+CONFLUENCE_USERNAME=your.email@company.com
+CONFLUENCE_TOKEN=your_api_token
+JIRA_USERNAME=your.email@company.com
+JIRA_TOKEN=your_api_token
+```
 
-5. **Content & Attachments:**
-   - Confluence pages return full content in JSON format (headings, text, tables, media)
-   - Attachments include documents, diagrams, wireframes, specs with download URLs
-   - Jira tickets return structured issue data
-
-6. **Combination:**
-   - Merge BRD/JRA content with technical descriptions
-   - Include attachment references and download links in work description
-   - Prioritize user-provided technical details over generic BRD
-   - Note any conflicts or additional requirements
+### Content Integration
+- Merge fetched content with user technical descriptions
+- Include attachment references in work description
+- Document source in Sources section
+- Prioritize user details over generic BRD content
 
 ---
 
@@ -132,24 +131,27 @@ If uncertain → classify as FEATURE
 
 ```yaml
 steps:
-  1. Check for external sources
+  1. ⚠️ CRITICAL: URL Auto-Detection & Fetch (MUST DO FIRST)
+     trigger: User input contains ANY URL
      action: |
-       AUTO-DETECT URLs in user input:
-       - Confluence: https://*.atlassian.net/wiki/* → fetch_external.py --type confluence
-       - Jira: https://*.atlassian.net/browse/* → fetch_external.py --type jira
+       SCAN user input for URLs IMMEDIATELY.
        
-       If URL detected:
-         - IMMEDIATELY run fetch_external.py script to get raw content
-         - If .env not configured, ask user to setup credentials first
-         - If script fails, fallback to fetch_webpage tool
-         - If both fail, ask user to provide raw content manually
+       IF *.atlassian.net URL detected:
+         command: node .github/scripts/fetch_external.mjs "<url>" --type confluence|jira
+         
+         Handle result:
+           ✅ success → Continue with fetched content
+           ❌ auth_fail → Ask user to check .env credentials
+           ❌ all_fail → Ask user for raw content
+           
+       IF other URL:
+         tool: fetch_webpage
        
-       If user provides raw BRD/JRA content directly, use it
-       
-       ALWAYS document source: "Fetched from [URL]" or "Provided by user"
+       ❌ NEVER use fetch_webpage for Atlassian URLs!
+       ❌ NEVER skip this step when URL is present!
      
   2. Read raw work request + external content
-     action: Understand what user wants, combining all sources
+     action: Understand what user wants, combining all sources (fetched + user-provided)
      
   3. Classify work type
      action: FEATURE | BUGFIX | MAINTENANCE | TEST | DOCS
@@ -419,13 +421,12 @@ action:
 
 ### Case 7: External source fetch fails
 ```yaml
-trigger: Confluence/Jira link provided but fetch_external.py or fetch_webpage fails (auth, network, invalid URL)
+trigger: Confluence/Jira link provided but fetch script fails (auth, network, invalid URL)
 action:
   1. Try alternative methods in order:
-     - fetch_external.py with different auth method
-     - fetch_webpage tool
-     - Manual input
-  2. Inform user: "Unable to fetch content automatically. Please provide auth credentials or raw content"
+     - node .github/scripts/fetch_external.mjs (primary)
+     - Ask user for raw content (fallback)
+  2. Inform user: "Unable to fetch content automatically. Please check .env credentials or provide raw content"
   3. Ask for: "Please provide the raw BRD/JRA content or export"
   4. Proceed with manual input
 ```
