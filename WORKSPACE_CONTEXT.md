@@ -9,12 +9,12 @@
 # ================================================================
 
 meta:
-  generated: "2026-01-23"
+  generated: "2026-02-04"
   schema_version: "3.0"
-  roots_count: 4
+  roots_count: 5
   primary_root: apphub-vision
   tooling_root: copilot-flow      # Where prompts, templates, instructions live (STATIC)
-  default_docs_root: apphub-vision  # Default root for workflow docs (can override per-feature)
+  default_docs_root: Docs  # Default root for workflow docs (can override per-feature)
 
 roots:
   apphub-vision:
@@ -63,6 +63,18 @@ roots:
     build_cmd: null
     test_cmd: null
 
+  Docs:
+    type: documentation
+    role: docs_root  # Default location for workflow documentation
+    pkg_manager: null
+    lang: markdown
+    runtime: null
+    frameworks: []
+    instructions: null
+    dev_cmd: null
+    build_cmd: null
+    test_cmd: null
+
 # ================================================================
 # SECTION 2: SYSTEM GROUPING
 # ================================================================
@@ -74,7 +86,7 @@ systems:
     description: "Clearer App - AI analytics & automation platform for Shopify"
 
   copilot-tooling:
-    roots: [copilot-flow]
+    roots: [copilot-flow, Docs]
     primary: copilot-flow
     description: "Shared Copilot workflows and prompts for multi-root workspace"
 
@@ -157,6 +169,24 @@ relationships:
       via: "prompts-and-docs"
       confidence: high
 
+  Docs:
+    - to: apphub-vision
+      type: workflow-docs
+      sync: none
+      via: "docs/runs/"
+      confidence: high
+      notes: "Default storage for workflow documentation"
+    - to: reviews-assets
+      type: workflow-docs
+      sync: none
+      via: "docs/runs/"
+      confidence: high
+    - to: boost-pfs-backend
+      type: workflow-docs
+      sync: none
+      via: "docs/runs/"
+      confidence: high
+
 # ================================================================
 # SECTION 4: PATH ROUTING
 # ================================================================
@@ -211,6 +241,13 @@ path_routing:
     related_roots: [apphub-vision, reviews-assets, boost-pfs-backend]
     on_change_rebuild: []
 
+  - pattern: "Docs/**"
+    root: Docs
+    domain: workflow-docs
+    rules: []
+    related_roots: [apphub-vision, reviews-assets, boost-pfs-backend]
+    on_change_rebuild: []
+
 # ================================================================
 # SECTION 5: CONVENTIONS BY ROOT
 # ================================================================
@@ -260,12 +297,14 @@ queries:
     reviews-assets: npm
     boost-pfs-backend: npm
     copilot-flow: null
+    Docs: null
 
   instructions_path:
     apphub-vision: ".github/copilot-instructions.md"
     reviews-assets: null
     boost-pfs-backend: ".github/instructions/"
     copilot-flow: null
+    Docs: null
 
   change_impact:
     "reviews-assets/public/documentation/ui-library/src/**":
@@ -355,6 +394,11 @@ staleness:
     checked: "2026-01-23"
     hashes: {}
     watch: [.github/**]
+
+  Docs:
+    checked: "2026-02-04"
+    hashes: {}
+    watch: [docs/**]
 
 # ================================================================
 # SECTION 9: CROSS-ROOT WORKFLOWS

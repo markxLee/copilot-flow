@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../reviews-assets"
+		},
+		{
+			"path": "../Docs"
 		}
 	],
 	"settings": {
