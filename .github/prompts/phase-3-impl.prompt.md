@@ -18,6 +18,10 @@ TRIGGER_RULES:
     - "/phase-3-impl"        # Resume current task
     - "/impl go"             # Proceed after planning approval
     - "/impl approved"       # User self-approves after manual test (skip AI review)
+    # Batch execution (for simple tasks)
+    - "/phase-3-impl all"              # Run ALL remaining tasks
+    - "/phase-3-impl T-001,T-002,T-003" # Run specific tasks
+    - "/phase-3-impl T-001..T-005"      # Run task range
     
   invalid_triggers:
     - "go"           # Too generic, may skip steps
@@ -36,6 +40,9 @@ TRIGGER_RULES:
 - `/phase-3-impl next` — Start next incomplete task  
 - `/impl go` — Proceed with implementation after planning approval
 - `/impl approved` — Mark task complete after manual review (skip AI code-review)
+- `/phase-3-impl all` — **Batch mode**: Run ALL remaining tasks, review at end
+- `/phase-3-impl T-001,T-002,T-003` — **Batch mode**: Run specific tasks
+- `/phase-3-impl T-001..T-005` — **Batch mode**: Run task range
 
 ---
 
@@ -72,6 +79,130 @@ REVIEW_OPTIONS:
     when: "Already manually tested/reviewed, ready to continue"
     flow: Mark completed → next task immediately
     note: "Use this when you prefer to batch AI review at the end"
+
+---
+
+## 🚀 BATCH EXECUTION MODE (for simple tasks)
+
+```yaml
+BATCH_MODE:
+  # For simple/straightforward tasks that can be implemented together
+  # User reviews ALL at once after completion
+  
+  triggers:
+    all_tasks:
+      command: "/phase-3-impl all"
+      description: "Run ALL remaining incomplete tasks"
+      
+    specific_tasks:
+      command: "/phase-3-impl T-001,T-002,T-003"
+      description: "Run only specified tasks (comma-separated)"
+      
+    task_range:
+      command: "/phase-3-impl T-001..T-005"
+      description: "Run tasks from T-001 to T-005 inclusive"
+  
+  when_to_use:
+    - Simple/straightforward tasks
+    - Well-understood codebase
+    - Experienced developer who will review later
+    - Tasks with low complexity (no cross-root dependencies)
+    - Refactoring or mechanical changes
+    
+  when_NOT_to_use:
+    - Complex tasks with many edge cases
+    - Tasks with cross-root dependencies
+    - First time working in codebase
+    - Tasks that need careful review after each step
+    - TDD mode (tests must be written per task)
+  
+  execution_flow:
+    1_parse_tasks:
+      action: "Determine which tasks to run"
+      all: "Get all tasks with status != completed"
+      specific: "Parse comma-separated task IDs"
+      range: "Parse T-XXX..T-YYY format"
+      
+    2_validate:
+      checks:
+        - All specified tasks exist in tasks.md
+        - No task has unmet dependencies
+        - Tasks are in valid state (not-started or failed)
+      if_invalid: STOP with error message
+      
+    3_confirm_with_user:
+      output: |
+        ## 🚀 Batch Execution Mode
+        
+        **Tasks to implement:**
+        | Task | Title | Complexity |
+        |------|-------|------------|
+        | T-001 | ... | Low |
+        | T-002 | ... | Low |
+        | T-003 | ... | Medium |
+        
+        **Total:** <N> tasks
+        
+        ⚠️ **Note:** All tasks will be implemented continuously.
+        Review will happen AFTER all tasks complete.
+        
+        **Proceed?**
+        - Say `go` to start batch execution
+        - Say `cancel` to use single-task mode
+        
+    4_batch_implement:
+      for_each_task:
+        - Show: "## Implementing T-XXX: <title>"
+        - Read task details from tasks.md
+        - Plan implementation (brief)
+        - Implement changes
+        - Update impl-log.md
+        - Update state: task.status = "completed-pending-review"
+        - Show: "✅ T-XXX done. Moving to next..."
+      
+      NO_STOP_BETWEEN_TASKS: true
+      
+    5_batch_complete:
+      output: |
+        ## ✅ Batch Execution Complete
+        
+        **Implemented:**
+        | Task | Status | Files Changed |
+        |------|--------|---------------|
+        | T-001 | ✅ Done | 2 files |
+        | T-002 | ✅ Done | 1 file |
+        | T-003 | ✅ Done | 3 files |
+        
+        **Total:** <N> tasks, <M> files changed
+        
+        ---
+        
+        ### 📋 Next Step: Review All Changes
+        
+        **Run code review for all tasks:**
+        ```
+        /code-review
+        ```
+        
+        This will review ALL changes made in batch mode.
+  
+  state_tracking:
+    during_batch:
+      status.batch_mode: true
+      status.batch_tasks: ["T-001", "T-002", "T-003"]
+      status.batch_progress: "2/3"
+      
+    task_status_during_batch:
+      # Special status to indicate completed but not yet reviewed
+      value: "completed-pending-review"
+      
+    after_batch_complete:
+      status.batch_mode: false
+      status.last_action: "Batch execution complete: T-001, T-002, T-003"
+      
+    after_batch_review:
+      # When /code-review approves all
+      all_tasks.status: "completed"
 ```
 
 ---
@@ -1032,6 +1163,19 @@ TYPICAL_WORKFLOWS:
     /phase-3-impl T-001 → /impl go → /impl approved  # Simple task
     /phase-3-impl T-002 → /impl go → /code-review T-002  # Complex task
     ...
+    
+  workflow_4_batch_all:
+    # For simple work with many small tasks
+    /phase-3-impl all → go → [implements all] → STOP
+    /code-review  # Review everything at once
+    /phase-4-tests
+    
+  workflow_5_batch_partial:
+    # Batch some, review others individually
+    /phase-3-impl T-001,T-002,T-003 → go → [implements 3 tasks] → STOP
+    /code-review  # Review batch
+    /phase-3-impl T-004 → /impl go → /code-review T-004  # Complex task individually
+    /phase-4-tests
 
 NEXT_PROMPT_ENFORCEMENT:
   after_gate_1_planning:
